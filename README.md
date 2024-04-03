@@ -1,34 +1,37 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+<h2>💰 ZZanMoa의 프론트엔드 저장소입니다.</h2>
 
-## Getting Started
+### 클론 및 실행 방법
 
-First, run the development server:
-
-```bash
+```
+git clone https://github.com/ZZanMoa/ZZanMoa-Web.git
+npm install
 npm run dev
-# or
-yarn dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+### 폴더 구조
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+**기본적으로 src에서 페이지를 제외한 모든 파일을 관리한다**
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+> _[url 경로]_
 
-## Learn More
+- 추후 페이지 생성 시 추가 예정
+  <br></br>
 
-To learn more about Next.js, take a look at the following resources:
+> _shared_: 범용적으로 사용되는 것들
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- _apis_
+  - 범용적으로 사용될 api 호출 관련 함수
+- _atoms_
+  - recoil에 사용될 atom value
+- _components_
+  - 범용적으로 사용될 component
+- _constants_
+  - 범용적으로 사용될 상수
+- _hooks_
+  - 범용적으로 사용될 custom hook
+- _libraries_
+  - 라이브러리 관련 세팅
+- _types_
+  - interface, type

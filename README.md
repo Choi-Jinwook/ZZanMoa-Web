@@ -2,7 +2,7 @@
 
 ### 클론 및 실행 방법
 
-```
+```bash
 git clone https://github.com/ZZanMoa/ZZanMoa-Web.git
 npm install
 npm run dev

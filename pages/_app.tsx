@@ -1,5 +1,5 @@
 import type { AppProps } from "next/app";
-import { RecoilRoot } from "recoil";
+import { RecoilEnv, RecoilRoot } from "recoil";
 import { useState } from "react";
 import {
   DehydratedState,
@@ -12,6 +12,8 @@ function MyApp({
   Component,
   pageProps,
 }: AppProps<{ dehydratedState: DehydratedState }>) {
+  RecoilEnv.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED = false; // recoil key 중복 콘솔 출력 안함 설정
+
   const [queryClient] = useState(
     () =>
       new QueryClient({

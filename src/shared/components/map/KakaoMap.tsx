@@ -11,7 +11,7 @@ const KakaoMap = ({ mockMarker, center }: KakaoMapProps) => {
   return (
     <Map
       center={{ lat: center.lat, lng: center.lng }}
-      style={{ width: "100%", height: "360px" }}
+      style={{ width: "100%", height: "100%" }}
     >
       {mockMarker.map(({ lat, lng, data }) => (
         <MapMarker key={data} position={{ lat: lat, lng: lng }}>

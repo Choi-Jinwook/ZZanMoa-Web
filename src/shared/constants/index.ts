@@ -1,2 +1,2 @@
 export * from "./mockData";
-export { default as Colors } from "./color";
+export * from "./styleGuide";

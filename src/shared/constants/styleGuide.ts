@@ -24,48 +24,4 @@ export const Colors = {
   Green100: "#07A320",
 };
 
-export const TextSize = {
-  H1: `
-    font-size: 64px;
-    font-weight: 600;
-    line-height: 76px;
-    letter-spacing: 3%;
-  `,
-  H2: `
-    font-size: 36px;
-    font-weight: 600;
-    line-height: 44px;
-    letter-spacing: 3%;
-  `,
-  H3: `
-    font-size: 28px;
-    font-weight: 600;
-    line-height: 36px;
-    letter-spacing: 3%;
-  `,
-  H4: `
-    font-size: 20px;
-    font-weight: 600;
-    line-height: 28px;
-    letter-spacing: 3%;
-  `,
-  Body1: `
-    font-size: 18px;
-    line-height: 28px;
-  `,
-  Body2: `
-    font-size: 16px;
-    line-height: 24px;
-  `,
-  Body3: `
-    font-size: 14px;
-    line-height: 20px;
-  `,
-  Body4: `
-    font-size: 12px;
-    line-height: 16px;
-  `,
-};
-
 Object.freeze(Colors);
-Object.freeze(TextSize);

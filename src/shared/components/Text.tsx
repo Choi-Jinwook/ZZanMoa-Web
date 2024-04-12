@@ -68,35 +68,59 @@ const Text = ({
 };
 
 const H1 = styled.h1<TextProps>`
-  ${({ variant }) => variant}
+  font-size: 64px;
+  font-weight: 600;
+  line-height: 76px;
+  letter-spacing: 0.03em;
+  color: ${({ color }) => color};
 `;
 
-const H2 = styled.h1<TextProps>`
-  ${({ variant }) => variant}
+const H2 = styled.h2<TextProps>`
+  font-size: 36px;
+  font-weight: 600;
+  line-height: 44px;
+  letter-spacing: 0.03em;
+  color: ${({ color }) => color};
 `;
 
-const H3 = styled.h1<TextProps>`
-  ${({ variant }) => variant}
+const H3 = styled.h3<TextProps>`
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 36px;
+  letter-spacing: 0.03em;
+  color: ${({ color }) => color};
 `;
 
-const H4 = styled.h1<TextProps>`
-  ${({ variant }) => variant}
+const H4 = styled.h4<TextProps>`
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 28px;
+  letter-spacing: 0.03em;
+  color: ${({ color }) => color};
 `;
 
-const Body1 = styled.h1<TextProps>`
-  ${({ variant }) => variant}
+const Body1 = styled.p<TextProps>`
+  font-size: 18px;
+  line-height: 28px;
+  color: ${({ color }) => color};
 `;
 
-const Body2 = styled.h1<TextProps>`
-  ${({ variant }) => variant}
+const Body2 = styled.p<TextProps>`
+  font-size: 16px;
+  line-height: 24px;
+  color: ${({ color }) => color};
 `;
 
-const Body3 = styled.h1<TextProps>`
-  ${({ variant }) => variant}
+const Body3 = styled.p<TextProps>`
+  font-size: 14px;
+  line-height: 20px;
+  color: ${({ color }) => color};
 `;
 
-const Body4 = styled.h1<TextProps>`
-  ${({ variant }) => variant}
+const Body4 = styled.p<TextProps>`
+  font-size: 12px;
+  line-height: 16px;
+  color: ${({ color }) => color};
 `;
 
 export default Text;

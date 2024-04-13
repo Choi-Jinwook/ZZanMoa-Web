@@ -1,60 +1,45 @@
-import { KakaoMap } from "@shared/components/map";
-import { mockMarker } from "@shared/constants";
-import { Coords } from "@shared/types";
 import type { NextPage } from "next";
 import { useEffect, useState } from "react";
-import { SyncLoader } from "react-spinners";
 import styled from "styled-components";
+import { Navigation } from "@shared/components/NavBar";
+import { FindStore } from "./FindStore";
+import { DiscountNews } from "./DiscountNews";
+import { PriceComparision } from "./PriceComparision";
+
+type Tab = 'findStore' | 'priceComparison' | 'discountNews';
 
 const Home: NextPage = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [mapCenter, setMapCenter] = useState<Coords>({
-    lat: 33.5563,
-    lng: 126.79581,
-  });
-
-  useEffect(() => {
-    const { geolocation } = navigator;
-
-    geolocation.getCurrentPosition(
-      ({ coords }) => {
-        const userCoords = {
-          lat: coords.latitude,
-          lng: coords.longitude,
-        };
-        setMapCenter(userCoords);
-        setIsLoading(false);
-      },
-      (error) => {
-        console.warn("Fail to fetch current location", error);
-        alert("위치 정보 사용에 동의해주세요");
-      },
-    );
-  }, []);
+  const [activeTab, setActiveTab] = useState<Tab>('findStore');
 
   return (
-    <MapContainer $isLoading={isLoading}>
-      {isLoading ? (
-        <>
-          <p>위치 정보를 불러오는 중입니다.</p>
-          <SyncLoader color="#79CF9F" speedMultiplier={0.6} />
-        </>
-      ) : (
-        <KakaoMap mockMarker={mockMarker(mapCenter)} center={mapCenter} />
-      )}
-    </MapContainer>
+    <MainContainer>
+      <SideBar>
+        <Navigation onTabChange={setActiveTab} />
+      </SideBar>
+      <ContentArea>
+        {activeTab === 'findStore' && <FindStore />}
+        {activeTab === 'priceComparison' && <PriceComparision />}
+        {activeTab === 'discountNews' && <DiscountNews />}
+      </ContentArea>
+    </MainContainer>
   );
 };
 
-const MapContainer = styled.div<{ $isLoading?: boolean }>`
+export default Home;
+
+const MainContainer = styled.div`
   display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 360px;
-  background-color: #ccc;
-  align-items: center;
-  justify-content: center;
-  color: ${({ $isLoading }) => ($isLoading ? "white" : "black")};
+  height: 100vh;
 `;
 
-export default Home;
+const SideBar = styled.div`
+  width: 250px; 
+  background-color: #FFF; 
+  height: 100%;
+`;
+
+const ContentArea = styled.div`
+  flex-grow: 1;
+  overflow: hidden;
+  position: relative;
+`;

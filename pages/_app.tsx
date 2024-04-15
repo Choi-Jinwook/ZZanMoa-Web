@@ -1,3 +1,4 @@
+import "../styles/globals.css";
 import type { AppProps } from "next/app";
 import { RecoilEnv, RecoilRoot } from "recoil";
 import { useState } from "react";
@@ -7,6 +8,7 @@ import {
   QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";
+import "../styles/globals.css";
 
 function MyApp({
   Component,

@@ -3,6 +3,7 @@ export interface Coords {
   lng: number;
 }
 
-export interface PlaceData extends Coords {
-  data: any;
+export interface MarkerData {
+  name: string;
+  description: string; 
 }

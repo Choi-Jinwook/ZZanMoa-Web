@@ -35,7 +35,7 @@ const MenuList = () => {
 const ListContainer = styled.div`
   display: flex;
   flex-direction: column;
-  width: 138px;
+  min-width: 138px;
   height: 100%;
   border-right: 1px solid ${Colors.Black600};
   align-items: center;

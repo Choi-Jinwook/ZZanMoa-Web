@@ -5,8 +5,7 @@ import Marker from "./Marker";
 import { useState, useEffect } from "react";
 import { mockMarker } from "@shared/constants";
 import { SyncLoader } from "react-spinners";
-import locateBtnImage from '@shared/assets/locateBtn.png';
-
+import locateBtnImage from "@shared/assets/locateBtn.png";
 
 const KakaoMap = () => {
   const [map, setMap] = useState<kakao.maps.Map | null>(null);
@@ -16,7 +15,6 @@ const KakaoMap = () => {
     lng: 126.79581,
   });
   const markers = mockMarker(mapCenter);
-
 
   const handleLocate = () => {
     if (map) {
@@ -60,30 +58,32 @@ const KakaoMap = () => {
         <>
           <Map
             center={{ lat: mapCenter.lat, lng: mapCenter.lng }}
-            style={{ width: '100%', height: '100%' }}
+            style={{ width: "100%", height: "100%" }}
             level={3}
             onCreate={setMap}
           >
-            <MapMarker position={{
-              lat: mapCenter.lat,
-              lng: mapCenter.lng
-            }}>현재위치</MapMarker>
+            <MapMarker
+              position={{
+                lat: mapCenter.lat,
+                lng: mapCenter.lng,
+              }}
+            >
+              현재위치
+            </MapMarker>
             {map && <Marker markers={markers} map={map} />}
           </Map>
           <HandleLocateBtn onClick={handleLocate} />
         </>
       )}
     </MapContainer>
-
   );
 };
-
 
 const MapContainer = styled.div<{ $isLoading?: boolean }>`
   display: flex;
   flex-direction: column;
-  width: 100%;
-  height: 1000px;
+  width: 67%;
+  height: 100%;
   background-color: #ccc;
   align-items: center;
   justify-content: center;

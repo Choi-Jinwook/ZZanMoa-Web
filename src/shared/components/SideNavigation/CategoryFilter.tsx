@@ -1,13 +1,13 @@
-import Image from "next/image";
 import styled from "styled-components";
 import Text from "../Text";
 import { Colors } from "@shared/constants";
 import { useState } from "react";
 
 const CategoryFilter = () => {
-  const [currentCategory, setCurrentCategory] = useState("");
+  const [currentCategory, setCurrentCategory] = useState("전체");
 
   const CATEGORY = [
+    "전체",
     "🍚 한식",
     "🍜 중식",
     "🍝 경양식",
@@ -35,14 +35,6 @@ const CategoryFilter = () => {
             key={category}
             onClick={() => handleClick(category)}
           >
-            {currentCategory === category && (
-              <Image
-                src="/images/check.svg"
-                alt="check"
-                width={18}
-                height={18}
-              />
-            )}
             <Text variant="Body3">{category}</Text>
           </Category>
         ))}

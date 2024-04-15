@@ -4,7 +4,6 @@ import type { NextPage } from "next";
 import styled from "styled-components";
 
 const Home: NextPage = () => {
-
   return (
     <Container>
       <SideNavigation />
@@ -15,9 +14,8 @@ const Home: NextPage = () => {
 
 const Container = styled.div`
   display: flex;
-  width: 100vw;
-  height: 100vh;
+  width: 100dvw;
+  height: 100dvh;
 `;
-
 
 export default Home;

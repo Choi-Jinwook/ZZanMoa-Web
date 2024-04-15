@@ -1,35 +1,36 @@
+import { SideNavigation } from "@shared/components/SideNavigation";
+import { KakaoMap } from "@shared/components/map";
 import type { NextPage } from "next";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { Navigation } from "@shared/components/NavBar";
-import { FindStore } from "./FindStore";
-import { DiscountNews } from "./DiscountNews";
-import { PriceComparision } from "./PriceComparision";
-
-type Tab = 'findStore' | 'priceComparison' | 'discountNews';
 
 const Home: NextPage = () => {
-  const [activeTab, setActiveTab] = useState<Tab>('findStore');
+  const [map, setMap] = useState<kakao.maps.Map | null>(null);
+  const center = { lat: 37.554722, lng: 126.970833 };
 
   return (
-    <MainContainer>
-      <SideBar>
-        <Navigation onTabChange={setActiveTab} />
-      </SideBar>
-      <ContentArea>
-        {activeTab === 'findStore' && <FindStore />}
-        {activeTab === 'priceComparison' && <PriceComparision />}
-        {activeTab === 'discountNews' && <DiscountNews />}
-      </ContentArea>
-    </MainContainer>
+    <Container>
+      <SideNavigation />
+      <KakaoMap center={center}/>
+    </Container>
   );
 };
 
-export default Home;
-
-const MainContainer = styled.div`
+const Container = styled.div`
   display: flex;
+  width: 100vw;
   height: 100vh;
+`;
+
+const MapContainer = styled.div<{ $isLoading?: boolean }>`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background-color: #ccc;
+  align-items: center;
+  justify-content: center;
+  color: ${({ $isLoading }) => ($isLoading ? "white" : "black")};
 `;
 
 const SideBar = styled.div`
@@ -43,3 +44,5 @@ const ContentArea = styled.div`
   overflow: hidden;
   position: relative;
 `;
+
+export default Home;

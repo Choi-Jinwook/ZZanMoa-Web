@@ -1,2 +1,3 @@
 export * from "./kakaoMap";
-export * from "./TabTypes";
+export * from "./styles";
+export * from "./SideNavigation";

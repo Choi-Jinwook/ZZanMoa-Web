@@ -7,18 +7,16 @@ import { mockMarker } from "@shared/constants";
 import { SyncLoader } from "react-spinners";
 import locateBtnImage from '@shared/assets/locateBtn.png';
 
-interface KakaoMapProps {
-  center: Coords;
-}
 
-const KakaoMap = ({ center }: KakaoMapProps) => {
+const KakaoMap = () => {
   const [map, setMap] = useState<kakao.maps.Map | null>(null);
-  const markers = mockMarker(center);
   const [isLoading, setIsLoading] = useState(true);
   const [mapCenter, setMapCenter] = useState<Coords>({
     lat: 33.5563,
     lng: 126.79581,
   });
+  const markers = mockMarker(mapCenter);
+
 
   const handleLocate = () => {
     if (map) {
@@ -61,14 +59,14 @@ const KakaoMap = ({ center }: KakaoMapProps) => {
       ) : (
         <>
           <Map
-            center={{ lat: center.lat, lng: center.lng }}
+            center={{ lat: mapCenter.lat, lng: mapCenter.lng }}
             style={{ width: '100%', height: '100%' }}
             level={3}
             onCreate={setMap}
           >
             <MapMarker position={{
-              lat: center.lat,
-              lng: center.lng
+              lat: mapCenter.lat,
+              lng: mapCenter.lng
             }}>현재위치</MapMarker>
             {map && <Marker markers={markers} map={map} />}
           </Map>

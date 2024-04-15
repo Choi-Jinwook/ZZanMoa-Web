@@ -12,7 +12,6 @@ interface StyledInfoWindowProps {
 
 const InfoWindowContainer = styled.div`
   display: flex;
-  transform: translateY(-50%);
   background-color: white;
   border-radius: 4px;
   min-width: 295px;

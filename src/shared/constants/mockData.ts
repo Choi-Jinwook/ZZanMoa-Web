@@ -1,4 +1,4 @@
-import { Coords, PlaceData, MarkerData } from "@shared/types";
+import { Coords, MarkerData } from "@shared/types";
 
 // export const mockMarker = (mapCenter: Coords): PlaceData[] => [
 //   { lat: mapCenter.lat + 0.001, lng: mapCenter.lng + 0.001, data: "test1" },

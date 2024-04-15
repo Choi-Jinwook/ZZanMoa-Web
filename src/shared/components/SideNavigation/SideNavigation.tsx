@@ -25,8 +25,8 @@ const SideNavigation = () => {
 };
 
 const Container = styled.div`
-  min-width: 473px;
-  max-width: 473px;
+  min-width: 33%;
+  max-width: 33%;
   height: 100%;
 `;
 
@@ -44,10 +44,11 @@ const ListContainer = styled.div`
   display: flex;
   width: 100%;
   height: calc(100% - 60px);
+  overflow: auto;
 `;
 
 const DetailContainer = styled.div`
-  width: calc(100% - 138px);
+  width: 100%;
   height: 100%;
   padding: 30px 15px;
 `;

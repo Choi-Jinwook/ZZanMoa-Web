@@ -1,3 +1,4 @@
+import "../styles/globals.css";
 import type { AppProps } from "next/app";
 import { RecoilEnv, RecoilRoot } from "recoil";
 import { useState } from "react";

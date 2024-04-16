@@ -82,7 +82,7 @@ const KakaoMap = () => {
 const MapContainer = styled.div<{ $isLoading?: boolean }>`
   display: flex;
   flex-direction: column;
-  width: 67%;
+  width: calc(100% - 473px);
   height: 100%;
   background-color: #ccc;
   align-items: center;

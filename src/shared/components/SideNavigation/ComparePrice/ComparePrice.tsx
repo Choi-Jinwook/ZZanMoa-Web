@@ -5,6 +5,7 @@ import { Colors } from "@shared/constants";
 import Image from "next/image";
 import { useState } from "react";
 import styled from "styled-components";
+import MarketCard from "./MarketCard";
 
 const ComparePrice = () => {
   const [searchedItem, setSearchedItem] = useState("");
@@ -39,10 +40,7 @@ const ComparePrice = () => {
         subTitle="지도에서 최소 2개 시장을 선택해주세요"
       />
       <Selection>
-        <SelectedMarket />
-        <SelectedMarket />
-        <SelectedMarket />
-        <SelectedMarket />
+        <MarketCard />
       </Selection>
       <Divider />
       <ShoppingList>

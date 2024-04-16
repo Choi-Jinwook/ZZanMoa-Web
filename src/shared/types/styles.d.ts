@@ -7,3 +7,5 @@ export type FontVariant =
   | "Body2"
   | "Body3"
   | "Body4";
+
+export type FontWeight = "Regular" | "Medium" | "SemiBold" | "Bold";

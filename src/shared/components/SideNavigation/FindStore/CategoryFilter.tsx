@@ -1,8 +1,7 @@
-import Image from "next/image";
 import styled from "styled-components";
-import Text from "../Text";
 import { Colors } from "@shared/constants";
 import { useState } from "react";
+import Text from "@shared/components/Text";
 
 const CategoryFilter = () => {
   const [currentCategory, setCurrentCategory] = useState("");
@@ -12,8 +11,8 @@ const CategoryFilter = () => {
     "🍜 중식",
     "🍝 경양식",
     "🍣 일식",
-    "🍴 기타 음식업",
     "☕ 다방",
+    "🍴 기타 음식업",
     "💈 미용/이용",
     "👕 세탁",
     "🎬 영화",
@@ -26,8 +25,10 @@ const CategoryFilter = () => {
   };
 
   return (
-    <>
-      <Text variant="H4">카테고리</Text>
+    <Container>
+      <Text variant="H4" color={Colors.Black900} fontWeight="SemiBold">
+        카테고리
+      </Text>
       <CategoryContainer>
         {CATEGORY.map((category) => (
           <Category
@@ -35,21 +36,21 @@ const CategoryFilter = () => {
             key={category}
             onClick={() => handleClick(category)}
           >
-            {currentCategory === category && (
-              <Image
-                src="/images/check.svg"
-                alt="check"
-                width={18}
-                height={18}
-              />
-            )}
-            <Text variant="Body3">{category}</Text>
+            <Text variant="Body3" color={Colors.Black800}>
+              {category}
+            </Text>
           </Category>
         ))}
       </CategoryContainer>
-    </>
+    </Container>
   );
 };
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+`;
 
 const CategoryContainer = styled.div`
   display: flex;
@@ -60,10 +61,9 @@ const CategoryContainer = styled.div`
 const Category = styled.div<{ $focus: boolean }>`
   display: flex;
   border: 1px solid
-    ${({ $focus }) => ($focus ? Colors.Emerald500 : Colors.Black100)};
+    ${({ $focus }) => ($focus ? Colors.Emerald600 : Colors.Black600)};
   border-radius: 2rem;
-  background-color: ${({ $focus }) =>
-    $focus ? Colors.Emerald50 : "transparent"};
+  background-color: ${({ $focus }) => ($focus ? Colors.Emerald50 : "white")};
   align-items: center;
   justify-content: center;
   padding: 6px 16px;

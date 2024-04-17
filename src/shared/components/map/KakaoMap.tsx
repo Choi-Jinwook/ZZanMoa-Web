@@ -1,4 +1,4 @@
-import { Coords } from "@shared/types";
+import { Coords, MarkerInfo } from "@shared/types";
 import { Map, MapMarker } from "react-kakao-maps-sdk";
 import styled from "styled-components";
 import Marker from "./Marker";
@@ -7,6 +7,8 @@ import { mockMarker } from "@shared/constants";
 import { SyncLoader } from "react-spinners";
 import locateBtnImage from "@shared/assets/locateBtn.png";
 
+
+
 const KakaoMap = () => {
   const [map, setMap] = useState<kakao.maps.Map | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -14,7 +16,7 @@ const KakaoMap = () => {
     lat: 33.5563,
     lng: 126.79581,
   });
-  const markers = mockMarker(mapCenter);
+  const [markers, setMarkers] = useState<MarkerInfo[]>([]);
 
   const handleLocate = () => {
     if (map) {
@@ -24,6 +26,13 @@ const KakaoMap = () => {
 
   useEffect(() => {
     const { geolocation } = navigator;
+    const markerData = mockMarker(mapCenter).map((marker, index) => ({
+      ...marker,
+      id: index,
+      added: false,
+      focus: false,
+    }));
+    setMarkers(markerData);
 
     geolocation.getCurrentPosition(
       ({ coords }) => {
@@ -47,6 +56,16 @@ const KakaoMap = () => {
     }
   }, [map]);
 
+  function removeBorderFromMapElement() {
+    const element = document.querySelector("#__react-kakao-maps-sdk___Map > div:nth-child(1) > div > div:nth-child(6) > div:nth-child(107)") as HTMLElement;
+    if (element) {
+      element.style.border = 'none';
+      element.style.zIndex = '3';
+    }
+    
+  }
+  
+
   return (
     <MapContainer $isLoading={isLoading}>
       {isLoading ? (
@@ -62,14 +81,6 @@ const KakaoMap = () => {
             level={3}
             onCreate={setMap}
           >
-            <MapMarker
-              position={{
-                lat: mapCenter.lat,
-                lng: mapCenter.lng,
-              }}
-            >
-              현재위치
-            </MapMarker>
             {map && <Marker markers={markers} map={map} />}
           </Map>
           <HandleLocateBtn onClick={handleLocate} />
@@ -99,7 +110,7 @@ const HandleLocateBtn = styled.button`
   width: 40px;
   height: 50px;
   cursor: pointer;
-  z-index: 1;
+  z-index: 3;
 `;
 
 export default KakaoMap;

@@ -1,4 +1,4 @@
-import { SideNavigation } from "@shared/components/SideNavigation";
+import { SideNavigation } from "@shared/components";
 import { KakaoMap } from "@shared/components/map";
 import type { NextPage } from "next";
 import styled from "styled-components";

@@ -14,10 +14,20 @@ export interface Coords {
 //   focus: boolean;
 // }
 
+// export interface MarkerInfo {
+//   id: number; 
+//   name: string; 
+//   description: string; 
+//   added: boolean;
+//   focus: boolean;
+// }
+
 export interface MarkerInfo {
-  id: number; 
-  name: string; 
-  description: string; 
+  id: number;
+  name: string;
+  address: string;
+  position: Coords;
   added: boolean;
   focus: boolean;
+  src?: string;
 }

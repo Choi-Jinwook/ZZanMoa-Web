@@ -6,23 +6,22 @@ import { useState, useEffect } from "react";
 import { mockMarker } from "@shared/constants";
 import { SyncLoader } from "react-spinners";
 import locateBtnImage from "@shared/assets/locateBtn.png";
+import { useRecoilState } from "recoil";
+import { mapCenterState, markersState } from "@shared/atoms/MapState";
 
 
 
 const KakaoMap = () => {
   const [map, setMap] = useState<kakao.maps.Map | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [mapCenter, setMapCenter] = useState<Coords>({
-    lat: 33.5563,
-    lng: 126.79581,
-  });
-  const [markers, setMarkers] = useState<MarkerInfo[]>([]);
+  const [mapCenter, setMapCenter] = useRecoilState(mapCenterState);
+  const [markers, setMarkers] = useRecoilState(markersState);
 
   const handleLocate = () => {
     if (map) {
-      map.setCenter(new kakao.maps.LatLng(37.554722, 126.970833)); // 서울역 좌표
-    }
-  };
+      setMapCenter({ lat: 37.554722, lng: 126.970833 }); // 서울역 좌표
+    };
+  }
 
   useEffect(() => {
     const { geolocation } = navigator;
@@ -56,15 +55,13 @@ const KakaoMap = () => {
     }
   }, [map]);
 
-  function removeBorderFromMapElement() {
-    const element = document.querySelector("#__react-kakao-maps-sdk___Map > div:nth-child(1) > div > div:nth-child(6) > div:nth-child(107)") as HTMLElement;
-    if (element) {
-      element.style.border = 'none';
-      element.style.zIndex = '3';
-    }
-    
-  }
-  
+  // function removeBorderFromMapElement() {
+  //   const element = document.querySelector("#__react-kakao-maps-sdk___Map > div:nth-child(1) > div > div:nth-child(6) > div:nth-child(107)") as HTMLElement;
+  //   if (element) {
+  //     element.style.border = 'none';
+  //     element.style.zIndex = '3';
+  //   }
+  // }
 
   return (
     <MapContainer $isLoading={isLoading}>
@@ -81,7 +78,7 @@ const KakaoMap = () => {
             level={3}
             onCreate={setMap}
           >
-            {map && <Marker markers={markers} map={map} />}
+            {map && <Marker map={map} />}
           </Map>
           <HandleLocateBtn onClick={handleLocate} />
         </>

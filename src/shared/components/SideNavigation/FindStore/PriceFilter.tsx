@@ -1,5 +1,5 @@
 import { Colors, PRICE } from "@shared/constants";
-import Text from "../Text";
+import Text from "../../Text";
 import { useState } from "react";
 import styled from "styled-components";
 
@@ -35,15 +35,20 @@ const PriceFilter = () => {
 
   return (
     <SetPrice>
-      <PriceTitle>
-        <Text variant="H4" color={Colors.Black700}>
-          가격 설정
-        </Text>
-        <Text variant="H4" color={Colors.Emerald600}>
-          {`${currentPrice.start.toLocaleString()}원 ~ ${currentPrice.end.toLocaleString()}원`}
-        </Text>
-      </PriceTitle>
+      <Text variant="H4" color={Colors.Black900} fontWeight="SemiBold">
+        가격 설정
+      </Text>
       <PriceSetting>
+        <PriceRange>
+          <Text
+            variant="Body4"
+            color={Colors.Black800}
+          >{`최소 ${PRICE.RANGE_MIN_VALUE.toLocaleString()}원`}</Text>
+          <Text
+            variant="Body4"
+            color={Colors.Black800}
+          >{`최대 ${PRICE.RANGE_MAX_VALUE.toLocaleString()}원`}</Text>
+        </PriceRange>
         <PriceSliderContainer>
           <PriceSlider>
             <PriceSliderInner $start={range.start} $end={range.end} />
@@ -66,8 +71,16 @@ const PriceFilter = () => {
           </PriceSliderRangeContainer>
         </PriceSliderContainer>
         <PriceNotice>
-          <Text>{PRICE.RANGE_MIN_VALUE.toLocaleString()}원</Text>
-          <Text>{PRICE.RANGE_MAX_VALUE.toLocaleString()}원</Text>
+          <PriceBox>
+            <Text variant="Body2" color={Colors.Emerald700} fontWeight="Medium">
+              {currentPrice.start.toLocaleString()}원
+            </Text>
+          </PriceBox>
+          <PriceBox>
+            <Text variant="Body2" color={Colors.Emerald700} fontWeight="Medium">
+              {currentPrice.end.toLocaleString()}원
+            </Text>
+          </PriceBox>
         </PriceNotice>
       </PriceSetting>
     </SetPrice>
@@ -77,35 +90,38 @@ const PriceFilter = () => {
 const SetPrice = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 32px;
-`;
-
-const PriceTitle = styled.div`
-  display: flex;
-  justify-content: space-between;
+  gap: 24px;
 `;
 
 const PriceSetting = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 `;
 
-const PriceSliderContainer = styled.div``;
+const PriceRange = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+const PriceSliderContainer = styled.div`
+  height: 21px;
+  align-content: center;
+`;
 
 const PriceSlider = styled.div`
   position: relative;
   width: 100%;
-  height: 12px;
+  height: 4px;
   border-radius: 10px;
-  background-color: ${Colors.Black100};
+  background-color: ${Colors.Black500};
 `;
 
 const PriceSliderInner = styled.div<{ $start: number; $end: number }>`
   position: absolute;
   left: ${({ $start }) => $start}%;
   right: ${({ $end }) => $end}%;
-  height: 12px;
+  height: 4px;
   border-radius: 10px;
   background-color: ${Colors.Emerald500};
 `;
@@ -116,19 +132,19 @@ const PriceSliderRangeContainer = styled.div`
 
 const PriceSliderRange = styled.input`
   position: absolute;
-  top: -14px;
+  top: -6px;
   left: -2px;
   width: 100%;
-  height: 12px;
+  height: 4px;
   background: none;
   pointer-events: none;
 
   -webkit-appearance: none;
   &::-webkit-slider-thumb {
-    height: 26px;
-    width: 26px;
+    height: 21px;
+    width: 21px;
     border-radius: 50%;
-    border: 7px solid ${Colors.Emerald600};
+    border: 7px solid ${Colors.Emerald700};
     background-color: white;
     -webkit-appearance: none;
     pointer-events: auto;
@@ -138,6 +154,16 @@ const PriceSliderRange = styled.input`
 const PriceNotice = styled.div`
   display: flex;
   justify-content: space-between;
+`;
+
+const PriceBox = styled.div`
+  display: flex;
+  border: 1px solid ${Colors.Black600};
+  border-radius: 4px;
+  background-color: white;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 16px;
 `;
 
 export default PriceFilter;

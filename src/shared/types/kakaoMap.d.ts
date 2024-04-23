@@ -3,7 +3,31 @@ export interface Coords {
   lng: number;
 }
 
-export interface MarkerData {
+// export interface MarkerData {
+//   name: string;
+//   description: string; 
+// }
+
+// export interface MarkerState extends MarkerData {
+//   id: number;
+//   added: boolean;
+//   focus: boolean;
+// }
+
+// export interface MarkerInfo {
+//   id: number; 
+//   name: string; 
+//   description: string; 
+//   added: boolean;
+//   focus: boolean;
+// }
+
+export interface MarkerInfo {
+  id: number;
   name: string;
-  description: string; 
+  address: string;
+  position: Coords;
+  added: boolean;
+  focus: boolean;
+  src?: string;
 }

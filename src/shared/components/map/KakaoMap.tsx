@@ -8,8 +8,7 @@ import { SyncLoader } from "react-spinners";
 import locateBtnImage from "@shared/assets/locateBtn.png";
 import { useRecoilState } from "recoil";
 import { mapCenterState, markersState } from "@shared/atoms/MapState";
-
-
+import axios from "axios";
 
 const KakaoMap = () => {
   const [map, setMap] = useState<kakao.maps.Map | null>(null);
@@ -23,15 +22,39 @@ const KakaoMap = () => {
     };
   }
 
+  
+  const loadMarketData = (apiUrl) => {
+    axios.get(`${apiUrl}/market/market-place/get`)
+      .then(response => {
+        const newMarkers = response.data.map((market, index) => ({
+          id: index,
+          name: market.marketName,
+          added: false,
+          focus: false
+        }));
+        setMarkers(newMarkers);
+        console.log(response.data);
+        
+      })
+      .catch(error => console.error('Failed to fetch market data:', error));
+  };
+  
   useEffect(() => {
+    console.log("카카오맵 렌더링");
+  
     const { geolocation } = navigator;
-    const markerData = mockMarker(mapCenter).map((marker, index) => ({
-      ...marker,
-      id: index,
-      added: false,
-      focus: false,
-    }));
-    setMarkers(markerData);
+    const apiUrl = process.env.NEXT_PUBLIC_SERVER_API_URL;
+
+    // const markerData = mockMarker(mapCenter).map((marker, index) => ({
+    //   ...marker,
+    //   id: index,
+    //   added: false,
+    //   focus: false,
+    // }));
+    // setMarkers(markerData);
+
+    loadMarketData(apiUrl);
+    
 
     geolocation.getCurrentPosition(
       ({ coords }) => {

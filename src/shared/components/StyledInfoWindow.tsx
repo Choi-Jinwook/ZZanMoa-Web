@@ -6,6 +6,8 @@ import mockImg from '@shared/assets/photo.png';
 import Image from 'next/image';
 import { Colors } from '@shared/constants';
 import { MarkerInfo } from '@shared/types';
+import { useRecoilState } from 'recoil';
+import selectedMarketsState from '@shared/atoms/MarketState';
 
 const InfoWindowContainer = styled.div`
   display: flex;
@@ -50,7 +52,7 @@ const ActionsContainer = styled.div`
 `;
 
 const AddButton = styled.button.attrs(props => ({
-}))<AddButtonProps>`
+})) <AddButtonProps>`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -77,34 +79,42 @@ const IconImageWrapper = styled.div`
   margin-right: 8px;
 `;
 
-interface StyledInfoWindowProps extends Partial<MarkerInfo> {
-  onToggleAdded: () => void;
+interface StyledInfoWindowProps {
+  name: string;
+  address: string;
+  id: number;
   overlayRef: React.RefObject<kakao.maps.CustomOverlay>;
+  onToggleAdded: () => void;
+  added: boolean
 }
 
 interface AddButtonProps {
   added: boolean;
 }
 
-const StyledInfoWindow: React.FC<StyledInfoWindowProps> = ({ name, description, added, onToggleAdded, overlayRef }) => {
-  const addedMarkers = JSON.parse(localStorage.getItem('addedMarkers') || '[]');
-  const [localAdded, setLocalAdded] = useState(added);
 
+const StyledInfoWindow: React.FC<StyledInfoWindowProps> = ({ name, address, id, overlayRef, onToggleAdded, added }) => {
+  // const [selectedMarkets, setSelectedMarkets] = useRecoilState(selectedMarketsState);
+  const [isSelected, setIsSelected] = useState(false);
+
+  useEffect(() => {
+    setIsSelected(added);
+  }, [added]);
+
+  const handleButtonClick = () => {
+    setIsSelected(!isSelected);
+    onToggleAdded();
+  };
 
   useEffect(() => {
     if (overlayRef && overlayRef.current) {
       const content = overlayRef.current.getContent();
       if (content instanceof HTMLElement) {
-        content.style.display = localAdded ? 'block' : 'none';
+        content.style.display = isSelected ? 'block' : 'none';
       }
     }
-  }, [localAdded, overlayRef]);
-  
+  }, [isSelected, overlayRef]);
 
-  const handleButtonClick = () => {
-    onToggleAdded();
-    setLocalAdded(current => !current);
-  };
 
   return (
     <InfoWindowContainer>
@@ -115,7 +125,7 @@ const StyledInfoWindow: React.FC<StyledInfoWindowProps> = ({ name, description, 
       </LeftSection>
       <RightSection>
         <InfoTitle>{name}</InfoTitle>
-        <InfoDescription>{description}</InfoDescription>
+        <InfoDescription>{address}</InfoDescription>
         <ActionsContainer>
           <IconWrapper>
             <IconImageWrapper>
@@ -125,8 +135,8 @@ const StyledInfoWindow: React.FC<StyledInfoWindowProps> = ({ name, description, 
               <Image src={naverIcon} alt="네이버맵" width={24} height={24} />
             </IconImageWrapper>
           </IconWrapper>
-          <AddButton onClick={handleButtonClick} added={localAdded!}>
-            {localAdded ? '삭제하기' : '추가하기'}&emsp;{localAdded ? 'x' : '+'}
+          <AddButton onClick={handleButtonClick} added={isSelected}>
+            {isSelected ? '삭제하기' : '추가하기'}&emsp;{isSelected ? 'x' : '+'}
           </AddButton>
         </ActionsContainer>
       </RightSection>

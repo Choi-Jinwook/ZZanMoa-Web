@@ -15,4 +15,6 @@ export const mockMarker = (mapCenter: Coords): MarkerData[] => [
   { name: "망원시장", description: "망원동에 위치한 시장입니다." },
   { name: "동원시장", description: "동원동의 시장입니다." },
   { name: "가리봉시장", description: "가리봉동에 위치한 시장입니다." },
+  { name: "약수시장 골목형 상가", description: "약수시장 골목형 상가입니다." },
+
 ];

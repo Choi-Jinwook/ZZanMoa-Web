@@ -1,28 +1,32 @@
 import styled from "styled-components";
 import { Colors } from "@shared/constants";
-import { useState } from "react";
 import Text from "@shared/components/Text";
+import { useGetCategory } from "@shared/apis";
+import { useRecoilState } from "recoil";
+import { MinMaxPrice, SelectedCategory } from "@shared/atoms";
+import { convertCategory } from "@shared/hooks";
+import { useEffect } from "react";
 
 const CategoryFilter = () => {
-  const [currentCategory, setCurrentCategory] = useState("");
-
-  const CATEGORY = [
-    "🍚 한식",
-    "🍜 중식",
-    "🍝 경양식",
-    "🍣 일식",
-    "☕ 다방",
-    "🍴 기타 음식업",
-    "💈 미용/이용",
-    "👕 세탁",
-    "🎬 영화",
-    "🛏️ 숙박",
-    "기타 서비스",
-  ];
+  const { data: categories } = useGetCategory();
+  const [, setPrice] = useRecoilState(MinMaxPrice);
+  const [currentCategory, setCurrentCategory] =
+    useRecoilState(SelectedCategory);
+  const { categoriesWithEmojis } = convertCategory(categories);
 
   const handleClick = (value: string) => {
     setCurrentCategory(value);
   };
+
+  useEffect(() => {
+    const categoryData = categories?.find(
+      ({ category }) => category === currentCategory.split(" ").reverse()[0],
+    );
+    if (categoryData) {
+      const { minPrice, maxPrice } = categoryData;
+      setPrice({ minPrice, maxPrice });
+    }
+  }, [currentCategory]);
 
   return (
     <Container>
@@ -30,10 +34,10 @@ const CategoryFilter = () => {
         카테고리
       </Text>
       <CategoryContainer>
-        {CATEGORY.map((category) => (
+        {categoriesWithEmojis.map((category) => (
           <Category
-            $focus={currentCategory === category}
             key={category}
+            $focus={currentCategory === category}
             onClick={() => handleClick(category)}
           >
             <Text variant="Body3" color={Colors.Black800}>

@@ -1,37 +1,44 @@
 import { Colors, PRICE } from "@shared/constants";
 import Text from "../../Text";
-import { useState } from "react";
+import { useEffect } from "react";
 import styled from "styled-components";
+import { useRecoilState } from "recoil";
+import { CurrentPrice, MinMaxPrice, Range } from "@shared/atoms";
 
 const PriceFilter = () => {
-  const [currentPrice, setCurrentPrice] = useState({ start: 8000, end: 12000 });
-  const [range, setRange] = useState({
-    start: (currentPrice.start / PRICE.RANGE_MAX_VALUE) * 100,
-    end: 100 - (currentPrice.end / PRICE.RANGE_MAX_VALUE) * 100,
-  });
+  const [price] = useRecoilState(MinMaxPrice);
+  const [currentPrice, setCurrentPrice] = useRecoilState(CurrentPrice);
+  const [range, setRange] = useRecoilState(Range);
 
   const handlePrice = (target: string, value: string) => {
     const formattedValue = parseInt(value);
+    const priceRange = price.maxPrice - price.minPrice;
+
     if (
       target === "start" &&
-      currentPrice.end - formattedValue >= PRICE.RANGE_MIN_GAP
+      currentPrice.maxPrice - formattedValue >= PRICE.RANGE_MIN_GAP
     ) {
-      setCurrentPrice((prev) => ({ ...prev, start: formattedValue }));
+      setCurrentPrice((prev) => ({ ...prev, minPrice: formattedValue }));
       setRange((prev) => ({
         ...prev,
-        start: (formattedValue / PRICE.RANGE_MAX_VALUE) * 100,
+        start: ((formattedValue - price.minPrice) / priceRange) * 100,
       }));
     } else if (
       target === "end" &&
-      formattedValue - currentPrice.start >= PRICE.RANGE_MIN_GAP
+      formattedValue - currentPrice.minPrice >= PRICE.RANGE_MIN_GAP
     ) {
-      setCurrentPrice((prev) => ({ ...prev, end: formattedValue }));
+      setCurrentPrice((prev) => ({ ...prev, maxPrice: formattedValue }));
       setRange((prev) => ({
         ...prev,
-        end: 100 - (formattedValue / PRICE.RANGE_MAX_VALUE) * 100,
+        end: ((price.maxPrice - formattedValue) / priceRange) * 100,
       }));
     }
   };
+
+  useEffect(() => {
+    setCurrentPrice({ minPrice: price.minPrice, maxPrice: price.maxPrice });
+    setRange({ start: 0, end: 0 });
+  }, [price]);
 
   return (
     <SetPrice>
@@ -43,11 +50,11 @@ const PriceFilter = () => {
           <Text
             variant="Body4"
             color={Colors.Black800}
-          >{`최소 ${PRICE.RANGE_MIN_VALUE.toLocaleString()}원`}</Text>
+          >{`최소 ${currentPrice.minPrice.toLocaleString()}원`}</Text>
           <Text
             variant="Body4"
             color={Colors.Black800}
-          >{`최대 ${PRICE.RANGE_MAX_VALUE.toLocaleString()}원`}</Text>
+          >{`최대 ${currentPrice.maxPrice.toLocaleString()}원`}</Text>
         </PriceRange>
         <PriceSliderContainer>
           <PriceSlider>
@@ -56,16 +63,16 @@ const PriceFilter = () => {
           <PriceSliderRangeContainer>
             <PriceSliderRange
               type="range"
-              value={currentPrice.start}
-              min={PRICE.RANGE_MIN_VALUE}
-              max={PRICE.RANGE_MAX_VALUE}
+              value={currentPrice.minPrice}
+              min={price.minPrice}
+              max={price.maxPrice}
               onChange={({ target: { value } }) => handlePrice("start", value)}
             />
             <PriceSliderRange
               type="range"
-              value={currentPrice.end}
-              min={PRICE.RANGE_MIN_VALUE}
-              max={PRICE.RANGE_MAX_VALUE}
+              value={currentPrice.maxPrice}
+              min={price.minPrice}
+              max={price.maxPrice}
               onChange={({ target: { value } }) => handlePrice("end", value)}
             />
           </PriceSliderRangeContainer>
@@ -73,12 +80,12 @@ const PriceFilter = () => {
         <PriceNotice>
           <PriceBox>
             <Text variant="Body2" color={Colors.Emerald700} fontWeight="Medium">
-              {currentPrice.start.toLocaleString()}원
+              {currentPrice.minPrice.toLocaleString()}원
             </Text>
           </PriceBox>
           <PriceBox>
             <Text variant="Body2" color={Colors.Emerald700} fontWeight="Medium">
-              {currentPrice.end.toLocaleString()}원
+              {currentPrice.maxPrice.toLocaleString()}원
             </Text>
           </PriceBox>
         </PriceNotice>

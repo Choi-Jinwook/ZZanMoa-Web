@@ -1,7 +1,7 @@
 import "../styles/globals.css";
 import type { AppProps } from "next/app";
 import { RecoilEnv, RecoilRoot } from "recoil";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   DehydratedState,
   Hydrate,
@@ -9,6 +9,7 @@ import {
   QueryClientProvider,
 } from "@tanstack/react-query";
 import "../styles/globals.css";
+import { QueryKey } from "@shared/constants";
 
 function MyApp({
   Component,
@@ -32,12 +33,18 @@ function MyApp({
         },
       }),
   );
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // 가게 정보가 로드된 이후 페이지 렌더링
+    if (queryClient.getQueryData([QueryKey.store])) setIsLoading(false);
+  }, [queryClient]);
 
   return (
     <RecoilRoot>
       <QueryClientProvider client={queryClient}>
         <Hydrate state={pageProps.dehydratedState}>
-          <Component {...pageProps} />
+          {!isLoading && <Component {...pageProps} />}
         </Hydrate>
       </QueryClientProvider>
     </RecoilRoot>

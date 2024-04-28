@@ -6,33 +6,55 @@ import { useState, useEffect } from "react";
 import { mockMarker } from "@shared/constants";
 import { SyncLoader } from "react-spinners";
 import locateBtnImage from "@shared/assets/locateBtn.png";
-
-
+import { useRecoilState } from "recoil";
+import { mapCenterState, markersState } from "@shared/atoms/MapState";
+import axios from "axios";
 
 const KakaoMap = () => {
   const [map, setMap] = useState<kakao.maps.Map | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [mapCenter, setMapCenter] = useState<Coords>({
-    lat: 33.5563,
-    lng: 126.79581,
-  });
-  const [markers, setMarkers] = useState<MarkerInfo[]>([]);
+  const [mapCenter, setMapCenter] = useRecoilState(mapCenterState);
+  const [markers, setMarkers] = useRecoilState(markersState);
 
   const handleLocate = () => {
     if (map) {
-      map.setCenter(new kakao.maps.LatLng(37.554722, 126.970833)); // 서울역 좌표
-    }
-  };
+      setMapCenter({ lat: 37.554722, lng: 126.970833 }); // 서울역 좌표
+    };
+  }
 
+  
+  const loadMarketData = (apiUrl) => {
+    axios.get(`${apiUrl}/market/market-place/get`)
+      .then(response => {
+        const newMarkers = response.data.map((market, index) => ({
+          id: index,
+          name: market.marketName,
+          added: false,
+          focus: false
+        }));
+        setMarkers(newMarkers);
+        console.log(response.data);
+        
+      })
+      .catch(error => console.error('Failed to fetch market data:', error));
+  };
+  
   useEffect(() => {
+    console.log("카카오맵 렌더링");
+  
     const { geolocation } = navigator;
-    const markerData = mockMarker(mapCenter).map((marker, index) => ({
-      ...marker,
-      id: index,
-      added: false,
-      focus: false,
-    }));
-    setMarkers(markerData);
+    const apiUrl = process.env.NEXT_PUBLIC_SERVER_API_URL;
+
+    // const markerData = mockMarker(mapCenter).map((marker, index) => ({
+    //   ...marker,
+    //   id: index,
+    //   added: false,
+    //   focus: false,
+    // }));
+    // setMarkers(markerData);
+
+    loadMarketData(apiUrl);
+    
 
     geolocation.getCurrentPosition(
       ({ coords }) => {
@@ -56,15 +78,13 @@ const KakaoMap = () => {
     }
   }, [map]);
 
-  function removeBorderFromMapElement() {
-    const element = document.querySelector("#__react-kakao-maps-sdk___Map > div:nth-child(1) > div > div:nth-child(6) > div:nth-child(107)") as HTMLElement;
-    if (element) {
-      element.style.border = 'none';
-      element.style.zIndex = '3';
-    }
-    
-  }
-  
+  // function removeBorderFromMapElement() {
+  //   const element = document.querySelector("#__react-kakao-maps-sdk___Map > div:nth-child(1) > div > div:nth-child(6) > div:nth-child(107)") as HTMLElement;
+  //   if (element) {
+  //     element.style.border = 'none';
+  //     element.style.zIndex = '3';
+  //   }
+  // }
 
   return (
     <MapContainer $isLoading={isLoading}>
@@ -81,7 +101,7 @@ const KakaoMap = () => {
             level={3}
             onCreate={setMap}
           >
-            {map && <Marker markers={markers} map={map} />}
+            {map && <Marker map={map} />}
           </Map>
           <HandleLocateBtn onClick={handleLocate} />
         </>

@@ -1,36 +1,43 @@
+import selectedMarketsState from "@shared/atoms/MarketState";
 import Text from "@shared/components/Text";
 import { Colors } from "@shared/constants";
+import { MarkerInfo } from "@shared/types";
 import Image from "next/image";
 import { useState } from "react";
+import { useRecoilState, useRecoilValue } from "recoil";
 import styled from "styled-components";
 
 const MarketCard = () => {
-  const mockData = [
-    {
-      src: "/images/sample.png",
-      name: "가나다라가나다라가나다라 시장",
-      address: "서울특별시 무슨구 무슨로 123",
-    },
-    {
-      src: "/images/sample.png",
-      name: "가나다라 시장",
-      address: "서울특별시 무슨구 무슨로 123123",
-    },
-    {
-      src: "/images/sample.png",
-      name: "가나다라 시장",
-      address: "서울특별시 무슨구 무슨로 123123123",
-    },
-  ];
-  const [selectedMarket, setSelectedMarket] = useState([...mockData]);
+  
+  // const mockData = [
+  //   {
+  //     src: "/images/sample.png",
+  //     name: "가나다라가나다라가나다라 시장",
+  //     address: "서울특별시 무슨구 무슨로 123",
+  //   },
+  //   {
+  //     src: "/images/sample.png",
+  //     name: "가나다라 시장",
+  //     address: "서울특별시 무슨구 무슨로 123123",
+  //   },
+  //   {
+  //     src: "/images/sample.png",
+  //     name: "가나다라 시장",
+  //     address: "서울특별시 무슨구 무슨로 123123123",
+  //   },
+  // ];
+  // const [selectedMarket, setSelectedMarket] = useState([...mockData]);
+  const [selectedMarkets, setSelectedMarkets] = useRecoilState<MarkerInfo[]>(selectedMarketsState);
+
 
   const handleDelete = (index: number) => {
-    setSelectedMarket((prev) => prev.filter((_, i) => index !== i));
+    // setSelectedMarket((prev) => prev.filter((_, i) => index !== i));
+    setSelectedMarkets((prev) => prev.filter((_, i) => index !== i));
   };
 
   return (
     <>
-      {selectedMarket?.map(({ src, name, address }, index) => (
+      {selectedMarkets.map(({ src, name, address }, index) => (
         <SelectedMarket key={src + index}>
           <Image src={src} alt={src} width={84} height={84} />
           <MarketInfo>
@@ -58,10 +65,10 @@ const MarketCard = () => {
         </SelectedMarket>
       ))}
       <>
-        {selectedMarket.length < 4 &&
-          Array.from({ length: 4 - selectedMarket.length }, (_, _index) => (
-            <BlankBox key={_index} />
-          ))}
+        {selectedMarkets.length < 4 &&
+        Array.from({ length: 4 - selectedMarkets.length }, (_, _index) => (
+          <BlankBox key={_index} />
+        ))}
       </>
     </>
   );

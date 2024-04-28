@@ -8,38 +8,18 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import styled from "styled-components";
 
 const MarketCard = () => {
-  
-  // const mockData = [
-  //   {
-  //     src: "/images/sample.png",
-  //     name: "가나다라가나다라가나다라 시장",
-  //     address: "서울특별시 무슨구 무슨로 123",
-  //   },
-  //   {
-  //     src: "/images/sample.png",
-  //     name: "가나다라 시장",
-  //     address: "서울특별시 무슨구 무슨로 123123",
-  //   },
-  //   {
-  //     src: "/images/sample.png",
-  //     name: "가나다라 시장",
-  //     address: "서울특별시 무슨구 무슨로 123123123",
-  //   },
-  // ];
-  // const [selectedMarket, setSelectedMarket] = useState([...mockData]);
-  const [selectedMarkets, setSelectedMarkets] = useRecoilState<MarkerInfo[]>(selectedMarketsState);
-
+  const [selectedMarkets, setSelectedMarkets] =
+    useRecoilState<MarkerInfo[]>(selectedMarketsState);
 
   const handleDelete = (index: number) => {
-    // setSelectedMarket((prev) => prev.filter((_, i) => index !== i));
     setSelectedMarkets((prev) => prev.filter((_, i) => index !== i));
   };
 
   return (
     <>
       {selectedMarkets.map(({ src, name, address }, index) => (
-        <SelectedMarket key={src + index}>
-          <Image src={src} alt={src} width={84} height={84} />
+        <SelectedMarket key={address}>
+          {src && <Image src={src} alt={src} width={84} height={84} />}
           <MarketInfo>
             <MarketInfoWrapper>
               <Text
@@ -66,9 +46,9 @@ const MarketCard = () => {
       ))}
       <>
         {selectedMarkets.length < 4 &&
-        Array.from({ length: 4 - selectedMarkets.length }, (_, _index) => (
-          <BlankBox key={_index} />
-        ))}
+          Array.from({ length: 4 - selectedMarkets.length }, (_, _index) => (
+            <BlankBox key={_index} />
+          ))}
       </>
     </>
   );

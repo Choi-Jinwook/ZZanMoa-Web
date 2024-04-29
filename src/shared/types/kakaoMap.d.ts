@@ -29,5 +29,4 @@ export interface MarkerInfo {
   position: Coords;
   added: boolean;
   focus: boolean;
-  src?: string;
 }

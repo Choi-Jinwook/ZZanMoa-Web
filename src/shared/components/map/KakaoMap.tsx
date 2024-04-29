@@ -23,10 +23,10 @@ const KakaoMap = () => {
   }
 
   
-  const loadMarketData = (apiUrl) => {
+  const loadMarketData = (apiUrl: string | undefined) => {
     axios.get(`${apiUrl}/market/market-place/get`)
       .then(response => {
-        const newMarkers = response.data.map((market, index) => ({
+        const newMarkers = response.data.map((market: { marketName: any; }, index: any) => ({
           id: index,
           name: market.marketName,
           added: false,
@@ -43,16 +43,8 @@ const KakaoMap = () => {
     console.log("카카오맵 렌더링");
   
     const { geolocation } = navigator;
-    const apiUrl = process.env.NEXT_PUBLIC_SERVER_API_URL;
-
-    // const markerData = mockMarker(mapCenter).map((marker, index) => ({
-    //   ...marker,
-    //   id: index,
-    //   added: false,
-    //   focus: false,
-    // }));
-    // setMarkers(markerData);
-
+    const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+    
     loadMarketData(apiUrl);
     
 

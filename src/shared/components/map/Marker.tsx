@@ -99,7 +99,7 @@ const Marker = ({ map }: { map: kakao.maps.Map }) => {
     return () => kakao.maps.event.removeListener(map, 'click', handleMapClick);
   }, [map]);
   
-  const handleMarkerClick = (markerId) => {
+  const handleMarkerClick = (markerId: any) => {
     closeInfoWindow();
     setMarkers(prevMarkers => prevMarkers.map(marker => {
       const focused = marker.id === markerId ? !marker.focus : false;
@@ -112,8 +112,7 @@ const Marker = ({ map }: { map: kakao.maps.Map }) => {
   };
   
 
-  function updateMarkerOnMap(marker, added) {
-    console.log(marker.id);
+  function updateMarkerOnMap(marker: any, added: boolean) {
     const markerPosition = new kakao.maps.LatLng(marker.position.lat, marker.position.lng);
     const imageSrc = getMarkerImage(marker.focus);
     const markerImage = new kakao.maps.MarkerImage(imageSrc, new kakao.maps.Size(44, 51));
@@ -143,7 +142,7 @@ const Marker = ({ map }: { map: kakao.maps.Map }) => {
     updateCircleOverlay(marker, added);
   }
 
-  function updateCircleOverlay(marker, display) {
+  function updateCircleOverlay(marker: MarkerInfo, display: boolean) {
     let circleOverlay = circleOverlaysRef.current.get(marker.id);
     if (!circleOverlay) {
       const circleContent = document.createElement('div');

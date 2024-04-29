@@ -1,9 +1,7 @@
-import { Coords, MarkerInfo } from "@shared/types";
-import { Map, MapMarker } from "react-kakao-maps-sdk";
+import { Map } from "react-kakao-maps-sdk";
 import styled from "styled-components";
 import Marker from "./Marker";
 import { useState, useEffect } from "react";
-import { mockMarker } from "@shared/constants";
 import { SyncLoader } from "react-spinners";
 import locateBtnImage from "@shared/assets/locateBtn.png";
 import { useRecoilState } from "recoil";
@@ -19,34 +17,34 @@ const KakaoMap = () => {
   const handleLocate = () => {
     if (map) {
       setMapCenter({ lat: 37.554722, lng: 126.970833 }); // 서울역 좌표
-    };
-  }
+    }
+  };
 
-  
   const loadMarketData = (apiUrl: string | undefined) => {
-    axios.get(`${apiUrl}/market/market-place/get`)
-      .then(response => {
-        const newMarkers = response.data.map((market: { marketName: any; }, index: any) => ({
-          id: index,
-          name: market.marketName,
-          added: false,
-          focus: false
-        }));
+    axios
+      .get(`${apiUrl}/market/market-place/get`)
+      .then((response) => {
+        const newMarkers = response.data.map(
+          (market: { marketName: any }, index: any) => ({
+            id: index,
+            name: market.marketName,
+            added: false,
+            focus: false,
+          }),
+        );
         setMarkers(newMarkers);
         console.log(response.data);
-        
       })
-      .catch(error => console.error('Failed to fetch market data:', error));
+      .catch((error) => console.error("Failed to fetch market data:", error));
   };
-  
+
   useEffect(() => {
     console.log("카카오맵 렌더링");
-  
+
     const { geolocation } = navigator;
     const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-    
+
     loadMarketData(apiUrl);
-    
 
     geolocation.getCurrentPosition(
       ({ coords }) => {

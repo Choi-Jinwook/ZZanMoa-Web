@@ -17,9 +17,9 @@ const MarketCard = () => {
 
   return (
     <>
-      {selectedMarkets.map(({ src, name, address }, index) => (
+      {selectedMarkets.map(({ name, address }, index) => (
         <SelectedMarket key={address}>
-          {src && <Image src={src} alt={src} width={84} height={84} />}
+          {/* {src && <Image src={src} alt={src} width={84} height={84} />} */}
           <MarketInfo>
             <MarketInfoWrapper>
               <Text
@@ -34,12 +34,12 @@ const MarketCard = () => {
               </Text>
             </MarketInfoWrapper>
             <DeleteButton onClick={() => handleDelete(index)}>
-              <Image
+              {/* <Image
                 src="/images/deleteMarket.svg"
                 alt="delete"
                 width={24}
                 height={24}
-              />
+              /> */}
             </DeleteButton>
           </MarketInfo>
         </SelectedMarket>

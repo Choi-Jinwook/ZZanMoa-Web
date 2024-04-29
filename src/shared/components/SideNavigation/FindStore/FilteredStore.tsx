@@ -34,7 +34,6 @@ const FilteredStore = () => {
   };
 
   const filteredStores = getFilteredStores(storeData || []);
-  console.log(filteredStores);
 
   return (
     <Container>

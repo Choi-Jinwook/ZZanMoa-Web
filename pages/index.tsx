@@ -1,16 +1,20 @@
 import { getStoreApi } from "@shared/apis";
-import { SideNavigation } from "@shared/components";
+import { SelectedMenu } from "@shared/atoms";
+import { SaleAlert, SideNavigation } from "@shared/components";
 import { KakaoMap } from "@shared/components/map";
 import { QueryKey } from "@shared/constants";
 import { QueryClient, dehydrate } from "@tanstack/react-query";
 import type { GetServerSideProps, NextPage } from "next";
+import { useRecoilState } from "recoil";
 import styled from "styled-components";
 
 const Home: NextPage = () => {
+  const [currentMenu] = useRecoilState(SelectedMenu);
+
   return (
     <Container>
       <SideNavigation />
-      <KakaoMap />
+      {currentMenu !== "할인 소식" ? <KakaoMap /> : <SaleAlert />}
     </Container>
   );
 };

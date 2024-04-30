@@ -1,10 +1,10 @@
 import styled from "styled-components";
 import { Colors } from "@shared/constants";
-import Text from "@shared/components/Text";
 import { useGetCategory } from "@shared/apis";
 import { useRecoilState } from "recoil";
 import { MinMaxPrice, SelectedCategory } from "@shared/atoms";
 import { useEffect } from "react";
+import { Category, Text } from "@shared/components";
 
 const CategoryFilter = () => {
   const { data: categories } = useGetCategory();
@@ -39,22 +39,16 @@ const CategoryFilter = () => {
             </Text>
           </TextContainer>
           <CategoryContent>
-            {categories?.slice(0, 6).map(({ category }) => (
-              <Category
-                key={category}
-                $focus={currentCategory === category}
-                onClick={() => handleClick(category)}
-              >
-                <Text
-                  variant="Body3"
-                  color={
-                    currentCategory === category ? "white" : Colors.Black800
-                  }
-                >
-                  {category}
-                </Text>
-              </Category>
-            ))}
+            {categories
+              ?.slice(0, 6)
+              .map(({ category }) => (
+                <Category
+                  key={category}
+                  category={category}
+                  currentCategory={currentCategory}
+                  handleClick={handleClick}
+                />
+              ))}
           </CategoryContent>
         </CategoryWrapper>
         <CategoryWrapper>
@@ -64,17 +58,16 @@ const CategoryFilter = () => {
             </Text>
           </TextContainer>
           <CategoryContent>
-            {categories?.slice(6, 15).map(({ category }) => (
-              <Category
-                key={category}
-                $focus={currentCategory === category}
-                onClick={() => handleClick(category)}
-              >
-                <Text variant="Body3" color={Colors.Black800}>
-                  {category}
-                </Text>
-              </Category>
-            ))}
+            {categories
+              ?.slice(6, 15)
+              .map(({ category }) => (
+                <Category
+                  key={category}
+                  category={category}
+                  currentCategory={currentCategory}
+                  handleClick={handleClick}
+                />
+              ))}
           </CategoryContent>
         </CategoryWrapper>
       </CategoryContainer>
@@ -107,18 +100,6 @@ const TextContainer = styled.div`
 const CategoryWrapper = styled.div`
   display: flex;
   gap: 16px;
-`;
-
-const Category = styled.div<{ $focus: boolean }>`
-  display: flex;
-  border: 1px solid
-    ${({ $focus }) => ($focus ? Colors.Emerald600 : Colors.Black600)};
-  border-radius: 2rem;
-  background-color: ${({ $focus }) => ($focus ? Colors.Emerald600 : "white")};
-  align-items: center;
-  justify-content: center;
-  padding: 6px 16px;
-  gap: 8px;
 `;
 
 export default CategoryFilter;

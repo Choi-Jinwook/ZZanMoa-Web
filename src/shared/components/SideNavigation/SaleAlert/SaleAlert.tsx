@@ -1,105 +1,97 @@
+import { useGetBargainDistrict, useGetBargainInfo } from "@shared/apis/bargain";
+import { saleContent } from "@shared/atoms";
 import { Category, Chevron, Text } from "@shared/components";
 import { Colors } from "@shared/constants";
+import { convertCategoryId } from "@shared/hooks";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { MouseEvent, useEffect, useRef, useState } from "react";
+import { useRecoilState } from "recoil";
 import styled from "styled-components";
 
-interface MockData {
-  id: number;
-  title: string;
-  createdAt: string;
-}
-
 const SaleAlert = () => {
-  const mockData: MockData[] = [
-    {
-      id: 800,
-      title: " 장바구니 물가정보 게시(24. 2월)",
-      createdAt: "2024.00.00",
-    },
-    {
-      id: 800,
-      title: " 장바구니 물가정보 게시(24. 2월)",
-      createdAt: "2024.00.00",
-    },
-    {
-      id: 800,
-      title: " 장바구니 물가정보 게시(24. 2월)",
-      createdAt: "2024.00.00",
-    },
-    {
-      id: 800,
-      title: " 장바구니 물가정보 게시(24. 2월)",
-      createdAt: "2024.00.00",
-    },
-    {
-      id: 800,
-      title: " 장바구니 물가정보 게시(24. 2월)",
-      createdAt: "2024.00.00",
-    },
-    {
-      id: 800,
-      title: " 장바구니 물가정보 게시(24. 2월)",
-      createdAt: "2024.00.00",
-    },
-    {
-      id: 800,
-      title: " 장바구니 물가정보 게시(24. 2월)",
-      createdAt: "2024.00.00",
-    },
-    {
-      id: 800,
-      title: " 장바구니 물가정보 게시(24. 2월)",
-      createdAt: "2024.00.00",
-    },
-    {
-      id: 800,
-      title: " 장바구니 물가정보 게시(24. 2월)",
-      createdAt: "2024.00.00",
-    },
-    {
-      id: 800,
-      title: " 장바구니 물가정보 게시(24. 2월)",
-      createdAt: "2024.00.00",
-    },
-    {
-      id: 800,
-      title: " 장바구니 물가정보 게시(24. 2월)",
-      createdAt: "2024.00.00",
-    },
-  ];
+  const selectBoxRef = useRef<HTMLDivElement | null>(null);
+  const dropdownButtonRef = useRef<HTMLDivElement | null>(null);
   const [currentCategory, setCurrentCategory] = useState("전체");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentCategoryId, setCurrentCategoryId] = useState(0);
+  const [currentDistrict, setCurrentDistrict] = useState("서울시 전체");
+  const [currentDistrictId, setCurrentDistrictId] = useState(0);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [, setContent] = useRecoilState(saleContent);
   const [isOpen, setIsOpen] = useState(false);
   const { push } = useRouter();
+  const { data: district } = useGetBargainDistrict();
+  const { data: saleInfo } = useGetBargainInfo(
+    currentPage,
+    currentCategoryId || undefined,
+  );
+
   const CATEGORY = ["전체", "할인 소식", "직거래 마켓"];
 
-  const handleClick = (value: string) => {
+  const handleClickCategory = (value: string) => {
+    setCurrentCategoryId(convertCategoryId(value));
+    setCurrentPage(0);
     setCurrentCategory(value);
   };
 
   const handleLeft = () => {
-    setCurrentPage((prev) => (prev === 1 ? prev : prev - 1));
+    setCurrentPage((prev) => (prev === 0 ? prev : prev - 10));
   };
 
   const handleRight = () => {
     setCurrentPage((prev) =>
-      prev === Math.floor((mockData.length - 1) / 9) + 1 ? prev : prev + 1,
+      prev + 10 > Number(saleInfo?.totalPages)
+        ? Number(saleInfo?.totalPages) - 1
+        : prev + 10,
     );
   };
 
   const handleNumberClick = (index: number) => {
-    setCurrentPage(index);
+    setCurrentPage(index + Math.floor(currentPage / 10) * 10);
   };
 
   const handleClickDropDown = () => {
     setIsOpen((prev) => !prev);
   };
 
-  const handleRoute = (id: number) => {
-    push(`/info/${id}`);
+  const handleDistrict = (value: string, id: number) => {
+    setCurrentDistrict(value);
+    setCurrentDistrictId(id);
+    setCurrentPage(0);
+    setIsOpen(false);
   };
+
+  const handleRoute = (id: number) => {
+    const selectedContent = saleInfo?.content.filter(({ id: _id, content }) => {
+      return id === _id ? content : null;
+    });
+
+    if (selectedContent) {
+      setContent({
+        title: selectedContent[0].title,
+        content: selectedContent[0].content,
+      });
+      push(`/info/${id}`);
+    }
+  };
+
+  useEffect(() => {
+    const handleClickOutSide = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (
+        !dropdownButtonRef.current?.contains(target) &&
+        !selectBoxRef.current?.contains(target)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    window.addEventListener("click", (e: any) => handleClickOutSide(e));
+
+    return () => {
+      window.removeEventListener("click", (e: any) => handleClickOutSide(e));
+    };
+  }, []);
 
   return (
     <Container>
@@ -119,31 +111,50 @@ const SaleAlert = () => {
                 key={_category}
                 category={_category}
                 currentCategory={currentCategory}
-                handleClick={handleClick}
+                handleClick={handleClickCategory}
               />
             ))}
           </CategoryWrapper>
         </CategoryContainer>
         <LocateFilter>
           <LocateContainer>
-            <SelectBox>
+            <SelectBox ref={dropdownButtonRef}>
               <Text
                 variant="Body1"
                 color={Colors.Emerald600}
                 fontWeight="Medium"
               >
-                서울시 전체
+                {currentDistrict}
               </Text>
               <SelectChevron $isOpen={isOpen} onClick={handleClickDropDown}>
                 <Chevron color={Colors.Emerald600} width={28} height={28} />
               </SelectChevron>
+              {isOpen && (
+                <DropDownContainer ref={selectBoxRef}>
+                  {district?.map(({ districtId, districtName }, index) => (
+                    <DropDown
+                      key={districtId}
+                      $isLast={index === district.length - 1}
+                      onClick={() => handleDistrict(districtName, districtId)}
+                    >
+                      <Text
+                        variant="Body3"
+                        color={Colors.Black900}
+                        fontWeight="Medium"
+                      >
+                        {districtName}
+                      </Text>
+                    </DropDown>
+                  ))}
+                </DropDownContainer>
+              )}
             </SelectBox>
             <RecentPost>
               <Text variant="Body1" color={Colors.Black700}>
                 최근 일주일 게시물&nbsp;
               </Text>
               <Text variant="Body1" color={Colors.Emerald600}>
-                {30}
+                {saleInfo?.recentNewsCount}
               </Text>
               <Text variant="Body1" color={Colors.Black700}>
                 건
@@ -171,9 +182,11 @@ const SaleAlert = () => {
             </CreatedAtContainer>
           </TableHeader>
           <TableContent>
-            {mockData
-              .slice((currentPage - 1) * 9, 9 * currentPage)
-              .map(({ id, title, createdAt }, index) => (
+            {saleInfo?.content.map(
+              (
+                { id, eventId, createdAt, districtId, title, content },
+                index,
+              ) => (
                 <BargainContent key={id + index}>
                   <NumberContainer>
                     <Text
@@ -189,9 +202,8 @@ const SaleAlert = () => {
                       variant="Body1"
                       color={Colors.Black900}
                       fontWeight="Medium"
-                    >
-                      {title}
-                    </Text>
+                      dangerouslySetInnerHTML={{ __html: title }}
+                    />
                   </TitleContainer>
                   <Text
                     variant="Body1"
@@ -201,7 +213,8 @@ const SaleAlert = () => {
                     {createdAt}
                   </Text>
                 </BargainContent>
-              ))}
+              ),
+            )}
           </TableContent>
         </TableContainer>
         <PageNation>
@@ -209,22 +222,27 @@ const SaleAlert = () => {
             <Chevron />
           </ChevronContainer>
           {Array.from({
-            length: Math.floor((mockData.length - 1) / 9) + 1,
+            length: 10,
           }).map((_, index) => {
+            if (
+              Math.floor(currentPage / 10) * 10 + index + 1 >
+              Number(saleInfo?.totalPages)
+            )
+              return;
             return (
               <Numbering
                 key={index}
-                $isSelected={currentPage === index + 1}
-                onClick={() => handleNumberClick(index + 1)}
+                $isSelected={currentPage % 10 === index}
+                onClick={() => handleNumberClick(index)}
               >
                 <Text
                   variant="Body1"
                   color={
-                    currentPage === index + 1 ? "white" : Colors.Emerald600
+                    currentPage % 10 === index ? "white" : Colors.Emerald600
                   }
                   fontWeight="Bold"
                 >
-                  {index + 1}
+                  {Math.floor(currentPage / 10) * 10 + index + 1}
                 </Text>
               </Numbering>
             );
@@ -274,17 +292,20 @@ const CategoryWrapper = styled.div`
 `;
 
 const LocateFilter = styled.div`
+  width: 100%;
   padding: 16px 24px;
 `;
 
 const LocateContainer = styled.div`
   display: flex;
+  width: 100%;
   gap: 12px;
   align-items: center;
 `;
 
 const SelectBox = styled.div`
   display: flex;
+  position: relative;
   height: 48px;
   align-items: center;
   gap: 8px;
@@ -307,18 +328,46 @@ const SelectChevron = styled.div<{ $isOpen: boolean }>`
   cursor: pointer;
 `;
 
+const DropDownContainer = styled.div`
+  position: absolute;
+  top: 48px;
+  height: 560px;
+  box-shadow: 0px 0px 8px 0px rgba(212, 157, 157, 0.75);
+  border: 1px solid white;
+  border-radius: 4px;
+  overflow: auto;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`;
+
+const DropDown = styled.div<{ $isLast?: boolean }>`
+  position: relative;
+  width: 168px;
+  padding: 12px 16px;
+  background-color: white;
+  z-index: 5;
+  ${({ $isLast }) => {
+    if (!$isLast) {
+      return `border-bottom: 1px solid ${Colors.Black600};`;
+    }
+  }}
+  cursor: pointer;
+`;
+
 const RecentPost = styled.div`
   display: flex;
   flex-grow: 1;
 `;
 
 const SearchBox = styled.div`
-  width: 339px;
+  width: 491px;
   height: 48px;
 `;
 
 const Input = styled.input`
-  width: 339px;
+  width: 491px;
   height: 48px;
   outline: none;
   border: none;

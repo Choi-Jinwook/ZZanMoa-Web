@@ -1,13 +1,13 @@
+import { saleContent } from "@shared/atoms";
 import { SideNavigation, Text } from "@shared/components";
 import { Colors } from "@shared/constants";
 import { useRouter } from "next/router";
+import { useRecoilState } from "recoil";
 import styled from "styled-components";
 
 const SaleInfo = () => {
-  const {
-    query: { id },
-    back,
-  } = useRouter();
+  const [content] = useRecoilState(saleContent);
+  const { back } = useRouter();
 
   return (
     <Container>
@@ -15,10 +15,19 @@ const SaleInfo = () => {
       <ContentContainer>
         <Title>
           <Text variant="H3" color={Colors.Black900} fontWeight="Bold">
-            [양천구] 장바구니 물가정보 게시(24. 2월)
+            {content.title}
           </Text>
         </Title>
-        <Content></Content>
+        <Content>
+          <Text
+            variant="Body1"
+            color={Colors.Black900}
+            fontWeight="Medium"
+            dangerouslySetInnerHTML={{
+              __html: content.content.replace(/\n/g, "<br>"),
+            }}
+          />
+        </Content>
         <GoToList onClick={back}>
           <Text variant="Body1" color={Colors.Emerald700} fontWeight="SemiBold">
             목록으로
@@ -49,6 +58,7 @@ const Title = styled.div`
 
 const Content = styled.div`
   padding: 36px 0;
+  white-space: pre-wrap;
   border-bottom: 1px solid ${Colors.Black600};
 `;
 

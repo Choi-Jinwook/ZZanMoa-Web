@@ -14,11 +14,11 @@ const Marker_FindStore = ({ map }: { map: kakao.maps.Map }) => {
 
     useEffect(() => {
 
-        const existingMarkers: kakao.maps.Marker[] = [];
+        // const existingMarkers: kakao.maps.Marker[] = [];
         removeAllMarkers();
 
         console.log(storeMarkers);
-        console.log(existingMarkers);
+        // console.log(existingMarkers);
         
         // 지도 강제 갱신
         function forceMapRefresh(map) {
@@ -41,21 +41,20 @@ const Marker_FindStore = ({ map }: { map: kakao.maps.Map }) => {
         }
 
         // 지도 위 마커 삭제
-        function removeAllMarkers() {
-            // forceMapRefresh(map);
-            existingMarkers.forEach(marker => marker.setMap(null));
-            // forceMapRefresh(map);
-        }
-        
         // function removeAllMarkers() {
-        //     console.log("Removing all markers...");
-        //     markers.forEach((value, key) => {
-        //         console.log(`Removing marker at: ${value.marker.getPosition().toString()}`);
-        //         value.marker.setMap(null);
-        //         markers.delete(key);
-        //     });
-        //     console.log(`Markers after removal: ${markers.size}`);
+        //     existingMarkers.forEach(marker => marker.setMap(null));
+        //     forceMapRefresh(map);
         // }
+        
+        function removeAllMarkers() {
+            console.log("Removing all markers");
+            markers.forEach((value, key) => {
+                console.log(`Removing marker at: ${value.marker.getPosition().toString()}`);
+                value.marker.setMap(null);
+                markers.delete(key);
+            });
+            console.log(`삭제 후 마커: ${markers.size}`);
+        }
 
         kakao.maps.event.addListener(map, 'click', closeInfoWindow);
 
@@ -73,10 +72,10 @@ const Marker_FindStore = ({ map }: { map: kakao.maps.Map }) => {
                                 position: newPos,
                                 title: store.storeName
                             });
-                            existingMarkers.push(marker);
-                            console.log(existingMarkers);
-                            
 
+                            // existingMarkers.push(marker);
+                            // console.log(existingMarkers);
+                            
                             console.log(`Adding new marker for: ${store.storeName}`);
 
                             const infoWindowContent = document.createElement("div");
@@ -102,21 +101,18 @@ const Marker_FindStore = ({ map }: { map: kakao.maps.Map }) => {
                     });
                 }
             });
-            // setMarkers(newMarkers);
+            setMarkers(newMarkers);
         }
 
         removeAllMarkers();
         addNewMarkers();
 
         return () => {
-            // console.log("Cleaning up markers...");
-            // markers.forEach((value, key) => {
-            //     value.marker.setMap(map);
-            //     value.marker.setMap(null);
-            // });
-            // console.log("Markers cleaned up on component unmount.");
-            existingMarkers.forEach(marker => marker.setMap(null));
-
+            markers.forEach((value, key) => {
+                value.marker.setMap(map);
+                value.marker.setMap(null);
+            });
+            // existingMarkers.forEach(marker => marker.setMap(null));
         };
     }, [storeMarkers, map]);
     return null;

@@ -69,13 +69,13 @@ const AddButton = styled.button.attrs(props => ({
   }
 `;
 
-const IconWrapper = styled.div`
+export const IconWrapper = styled.div`
   display: flex;
   align-items: center;
   margin-right: 8px;
 `;
 
-const IconImageWrapper = styled.div`
+export const IconImageWrapper = styled.div`
   margin-right: 8px;
 `;
 

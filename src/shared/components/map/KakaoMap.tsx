@@ -4,15 +4,18 @@ import Marker from "./Marker";
 import { useState, useEffect } from "react";
 import { SyncLoader } from "react-spinners";
 import locateBtnImage from "@shared/assets/locateBtn.png";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { mapCenterState, markersState } from "@shared/atoms/MapState";
 import axios from "axios";
+import Marker_FindStore from "./Marker_FindStore";
+import { SelectedMenu } from "@shared/atoms";
 
 const KakaoMap = () => {
   const [map, setMap] = useState<kakao.maps.Map | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [mapCenter, setMapCenter] = useRecoilState(mapCenterState);
   const [markers, setMarkers] = useRecoilState(markersState);
+  const currentMenu = useRecoilValue(SelectedMenu);
 
   const handleLocate = () => {
     if (map) {
@@ -37,15 +40,18 @@ const KakaoMap = () => {
       })
       .catch((error) => console.error("Failed to fetch market data:", error));
   };
+  
 
   useEffect(() => {
     console.log("카카오맵 렌더링");
 
     const { geolocation } = navigator;
     const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-
-    loadMarketData(apiUrl);
-
+    
+    if (currentMenu === '시장 가격 비교') {
+      loadMarketData(apiUrl);
+    }
+  
     geolocation.getCurrentPosition(
       ({ coords }) => {
         const userCoords = {
@@ -66,7 +72,7 @@ const KakaoMap = () => {
       const zoomControl = new kakao.maps.ZoomControl();
       map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
     }
-  }, [map]);
+  }, [map, currentMenu]);
 
   // function removeBorderFromMapElement() {
   //   const element = document.querySelector("#__react-kakao-maps-sdk___Map > div:nth-child(1) > div > div:nth-child(6) > div:nth-child(107)") as HTMLElement;
@@ -91,7 +97,9 @@ const KakaoMap = () => {
             level={3}
             onCreate={setMap}
           >
-            {map && <Marker map={map} />}
+            { currentMenu == '시장 가격 비교' && map && <Marker map={map} />}
+            { currentMenu == '알뜰 가게 찾기' && map && <Marker_FindStore map={map} />}
+            {/* { map && <Marker map={map} />} */}
           </Map>
           <HandleLocateBtn onClick={handleLocate} />
         </>

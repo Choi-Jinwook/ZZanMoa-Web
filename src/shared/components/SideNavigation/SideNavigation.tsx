@@ -6,13 +6,24 @@ import { FindStore, MenuList } from "./FindStore";
 import { ComparePrice } from "./ComparePrice";
 import { useRecoilState } from "recoil";
 import { SelectedMenu } from "@shared/atoms";
+import { navigationState } from "@shared/atoms/navigation";
+
 
 const SideNavigation = () => {
   const [currentMenu, setCurrentMenu] = useRecoilState(SelectedMenu);
+  // const [currentMenu, setCurrentMenu] = useState<Menu>("알뜰 가게 찾기");
 
   const handleCurrentMenu = (value: Menu) => {
     setCurrentMenu(value);
   };
+
+  // const [navState, setNavState] = useRecoilState(navigationState);
+
+  // const handleNavChange = (newState: Menu) => {
+  //   setNavState(newState);
+  //   console.log("navStateChanged: ", navState);
+    
+  // };
 
   return (
     <Container $currentMenu={currentMenu}>

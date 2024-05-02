@@ -2,10 +2,12 @@ import { Colors, QueryKey } from "@shared/constants";
 import styled from "styled-components";
 import Text from "../../Text";
 import { StoreData } from "@shared/types";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import { CurrentPrice, SelectedCategory } from "@shared/atoms";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import { storeMarkerState } from "@shared/atoms/storeMarkerState";
+import { useEffect } from "react";
 
 const FilteredStore = () => {
   const { data: storeData } = useQuery([QueryKey.store], async () => {
@@ -17,75 +19,52 @@ const FilteredStore = () => {
   });
   const [currentCategory] = useRecoilState(SelectedCategory);
   const [currentPrice] = useRecoilState(CurrentPrice);
+  const setStoreMarkers = useSetRecoilState(storeMarkerState);
 
-  const getFilteredStores = (stores: StoreData[]) => {
-    return stores.filter(({ items }) => {
-      if (currentCategory === "") {
-        return true;
-      } else {
-        return items.some(
-          ({ category, price }) =>
-            category.includes(currentCategory.split(" ").reverse()[0]) &&
-            price >= currentPrice.minPrice &&
-            price <= currentPrice.maxPrice,
-        );
-      }
-    });
-  };
 
-  const filteredStores = getFilteredStores(storeData || []);
+  useEffect(() => {
+    if (currentCategory) {
+      const filteredStores = storeData?.filter(store => 
+        store.items.some(item => 
+          item.category.includes(currentCategory) &&
+          item.price >= currentPrice.minPrice &&
+          item.price <= currentPrice.maxPrice
+        )
+      ) || [];
+      
+      setStoreMarkers(filteredStores);
+      console.log(filteredStores.length);
+      
+    } 
+    // else {
+    //   setStoreMarkers([]);
+    // }
+  }, [storeData, currentCategory, currentPrice, setStoreMarkers]);
+
+  // const filteredStores = getFilteredStores(storeData || []);
+  // console.log(filteredStores);
 
   return (
     <Container>
-      {filteredStores.map(
-        ({ storeId, storeName, address, items, phoneNumber }) => {
-          return (
-            <StoreCard key={storeId}>
-              <Text
-                variant="Body1"
-                color={Colors.Black900}
-                fontWeight="SemiBold"
-              >
-                {storeName}
-              </Text>
-              <StoreDetail>
-                <Text
-                  variant="Body4"
-                  color={Colors.Black800}
-                >{`장소 | ${address}`}</Text>
-                <Text
-                  variant="Body4"
-                  color={Colors.Black800}
-                >{`번호 | ${phoneNumber}`}</Text>
-              </StoreDetail>
-              <StoreMenu>
-                {items.slice(0, 2).map(({ item, itemId, price }) => (
-                  <Menu key={itemId + price}>
-                    <Text
-                      variant="Body4"
-                      color={Colors.Emerald600}
-                      fontWeight="SemiBold"
-                    >
-                      {item}
-                    </Text>
-                  </Menu>
-                ))}
-                {items.length - 2 > 0 && (
-                  <Remains key={address + storeId}>
-                    <Text
-                      variant="Body4"
-                      color={Colors.Black800}
-                      fontWeight="SemiBold"
-                    >
-                      {`+${items.length - 2}`}
-                    </Text>
-                  </Remains>
-                )}
-              </StoreMenu>
-            </StoreCard>
-          );
-        },
-      )}
+      {storeData && storeData.map(({ storeId, storeName, address, items, phoneNumber }) => (
+        <StoreCard key={storeId}>
+          <Text variant="Body1" color={Colors.Black900} fontWeight="SemiBold">{storeName}</Text>
+          <StoreDetail>
+            <Text variant="Body4" color={Colors.Black800}>{`장소 | ${address}`}</Text>
+            <Text variant="Body4" color={Colors.Black800}>{`번호 | ${phoneNumber}`}</Text>
+          </StoreDetail>
+          <StoreMenu>
+            {items.slice(0, 2).map(({ item, itemId, price }) => (
+              <Menu key={itemId + price}>
+                <Text variant="Body4" color={Colors.Emerald600} fontWeight="SemiBold">{item}</Text>
+              </Menu>
+            ))}
+            {items.length > 2 && (
+              <Remains>{`+${items.length - 2} more`}</Remains>
+            )}
+          </StoreMenu>
+        </StoreCard>
+      ))}
     </Container>
   );
 };

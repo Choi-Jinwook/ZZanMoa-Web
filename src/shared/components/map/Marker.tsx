@@ -2,9 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import StyledInfoWindow from "@shared/components/StyledInfoWindow";
 import { createRoot } from "react-dom/client";
 import { MarkerInfo } from "@shared/types";
-import { useRecoilState, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import selectedMarketsState from "@shared/atoms/MarketState";
 import { markersState } from "@shared/atoms/MapState";
+import { SelectedMenu } from "@shared/atoms";
 
 const Marker = ({ map }: { map: kakao.maps.Map }) => {
   const [markers, setMarkers] = useRecoilState(markersState);
@@ -64,6 +65,8 @@ const Marker = ({ map }: { map: kakao.maps.Map }) => {
 
     if (!map) return;
 
+    console.log("시장마커");
+    
     const markerUpdates = markers
       .filter((marker) => !marker.position)
       .map(

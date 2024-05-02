@@ -1,3 +1,5 @@
+import { Coords } from "./kakaoMap";
+
 interface StoreItems {
   itemId: string;
   item: string;
@@ -11,6 +13,7 @@ export interface StoreData {
   phoneNumber: string;
   address: string;
   items: StoreItems[];
+  position: Coords;
 }
 
 export interface StoreCategory {

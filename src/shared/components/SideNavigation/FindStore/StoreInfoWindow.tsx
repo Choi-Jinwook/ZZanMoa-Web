@@ -79,7 +79,7 @@ const PriceItem = styled.li`
 `;
 
 
-function StoreInfoWindow({ store, onClose }) {
+function StoreInfoWindow({ store, onClose }) {    
     const displayedItems = store.items.slice(0, 2);
     const moreItemsCount = store.items.length - 2;
     return (

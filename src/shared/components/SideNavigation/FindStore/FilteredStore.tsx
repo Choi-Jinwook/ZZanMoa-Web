@@ -8,6 +8,8 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { storeMarkerState } from "@shared/atoms/storeMarkerState";
 import { useEffect } from "react";
+import { debounce } from 'lodash';
+
 
 const FilteredStore = () => {
   const { data: storeData } = useQuery([QueryKey.store], async () => {
@@ -21,25 +23,29 @@ const FilteredStore = () => {
   const [currentPrice] = useRecoilState(CurrentPrice);
   const setStoreMarkers = useSetRecoilState(storeMarkerState);
 
+    // debounce 함수 생성
+    const debouncedSetStoreMarkers = debounce((filteredStores: StoreData[] | ((currVal: StoreData[]) => StoreData[])) => {
+      setStoreMarkers(filteredStores);
+    }, 800);
 
-  useEffect(() => {
-    if (currentCategory) {
-      const filteredStores = storeData?.filter(store => 
-        store.items.some(item => 
+    useEffect(() => {
+      if (!currentCategory) return;
+  
+      const filteredStores = storeData?.filter(store =>
+        store.items.some(item =>
           item.category.includes(currentCategory) &&
           item.price >= currentPrice.minPrice &&
           item.price <= currentPrice.maxPrice
         )
       ) || [];
-      
-      setStoreMarkers(filteredStores);
+  
+      debouncedSetStoreMarkers(filteredStores);
       console.log(filteredStores.length);
-      
-    } 
-    // else {
-    //   setStoreMarkers([]);
-    // }
-  }, [storeData, currentCategory, currentPrice, setStoreMarkers]);
+  
+      // else {
+      //   setStoreMarkers([]);
+      // }
+    }, [storeData, currentCategory, currentPrice, setStoreMarkers]);
 
   // const filteredStores = getFilteredStores(storeData || []);
   // console.log(filteredStores);

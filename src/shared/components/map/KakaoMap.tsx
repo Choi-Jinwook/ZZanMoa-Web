@@ -9,6 +9,7 @@ import { mapCenterState, markersState } from "@shared/atoms/MapState";
 import axios from "axios";
 import Marker_FindStore from "./Marker_FindStore";
 import { SelectedMenu } from "@shared/atoms";
+import { storeMarkerState } from "@shared/atoms/storeMarkerState";
 
 const KakaoMap = () => {
   const [map, setMap] = useState<kakao.maps.Map | null>(null);
@@ -16,6 +17,10 @@ const KakaoMap = () => {
   const [mapCenter, setMapCenter] = useRecoilState(mapCenterState);
   const [markers, setMarkers] = useRecoilState(markersState);
   const currentMenu = useRecoilValue(SelectedMenu);
+  const storeMarkers = useRecoilValue(storeMarkerState);
+  const [kakaoMarkers, setKakaoMarkers] = useState([]);
+  const [mapKey, setMapKey] = useState(Date.now());
+
 
   const handleLocate = () => {
     if (map) {
@@ -40,7 +45,14 @@ const KakaoMap = () => {
       })
       .catch((error) => console.error("Failed to fetch market data:", error));
   };
-  
+
+  // useEffect(() => {
+  //   setMapKey(Date.now());
+  // }, [storeMarkers]);
+
+  useEffect(() => {
+    setMapKey(Date.now());
+  }, [currentMenu])
 
   useEffect(() => {
     console.log("카카오맵 렌더링");
@@ -92,6 +104,7 @@ const KakaoMap = () => {
       ) : (
         <>
           <Map
+            key={mapKey}
             center={{ lat: mapCenter.lat, lng: mapCenter.lng }}
             style={{ width: "100%", height: "100%" }}
             level={3}

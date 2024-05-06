@@ -34,12 +34,12 @@ const MarketCard = () => {
               </Text>
             </MarketInfoWrapper>
             <DeleteButton onClick={() => handleDelete(index)}>
-              {/* <Image
+              <Image
                 src="/images/deleteMarket.svg"
                 alt="delete"
                 width={24}
                 height={24}
-              /> */}
+              />
             </DeleteButton>
           </MarketInfo>
         </SelectedMarket>

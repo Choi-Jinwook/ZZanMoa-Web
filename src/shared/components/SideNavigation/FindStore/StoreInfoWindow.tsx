@@ -5,7 +5,6 @@ import naverIcon from '@shared/assets/naverMapIcon.png';
 import Image from 'next/image';
 import { Colors } from '@shared/constants';
 import Text from "../../Text";
-import Divider from '@shared/components/Divider';
 import { IconImageWrapper, IconWrapper } from '@shared/components/StyledInfoWindow';
 
 
@@ -71,7 +70,7 @@ const PriceItem = styled.li`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding: 4px 16px;
+  padding: 4px 0px 0px 16px;
   border-top: 1px solid #B9B9BA;
   &:last-child {
     border-bottom: 1px solid #B9B9BA;

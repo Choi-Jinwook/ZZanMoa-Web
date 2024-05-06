@@ -12,6 +12,7 @@ const Marker_FindStore = ({ map }: { map: kakao.maps.Map }) => {
     const infoWindowRef = useRef<kakao.maps.InfoWindow | null>(null);
 
     useEffect(() => {
+        removeAllMarkers();
         // info 닫기
         function closeInfoWindow() {
             if (infoWindowRef.current) {
@@ -21,10 +22,14 @@ const Marker_FindStore = ({ map }: { map: kakao.maps.Map }) => {
 
         function removeAllMarkers() {
             markers.forEach((value, key) => {
-                value.marker.setMap(null);
-                markers.delete(key);
+                if (value.marker) {
+                    value.marker.setMap(null);
+                }
+                if (value.overlay) {
+                    value.overlay.setMap(null);
+                }
             });
-            setMarkers(new Map());
+            markers.clear();
         }
 
         kakao.maps.event.addListener(map, 'click', closeInfoWindow);
@@ -37,7 +42,18 @@ const Marker_FindStore = ({ map }: { map: kakao.maps.Map }) => {
                 if (!store.position && store.address) {
                     geocoder.addressSearch(store.address, (result, status) => {
                         if (status === kakao.maps.services.Status.OK) {
-                            const newPos = new kakao.maps.LatLng(result[0].y, result[0].x);
+                            const newPos = new kakao.maps.LatLng(parseFloat(result[0].y), parseFloat(result[0].x));
+                            // const content = document.createElement('div');
+                            // content.className = 'custom-overlay';
+                            // content.style.cssText = overlayStyle;
+                            // content.innerHTML = `<strong>${store.storeName}</strong>`;
+                            
+                            // const overlay = new kakao.maps.CustomOverlay({
+                            //     map: map,
+                            //     position: newPos,
+                            //     content: content,
+                            //     yAnchor: 1.1
+                            // });
                             const marker = new kakao.maps.Marker({
                                 map: map,
                                 position: newPos,

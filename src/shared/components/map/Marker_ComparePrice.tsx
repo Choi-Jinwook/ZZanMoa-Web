@@ -7,7 +7,7 @@ import selectedMarketsState from "@shared/atoms/MarketState";
 import { markersState } from "@shared/atoms/MapState";
 import { SelectedMenu } from "@shared/atoms";
 
-const Marker = ({ map }: { map: kakao.maps.Map }) => {
+const Marker_ComparePrice = ({ map }: { map: kakao.maps.Map }) => {
   const [markers, setMarkers] = useRecoilState(markersState);
   const setSelectedMarkets = useSetRecoilState(selectedMarketsState);
   const infoWindowRef = useRef<kakao.maps.InfoWindow | null>(null);
@@ -212,4 +212,4 @@ const Marker = ({ map }: { map: kakao.maps.Map }) => {
 
   return null;
 };
-export default Marker;
+export default Marker_ComparePrice;

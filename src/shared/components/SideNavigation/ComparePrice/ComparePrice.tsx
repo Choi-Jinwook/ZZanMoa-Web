@@ -3,34 +3,84 @@ import SectionTitle from "@shared/components/SectionTitle";
 import Text from "@shared/components/Text";
 import { Colors } from "@shared/constants";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import MarketCard from "./MarketCard";
+import { useGetMarketItems } from "@shared/apis";
+import selectedMarketsState from "@shared/atoms/MarketState";
+import { useRecoilState } from "recoil";
+import axios from "axios";
+import { useRouter } from "next/router";
+import { rank } from "@shared/atoms";
 
 const ComparePrice = () => {
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const searchRef = useRef<HTMLDivElement | null>(null);
   const [searchedItem, setSearchedItem] = useState("");
-  const [selectedList, setSelectedList] = useState([
-    "계란",
-    "쌀",
-    "우유",
-    "샤인머스켓",
-    "빵",
-    "딸기",
-    "삼겹살",
-  ]);
+  const [selectedList, setSelectedList] = useState<string[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedMarkets] = useRecoilState(selectedMarketsState);
+  const [, setRank] = useRecoilState(rank);
+  const { push } = useRouter();
+  const { data: items } = useGetMarketItems();
 
   const handleSearch = (value: string) => {
     setSearchedItem(value);
   };
 
-  const addItem = (value: string, key: string) => {
+  const handleAddItem = (value: string) => {
     if (value === "") return;
-    if (key === "Enter") setSelectedList((prev) => [...prev, value]);
+    setSelectedList((prev) => {
+      if (prev) {
+        return [...prev, value];
+      }
+
+      return [value];
+    });
+    setSearchedItem("");
   };
 
-  const deleteItem = (index: number) => {
+  const handleDeleteItem = (index: number) => {
     setSelectedList((prev) => prev.filter((_, i) => i !== index));
   };
+
+  const handleCompare = async () => {
+    try {
+      const marketNames = selectedMarkets.map(({ name }) => {
+        return name;
+      });
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/market/compare`,
+        {
+          marketNames: marketNames,
+          itemNames: selectedList,
+        },
+      );
+
+      if (res.status === 200) {
+        setRank(res.data);
+        push(`/compare`);
+      }
+    } catch (error) {
+      console.warn(error);
+    }
+  };
+
+  useEffect(() => {
+    const handleInputFocus = (e: any) => {
+      if (document.activeElement !== inputRef.current) {
+        setIsOpen(false);
+      } else {
+        setIsOpen(true);
+      }
+    };
+
+    window.addEventListener("click", (e) => handleInputFocus(e));
+
+    return () => {
+      window.removeEventListener("click", (e) => handleInputFocus(e));
+    };
+  }, []);
 
   return (
     <Container>
@@ -49,14 +99,51 @@ const ComparePrice = () => {
           title="장바구니 담기"
           subTitle="구매할 상품을 장바구니에 담아보세요"
         />
-        <SearchBox>
+        <SearchBox ref={searchRef}>
           <Image src="/images/search.svg" alt="search" width={24} height={24} />
           <Search
+            ref={inputRef}
             value={searchedItem}
             onChange={({ target: { value } }) => handleSearch(value)}
-            onKeyUpCapture={({ key }) => addItem(searchedItem, key)}
             placeholder="상품 검색"
           />
+          {isOpen && (
+            <AutoCompleteContainer>
+              {items
+                ?.filter(({ itemName }) =>
+                  searchedItem ? itemName.includes(searchedItem) : true,
+                )
+                .map(({ itemId, itemName }, index, array) => {
+                  const parts = itemName.split(
+                    new RegExp(`(${searchedItem})`, "gi"),
+                  );
+
+                  return (
+                    <AutoCompleteItem
+                      key={itemId}
+                      $isLast={index === array.length - 1}
+                      onClick={() => handleAddItem(itemName)}
+                    >
+                      {parts.map((part, index) => (
+                        <Text
+                          variant="Body2"
+                          color={Colors.Black900}
+                          fontWeight="Bold"
+                          key={part + index}
+                          className={
+                            part.toLowerCase() === searchedItem.toLowerCase()
+                              ? "highlight"
+                              : ""
+                          }
+                        >
+                          {part}
+                        </Text>
+                      ))}
+                    </AutoCompleteItem>
+                  );
+                })}
+            </AutoCompleteContainer>
+          )}
         </SearchBox>
         <SelectedList>
           {selectedList?.map((item, index) => {
@@ -65,7 +152,7 @@ const ComparePrice = () => {
                 <Text variant="Body3" color={Colors.Black900}>
                   {item}
                 </Text>
-                <ImageContainer onClick={() => deleteItem(index)}>
+                <ImageContainer onClick={() => handleDeleteItem(index)}>
                   <Image
                     src="/images/delete.svg"
                     alt="delete"
@@ -77,7 +164,10 @@ const ComparePrice = () => {
             );
           })}
         </SelectedList>
-        <SearchButton $isSelected={selectedList.length !== 0}>
+        <SearchButton
+          $isSelected={selectedList.length !== 0 && selectedMarkets.length > 1}
+          onClick={handleCompare}
+        >
           <Text variant="Body2" color="white">
             가격 확인하기
           </Text>
@@ -100,18 +190,6 @@ const Selection = styled.div`
   gap: 8px;
 `;
 
-const SelectedMarket = styled.div`
-  width: 100%;
-  height: 100px;
-  border: 1px dashed ${Colors.Black500};
-  border-radius: 4px;
-  background-color: ${Colors.Black100};
-  background-image: url("/images/plusunion.svg");
-  background-repeat: no-repeat;
-  background-position: center;
-  cursor: pointer;
-`;
-
 const ShoppingList = styled.div`
   display: flex;
   flex-direction: column;
@@ -120,6 +198,7 @@ const ShoppingList = styled.div`
 
 const SearchBox = styled.div`
   display: flex;
+  position: relative;
   width: 100%;
   height: 56px;
   padding: 4px 16px;
@@ -134,6 +213,43 @@ const Search = styled.input`
   font-size: 16px;
   border: none;
   outline: none;
+`;
+
+const AutoCompleteContainer = styled.div`
+  position: absolute;
+  top: 72px;
+  left: 0px;
+  width: 100%;
+  min-height: 50px;
+  max-height: 240px;
+  box-shadow: 0px 0px 8px 0px rgba(212, 157, 157, 0.75);
+  border: 1px solid white;
+  border-radius: 4px;
+  background-color: white;
+  overflow: auto;
+  z-index: 5;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`;
+
+const AutoCompleteItem = styled.div<{ $isLast?: boolean }>`
+  display: flex;
+  padding: 12px 16px;
+  ${({ $isLast }) => {
+    if (!$isLast) {
+      return `
+        border-bottom: 1px solid ${Colors.Black600};  
+      `;
+    }
+  }}
+  cursor: pointer;
+
+  p.highlight {
+    color: ${Colors.Emerald600};
+    font-weight: bold;
+  }
 `;
 
 const SelectedList = styled.div`
@@ -174,6 +290,7 @@ const SearchButton = styled.button<{ $isSelected: boolean }>`
   color: white;
   background-color: ${({ $isSelected }) =>
     $isSelected ? Colors.Emerald500 : Colors.Black500};
+  cursor: pointer;
 `;
 
 export default ComparePrice;

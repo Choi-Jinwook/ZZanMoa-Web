@@ -19,7 +19,6 @@ const MarketCard = () => {
     <>
       {selectedMarkets.map(({ name, address }, index) => (
         <SelectedMarket key={address}>
-          {/* {src && <Image src={src} alt={src} width={84} height={84} />} */}
           <MarketInfo>
             <MarketInfoWrapper>
               <Text
@@ -34,29 +33,27 @@ const MarketCard = () => {
               </Text>
             </MarketInfoWrapper>
             <DeleteButton onClick={() => handleDelete(index)}>
-              {/* <Image
+              <Image
                 src="/images/deleteMarket.svg"
                 alt="delete"
                 width={24}
                 height={24}
-              /> */}
+              />
             </DeleteButton>
           </MarketInfo>
         </SelectedMarket>
       ))}
-      <>
-        {selectedMarkets.length < 4 &&
-          Array.from({ length: 4 - selectedMarkets.length }, (_, _index) => (
-            <BlankBox key={_index} />
-          ))}
-      </>
+      {selectedMarkets.length < 4 &&
+        Array.from({ length: 4 - selectedMarkets.length }, (_, _index) => (
+          <BlankBox key={_index} />
+        ))}
     </>
   );
 };
 
 const BlankBox = styled.div`
   width: 100%;
-  height: 100px;
+  height: 80px;
   border: 1px dashed ${Colors.Black500};
   border-radius: 4px;
   background-color: ${Colors.Black100};
@@ -69,16 +66,16 @@ const BlankBox = styled.div`
 const SelectedMarket = styled.div`
   display: flex;
   width: 100%;
-  height: 100px;
+  height: 80px;
   border: 1px solid ${Colors.Black500};
   border-radius: 4px;
-  padding: 8px;
+  padding: 16px;
   gap: 16px;
 `;
 
 const MarketInfo = styled.div`
   display: flex;
-  width: calc(100% - 100px);
+  width: 100%;
   justify-content: space-between;
 `;
 

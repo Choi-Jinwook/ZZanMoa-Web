@@ -27,14 +27,24 @@ export const useGetBargainDistrict = () => {
   );
 };
 
-export const useGetBargainInfo = (page: number, id?: number) => {
+export const useGetBargainInfo = (
+  page: number,
+  eventId?: number,
+  districtId?: number,
+  keyword?: string,
+) => {
   return useQuery<SaleInfo, Error, SaleInfo>(
-    [QueryKey.bargain, page, id],
+    [QueryKey.bargain, page, eventId, districtId, keyword],
     async () => {
       const res = await axios.get<SaleInfo>(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/bargain-board/`,
         {
-          params: { id: id, page: page },
+          params: {
+            eventId: eventId,
+            page: page,
+            districtId: districtId,
+            keyword: keyword,
+          },
         },
       );
 

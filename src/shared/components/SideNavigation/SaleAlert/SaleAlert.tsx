@@ -3,30 +3,42 @@ import { saleContent } from "@shared/atoms";
 import { Category, Chevron, Text } from "@shared/components";
 import { Colors } from "@shared/constants";
 import { convertCategoryId } from "@shared/hooks";
+import { District } from "@shared/types";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { MouseEvent, useEffect, useRef, useState } from "react";
+import { KeyboardEvent, MouseEvent, useEffect, useRef, useState } from "react";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
+
+interface DistrictCheck extends District {
+  checked: boolean;
+}
 
 const SaleAlert = () => {
   const selectBoxRef = useRef<HTMLDivElement | null>(null);
   const dropdownButtonRef = useRef<HTMLDivElement | null>(null);
-  const [currentCategory, setCurrentCategory] = useState("전체");
-  const [currentCategoryId, setCurrentCategoryId] = useState(0);
+  const [currentCategory, setCurrentCategory] = useState("할인 소식");
+  const [currentCategoryId, setCurrentCategoryId] = useState(1);
   const [currentDistrict, setCurrentDistrict] = useState("서울시 전체");
   const [currentDistrictId, setCurrentDistrictId] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
   const [, setContent] = useRecoilState(saleContent);
   const [isOpen, setIsOpen] = useState(false);
+  // const [modalOpen, setModalOpen] = useState(false);
+  // const [agree, setAgree] = useState(false);
+  // const [checked, setChecked] = useState<DistrictCheck[]>([]);
+  const [searchValue, setSearchValue] = useState("");
+  const [currentSearchValue, setCurrentSearchValue] = useState("");
   const { push } = useRouter();
   const { data: district } = useGetBargainDistrict();
   const { data: saleInfo } = useGetBargainInfo(
     currentPage,
-    currentCategoryId || undefined,
+    currentCategoryId,
+    currentDistrictId || undefined,
+    searchValue === "" ? undefined : searchValue,
   );
 
-  const CATEGORY = ["전체", "할인 소식", "직거래 마켓"];
+  const CATEGORY = ["할인 소식", "직거래 마켓", "물가정보"];
 
   const handleClickCategory = (value: string) => {
     setCurrentCategoryId(convertCategoryId(value));
@@ -75,6 +87,42 @@ const SaleAlert = () => {
     }
   };
 
+  const handleSearch = (value: string) => {
+    setCurrentSearchValue(value);
+  };
+
+  const handleEnter = (e: KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.stopPropagation();
+      setSearchValue(currentSearchValue);
+    }
+  };
+
+  // const handleClickSubscribe = () => {
+  //   setModalOpen(true);
+  // };
+
+  // const handleSubscribeDistrict = (index: number) => {
+  //   setChecked((prev) => {
+  //     if (index === 0 && !prev[0].checked) {
+  //       return prev.map((item) => ({ ...item, checked: true }));
+  //     } else if (index === 0 && prev[0].checked) {
+  //       return prev.map((item) => ({ ...item, checked: false }));
+  //     } else if (index !== 0) {
+  //       return prev.map((item, i) =>
+  //         i === 0 || i === index ? { ...item, checked: false } : item,
+  //       );
+  //     }
+  //     const newArray = [...prev];
+  //     newArray[index] = {
+  //       ...newArray[index],
+  //       checked: !newArray[index].checked,
+  //     };
+
+  //     return newArray;
+  //   });
+  // };
+
   useEffect(() => {
     const handleClickOutSide = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
@@ -93,8 +141,113 @@ const SaleAlert = () => {
     };
   }, []);
 
+  // useEffect(() => {
+  //   if (district) {
+  //     setChecked(() => {
+  //       const initialChecked = district.map(({ districtId, districtName }) => {
+  //         return {
+  //           districtId: districtId,
+  //           districtName: districtName,
+  //           checked: false,
+  //         };
+  //       });
+
+  //       initialChecked.sort((a, b) => a.districtId - b.districtId);
+
+  //       return initialChecked;
+  //     });
+  //   }
+  // }, [district]);
+
   return (
     <Container>
+      {/* {modalOpen && (
+        <>
+          <Dimmed onClick={() => setModalOpen(false)} />
+          <Modal>
+            <ModalTitle>
+              <Text variant="H2" color={Colors.Black900} fontWeight="SemiBold">
+                서울시 관심 지역
+              </Text>
+              <Text variant="H2" color={Colors.Black900} fontWeight="SemiBold">
+                할인 & 직거래 마켓 소식 받아보세요
+              </Text>
+            </ModalTitle>
+            <CheckBoxContainer>
+              {district?.map(({ districtId, districtName }, index) => {
+                return (
+                  <CheckBoxWrapper key={districtId}>
+                    <HiddenCheckBox
+                      id={String(districtId)}
+                      checked={checked[index].checked}
+                      onChange={() => handleSubscribeDistrict(index)}
+                    />
+                    <SaveIDCheckBox
+                      checked={checked[index].checked}
+                      onChange={() => handleSubscribeDistrict(index)}
+                    >
+                      <Image
+                        src="/images/checked.svg"
+                        alt="checked"
+                        width={12}
+                        height={12}
+                      />
+                    </SaveIDCheckBox>
+                    <Label htmlFor={String(districtId)}>
+                      <Text variant="Body3" color={Colors.Black900}>
+                        {districtName}
+                      </Text>
+                    </Label>
+                  </CheckBoxWrapper>
+                );
+              })}
+            </CheckBoxContainer>
+            <InputContainer>
+              <ModalInput placeholder="성명을 입력해주세요" />
+              <ModalInput placeholder="이메일 주소를 입력해주세요" />
+              <Agreements>
+                <HiddenCheckBox
+                  id="agree"
+                  checked={agree}
+                  onChange={() => setAgree((prev) => !prev)}
+                />
+                <SaveIDCheckBox
+                  checked={agree}
+                  onClick={() => setAgree((prev) => !prev)}
+                >
+                  <Image
+                    src="/images/checked.svg"
+                    alt="checked"
+                    width={12}
+                    height={12}
+                  />
+                </SaveIDCheckBox>
+                <Label htmlFor="agree">
+                  <Text variant="Body1" color={Colors.Black900}>
+                    개인정보 수집 및 이용약관에 동의합니다
+                  </Text>
+                </Label>
+              </Agreements>
+              <Buttons>
+                <Subscribe>
+                  <Text variant="Body2" color="white" fontWeight="SemiBold">
+                    구독하기
+                  </Text>
+                </Subscribe>
+                <UnSubscribe>
+                  <Text
+                    variant="Body2"
+                    color={Colors.Black600}
+                    fontWeight="SemiBold"
+                  >
+                    수신 거부
+                  </Text>
+                </UnSubscribe>
+              </Buttons>
+            </InputContainer>
+          </Modal>
+        </>
+      )} */}
       <Banner>
         <Image
           src="/images/banner.svg"
@@ -161,7 +314,11 @@ const SaleAlert = () => {
               </Text>
             </RecentPost>
             <SearchBox>
-              <Input placeholder="검색어를 입력하세요" />
+              <Input
+                placeholder="검색어를 입력하세요"
+                onChange={({ target: { value } }) => handleSearch(value)}
+                onKeyDown={(e) => handleEnter(e)}
+              />
             </SearchBox>
           </LocateContainer>
         </LocateFilter>
@@ -182,12 +339,12 @@ const SaleAlert = () => {
             </CreatedAtContainer>
           </TableHeader>
           <TableContent>
-            {saleInfo?.content.map(
+            {saleInfo?.content?.map(
               (
                 { id, eventId, createdAt, districtId, title, content },
                 index,
               ) => (
-                <BargainContent key={id + index}>
+                <BargainContent key={id + index + districtId + title}>
                   <NumberContainer>
                     <Text
                       variant="Body1"
@@ -252,6 +409,12 @@ const SaleAlert = () => {
           </ChevronContainer>
         </PageNation>
       </ContentContainer>
+      {/* <SubscribeButton onClick={handleClickSubscribe}>
+        <Image src="/images/mail.svg" alt="main" width={28} height={28} />
+        <Text variant="Body1" color="white" fontWeight="SemiBold">
+          구독하기
+        </Text>
+      </SubscribeButton> */}
     </Container>
   );
 };
@@ -266,6 +429,128 @@ const Container = styled.div`
   gap: 36px;
   overflow: auto;
 `;
+
+// const Dimmed = styled.div`
+//   position: absolute;
+//   left: 138px;
+//   top: 0;
+//   width: calc(100% - 138px);
+//   height: 100dvh;
+//   background-color: ${Colors.Black800};
+//   opacity: 0.6;
+//   z-index: 8;
+// `;
+
+// const Modal = styled.div`
+//   position: absolute;
+//   display: flex;
+//   flex-direction: column;
+//   width: 80%;
+//   height: 80%;
+//   border-radius: 4px;
+//   background-color: white;
+//   padding: 68px 0;
+//   gap: 80px;
+//   text-align: center;
+//   z-index: 10;
+// `;
+
+// const ModalTitle = styled.div``;
+
+// const CheckBoxContainer = styled.div`
+//   display: flex;
+//   width: 62%;
+//   flex-wrap: wrap;
+//   margin: 0 auto;
+//   gap: 12px;
+// `;
+
+// const CheckBoxWrapper = styled.div`
+//   display: flex;
+//   min-width: 120px;
+//   align-items: center;
+//   gap: 8px;
+// `;
+
+// const HiddenCheckBox = styled.input.attrs(({ checked, onChange }) => ({
+//   type: "checkbox",
+//   checked: checked,
+//   onChange: onChange,
+// }))`
+//   border: 0;
+//   clip: rect(0 0 0 0);
+//   clippath: inset(50%);
+//   height: 1px;
+//   margin: -1px;
+//   overflow: hidden;
+//   padding: 0;
+//   position: absolute;
+//   white-space: nowrap;
+//   width: 1px;
+// `;
+
+// const Icon = styled.svg`
+//   fill: none;
+//   stroke: #ffffff;
+//   stroke-width: 2px;
+// `;
+
+// const SaveIDCheckBox = styled.div<{ checked: boolean }>`
+//   display: inline-block;
+//   width: 18px;
+//   height: 18px;
+//   border: ${({ checked }) => !checked && `2px solid ${Colors.Black600}`};
+//   background-color: ${({ checked }) =>
+//     checked ? `${Colors.Emerald600}` : "#ffffff"};
+//   border-radius: 2px;
+// `;
+
+// const Label = styled.label``;
+
+// const InputContainer = styled.div`
+//   display: flex;
+//   flex-direction: column;
+//   width: 37%;
+//   gap: 16px;
+//   align-self: center;
+// `;
+
+// const ModalInput = styled.input`
+//   width: 100%;
+//   height: 56px;
+//   font-size: 18px;
+//   border: 2px solid ${Colors.Emerald500};
+//   border-radius: 4px;
+//   outline: none;
+//   padding: 0 16px;
+// `;
+
+// const Agreements = styled.div`
+//   display: flex;
+//   align-items: center;
+//   gap: 8px;
+// `;
+
+// const Buttons = styled.div`
+//   display: flex;
+//   gap: 15px;
+// `;
+
+// const Subscribe = styled.button`
+//   width: calc((100% - 15px) / 2);
+//   height: 44px;
+//   border: 2px solid ${Colors.Emerald500};
+//   border-radius: 4px;
+//   background-color: ${Colors.Emerald500};
+// `;
+
+// const UnSubscribe = styled.button`
+//   width: calc((100% - 15px) / 2);
+//   height: 44px;
+//   border: 2px solid ${Colors.Black600};
+//   border-radius: 4px;
+//   background-color: white;
+// `;
 
 const Banner = styled.div`
   width: 100%;
@@ -464,5 +749,17 @@ const Numbering = styled.div<{ $isSelected: boolean }>`
     `;
   }}
 `;
+
+// const SubscribeButton = styled.button`
+//   position: absolute;
+//   display: flex;
+//   bottom: 80px;
+//   right: 110px;
+//   border-radius: 60px;
+//   background-color: ${Colors.Black900};
+//   padding: 10px 24px;
+//   gap: 10px;
+//   cursor: pointer;
+// `;
 
 export default SaleAlert;

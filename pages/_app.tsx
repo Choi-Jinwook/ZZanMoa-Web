@@ -33,18 +33,18 @@ function MyApp({
         },
       }),
   );
-  const [isLoading, setIsLoading] = useState(true);
+  // const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    // 가게 정보가 로드된 이후 페이지 렌더링
-    if (queryClient.getQueryData([QueryKey.store])) setIsLoading(false);
-  }, [queryClient]);
+  // useEffect(() => {
+  //   // 가게 정보가 로드된 이후 페이지 렌더링
+  //   if (queryClient.getQueryData([QueryKey.store])) setIsLoading(false);
+  // }, [queryClient]);
 
   return (
     <RecoilRoot>
       <QueryClientProvider client={queryClient}>
         <Hydrate state={pageProps.dehydratedState}>
-          {!isLoading && <Component {...pageProps} />}
+          <Component {...pageProps} />
         </Hydrate>
       </QueryClientProvider>
     </RecoilRoot>

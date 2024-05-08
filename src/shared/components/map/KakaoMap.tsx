@@ -19,27 +19,19 @@ const KakaoMap = () => {
   const currentMenu = useRecoilValue(SelectedMenu);
   const [mapKey, setMapKey] = useState(Date.now());
 
-  const [selectedDistrict, setSelectedDistrict] = useState('');
-  const [neighborhoods, setNeighborhoods] = useState([]);
 
   const updateMapCenter = (lng: number, lat: number) => {
     setMapCenter({ lng, lat });
     map.setCenter(new kakao.maps.LatLng(lat, lng));
     map.setLevel(3); 
-    console.log("Updating map center to:", lat, lng);
 
   };
 
   const handleDistrictChange = (location: { latitude: number; longitude: number; }) => {
     if (location.latitude && location.longitude) {
-      console.log(location.latitude);
-      console.log(location.longitude);
-
-      
       updateMapCenter(location.latitude, location.longitude);
     }
   };
-
 
   const handleLocate = () => {
     if (map) {
@@ -122,10 +114,7 @@ const KakaoMap = () => {
         </>
       ) : (
         <>
-          <DropdownContainer>
             <DistrictSelector onDistrictChange={handleDistrictChange} />
-
-          </DropdownContainer>
           <Map
             key={mapKey}
             center={{ lat: mapCenter.lat, lng: mapCenter.lng }}
@@ -168,18 +157,5 @@ const HandleLocateBtn = styled.button`
   z-index: 3;
 `;
 
-const DropdownContainer = styled.div`
-position: absolute;
-top: 10px;
-left: 10px;
-display: flex;
-flex-direction: row;
-gap: 5px; 
-z-index: 1000;
-`;
 
-const Dropdown = styled.select`
-  margin-bottom: 5px;
-  padding: 8px;
-`;
 export default KakaoMap;

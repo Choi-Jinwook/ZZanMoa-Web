@@ -45,7 +45,7 @@ const Marker_ComparePrice = ({ map }: { map: kakao.maps.Map }) => {
     );
     setFocusedMarkerId(markerId);
   };
-  
+
   const closeInfoWindow = () => {
     if (infoWindowRef.current) {
       infoWindowRef.current.close();
@@ -61,7 +61,7 @@ const Marker_ComparePrice = ({ map }: { map: kakao.maps.Map }) => {
       setFocusedMarkerId(null);
     }
   };
-  
+
   useEffect(() => {
     const selectedMarkets = markers.filter((marker) => marker.added);
     setSelectedMarkets(selectedMarkets);
@@ -79,7 +79,7 @@ const Marker_ComparePrice = ({ map }: { map: kakao.maps.Map }) => {
     const savedMarkers = JSON.parse(
       localStorage.getItem("addedMarkers") || "[]",
     );
-    
+
     const markerUpdates = markers
       .filter((marker) => !marker.position)
       .map(
@@ -146,6 +146,8 @@ const Marker_ComparePrice = ({ map }: { map: kakao.maps.Map }) => {
     };
 
     const infoWindowContent = document.createElement("div");
+    infoWindowContent.style.backgroundColor = 'transparent';
+    infoWindowContent.style.border = 'none';
     const root = createRoot(infoWindowContent);
     root.render(
       <StyledInfoWindow

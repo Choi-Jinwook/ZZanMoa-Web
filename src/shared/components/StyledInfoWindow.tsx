@@ -1,44 +1,31 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import mockImg from '@shared/assets/photo.png';
 import Image from 'next/image';
 import { Colors } from '@shared/constants';
+import Text from "@shared/components/Text";
+
+
 
 const InfoWindowContainer = styled.div`
   display: flex;
   background-color: white;
   border-radius: 4px;
-  min-width: 295px;
+  min-width: 195px;
   max-width: 116px;
   padding: 8px;
-  border: 1px solid #ccc;
   z-index: 3;
+  border: none;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25), 0px 8px 16px rgba(0, 0, 0, 0.14);
+  gap: 8px;
 `;
 
 const LeftSection = styled.div`
   margin-right: 10px;
 `
 
-const ImgContainer = styled.div`
-  width: 86px;
-  height: 86px;
-`
-
 const RightSection = styled.div`
 
 `
-
-const InfoTitle = styled.h1`
-  color: ${Colors.Black900};
-  font-size: 18px;
-  margin: 0 0 5px 0;
-`;
-
-const InfoDescription = styled.div`
-  color: ${Colors.Black800};
-  font-size: 12px;
-  margin-bottom: 10px;
-`;
 
 const ActionsContainer = styled.div`
   display: flex;
@@ -89,7 +76,6 @@ interface AddButtonProps {
 
 
 const StyledInfoWindow: React.FC<StyledInfoWindowProps> = ({ name, address, id, overlayRef, onToggleAdded, added }) => {
-  // const [selectedMarkets, setSelectedMarkets] = useRecoilState(selectedMarketsState);
   const [isSelected, setIsSelected] = useState(false);
 
   useEffect(() => {
@@ -110,17 +96,28 @@ const StyledInfoWindow: React.FC<StyledInfoWindowProps> = ({ name, address, id, 
     }
   }, [isSelected, overlayRef]);
 
+  
+
 
   return (
     <InfoWindowContainer>
       <LeftSection>
-        <ImgContainer>
-          <Image src={mockImg} />
-        </ImgContainer>
       </LeftSection>
       <RightSection>
-        <InfoTitle>{name}</InfoTitle>
-        <InfoDescription>{address}</InfoDescription>
+        <Text
+          variant="Body1"
+          color={Colors.Black900}
+          fontWeight="SemiBold"
+        >
+          {name}
+        </Text>
+        <Text
+          variant="Body4"
+          color={Colors.Black800}
+          fontWeight="Regular"
+        >
+          {address}
+        </Text>
         <ActionsContainer>
           <IconWrapper>
             <IconImageWrapper>

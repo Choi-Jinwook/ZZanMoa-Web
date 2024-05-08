@@ -80,7 +80,7 @@ const KakaoMap = () => {
           lng: 126.9706,
         };
         // if (userCoords.lat !== mapCenter.lat || userCoords.lng !== mapCenter.lng) {
-          setMapCenter(userCoords);
+        setMapCenter(userCoords);
         // }
         setIsLoading(false);
       },
@@ -92,16 +92,18 @@ const KakaoMap = () => {
     if (map) {
       const zoomControl = new kakao.maps.ZoomControl();
       map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
+
+      kakao.maps.event.addListener(map, 'infowindowopen', removeBorderFromMapElement);
     }
   }, [map, currentMenu]);
 
-  // function removeBorderFromMapElement() {
-  //   const element = document.querySelector("#__react-kakao-maps-sdk___Map > div:nth-child(1) > div > div:nth-child(6) > div:nth-child(107)") as HTMLElement;
-  //   if (element) {
-  //     element.style.border = 'none';
-  //     element.style.zIndex = '3';
-  //   }
-  // }
+  // Javascript - infoWindow  CSS 강제로 변경하기 (infoWindow 테두리 부분) --> 실패
+  function removeBorderFromMapElement() {
+    const element = document.querySelector("#__react-kakao-maps-sdk___Map > div:nth-child(1) > div > div:nth-child(6)") as HTMLElement;
+    if (element) {
+      element.style.border = "none";
+    }
+  }
 
   useEffect(() => {
     setMapKey(Date.now());

@@ -21,13 +21,13 @@ const FilteredStore = () => {
   });
   const [currentCategory] = useRecoilState(SelectedCategory);
   const [currentPrice] = useRecoilState(CurrentPrice);
-  // const setStoreMarkers = useSetRecoilState(storeMarkerState);
-  const [storeMarkers, setStoreMarkers] = useRecoilState(storeMarkerState);
+  const setStoreMarkers = useSetRecoilState(storeMarkerState);
+  // const [storeMarkers, setStoreMarkers] = useRecoilState(storeMarkerState);
 
     // debounce 함수 생성
     const debouncedSetStoreMarkers = debounce((filteredStores: StoreData[] | ((currVal: StoreData[]) => StoreData[])) => {
       setStoreMarkers(filteredStores);
-    }, 1000);
+    }, 2000);
 
     useEffect(() => {
       if (!currentCategory) return;
@@ -54,7 +54,7 @@ const FilteredStore = () => {
 
   return (
     <Container>
-      {storeMarkers.map(({ storeId, storeName, address, items, phoneNumber }) => (
+      {storeData && storeData.map(({ storeId, storeName, address, items, phoneNumber }) => (
         <StoreCard key={storeId}>
           <Text variant="Body1" color={Colors.Black900} fontWeight="SemiBold">{storeName}</Text>
           <StoreDetail>

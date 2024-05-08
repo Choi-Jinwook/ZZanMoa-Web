@@ -9,6 +9,7 @@ import { mapCenterState, markersState } from "@shared/atoms/MapState";
 import axios from "axios";
 import Marker_FindStore from "./Marker_FindStore";
 import { SelectedMenu } from "@shared/atoms";
+import DistrictSelector from "./DistrictSelector";
 
 const KakaoMap = () => {
   const [map, setMap] = useState<kakao.maps.Map | null>(null);
@@ -21,37 +22,24 @@ const KakaoMap = () => {
   const [selectedDistrict, setSelectedDistrict] = useState('');
   const [neighborhoods, setNeighborhoods] = useState([]);
 
-  const updateMapCenter = (lat: number, lng: number) => {
-    setMapCenter({ lat, lng });
+  const updateMapCenter = (lng: number, lat: number) => {
+    setMapCenter({ lng, lat });
     map.setCenter(new kakao.maps.LatLng(lat, lng));
+    map.setLevel(3); 
+    console.log("Updating map center to:", lat, lng);
+
   };
 
-  const handleDistrictChange = (e: { target: { value: any; }; }) => {
-    const district = e.target.value;
-    setSelectedDistrict(district);
-    fetchNeighborhoods(district);
-  };
+  const handleDistrictChange = (location: { latitude: number; longitude: number; }) => {
+    if (location.latitude && location.longitude) {
+      console.log(location.latitude);
+      console.log(location.longitude);
 
-  const fetchNeighborhoods = (district: string | number) => {
-    const data = {
-      '강남구': ['신사동', '논현동', '압구정동'],
-      '서초구': ['반포동', '서초동', '잠원동']
-    };
-    setNeighborhoods(data[district] || []);
-  };
-
-  const handleNeighborhoodChange = (e: { target: { value: any; }; }) => {
-    const neighborhood = e.target.value;
-    const coords = {
-      '신사동': { lat: 37.516872, lng: 127.020482 },
-      '논현동': { lat: 37.508163, lng: 127.021884 },
-      '압구정동': { lat: 37.527316, lng: 127.029476 }
-    };
-    const coord = coords[neighborhood];
-    if (coord) {
-      updateMapCenter(coord.lat, coord.lng);
+      
+      updateMapCenter(location.latitude, location.longitude);
     }
   };
+
 
   const handleLocate = () => {
     if (map) {
@@ -63,7 +51,10 @@ const KakaoMap = () => {
     axios
       .get(`${apiUrl}/market/market-place/get`)
       .then((response) => {
-        const newMarkers = response.data.map(
+        const filteredData = response.data.filter(
+          (market) => market.marketName !== '약수시장 골목형 상가'
+        );
+        const newMarkers = filteredData.map(
           (market: { marketName: any }, index: any) => ({
             id: index,
             name: market.marketName,
@@ -78,16 +69,13 @@ const KakaoMap = () => {
   };
 
   useEffect(() => {
-    setMapKey(Date.now());
-  }, [currentMenu])
-
-  useEffect(() => {
     console.log("카카오맵 렌더링");
 
     const { geolocation } = navigator;
     const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
     if (currentMenu === '시장 가격 비교') {
+      setIsLoading(true);
       loadMarketData(apiUrl);
     }
 
@@ -121,6 +109,10 @@ const KakaoMap = () => {
   //   }
   // }
 
+  useEffect(() => {
+    setMapKey(Date.now());
+  }, [currentMenu])
+
   return (
     <MapContainer $isLoading={isLoading}>
       {isLoading ? (
@@ -131,21 +123,8 @@ const KakaoMap = () => {
       ) : (
         <>
           <DropdownContainer>
-            <Dropdown>
-              {['서울', '인천', '대전'].map((city, index) => (
-                <option key={index} value={city}>{city}</option>
-              ))}
-            </Dropdown>
-            <Dropdown onChange={handleDistrictChange}>
-              {['강남구', '서초구'].map(district => (
-                <option key={district} value={district}>{district}</option>
-              ))}
-            </Dropdown>
-            <Dropdown onChange={handleNeighborhoodChange}>
-              {neighborhoods.map(neighborhood => (
-                <option key={neighborhood} value={neighborhood}>{neighborhood}</option>
-              ))}
-            </Dropdown>
+            <DistrictSelector onDistrictChange={handleDistrictChange} />
+
           </DropdownContainer>
           <Map
             key={mapKey}

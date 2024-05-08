@@ -55,9 +55,13 @@ const Marker_ComparePrice = ({ map }: { map: kakao.maps.Map }) => {
       "addedMarkers",
       JSON.stringify(selectedMarkets.map((market) => market.id)),
     );
+    console.log("첫번째 useEffect");
+
   }, [markers]);
 
   useEffect(() => {
+
+    if (!map) return;
     const places = new kakao.maps.services.Places();
     const savedMarkers = JSON.parse(
       localStorage.getItem("addedMarkers") || "[]",

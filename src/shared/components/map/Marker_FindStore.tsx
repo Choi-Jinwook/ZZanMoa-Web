@@ -12,7 +12,6 @@ const Marker_FindStore = ({ map }: { map: kakao.maps.Map }) => {
     const infoWindowRef = useRef<kakao.maps.InfoWindow | null>(null);
 
     useEffect(() => {
-        removeAllMarkers();
         // info 닫기
         function closeInfoWindow() {
             if (infoWindowRef.current) {
@@ -22,14 +21,10 @@ const Marker_FindStore = ({ map }: { map: kakao.maps.Map }) => {
 
         function removeAllMarkers() {
             markers.forEach((value, key) => {
-                if (value.marker) {
-                    value.marker.setMap(null);
-                }
-                if (value.overlay) {
-                    value.overlay.setMap(null);
-                }
+                value.marker.setMap(null);
+                markers.delete(key);
             });
-            markers.clear();
+            setMarkers(new Map());
         }
 
         kakao.maps.event.addListener(map, 'click', closeInfoWindow);

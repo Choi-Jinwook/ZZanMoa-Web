@@ -1,19 +1,36 @@
+import { markersState } from "@shared/atoms/MapState";
 import selectedMarketsState from "@shared/atoms/MarketState";
 import Text from "@shared/components/Text";
 import { Colors } from "@shared/constants";
 import { MarkerInfo } from "@shared/types";
 import Image from "next/image";
-import { useState } from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useState, useEffect } from "react";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import styled from "styled-components";
 
 const MarketCard = () => {
   const [selectedMarkets, setSelectedMarkets] =
     useRecoilState<MarkerInfo[]>(selectedMarketsState);
+    const setMarkers = useSetRecoilState(markersState);
 
-  const handleDelete = (index: number) => {
-    setSelectedMarkets((prev) => prev.filter((_, i) => index !== i));
+    const handleDelete = (index: number) => {
+      const markerToDelete = selectedMarkets[index];
+  
+      setSelectedMarkets(prev => prev.filter((_, i) => i !== index));
+  
+      setMarkers(prev => prev.map(marker => {
+          if (marker.id === markerToDelete.id) {
+              return { ...marker, added: false };
+          }
+          return marker;
+      }));
   };
+  
+  
+
+  useEffect(() => {
+    console.log('Selected Markets updated:', selectedMarkets);
+}, [selectedMarkets]);
 
   return (
     <>
@@ -29,7 +46,11 @@ const MarketCard = () => {
               >
                 {name}
               </Text>
-              <Text variant="Body4" color={Colors.Black800}>
+              <Text
+                variant="Body4"
+                color={Colors.Black800}
+                fontWeight="Regular"  
+              >
                 {address}
               </Text>
             </MarketInfoWrapper>
@@ -69,7 +90,7 @@ const BlankBox = styled.div`
 const SelectedMarket = styled.div`
   display: flex;
   width: 100%;
-  height: 100px;
+  height: 80px;
   border: 1px solid ${Colors.Black500};
   border-radius: 4px;
   padding: 8px;
@@ -78,11 +99,15 @@ const SelectedMarket = styled.div`
 
 const MarketInfo = styled.div`
   display: flex;
-  width: calc(100% - 100px);
+  width: 100%;
   justify-content: space-between;
 `;
 
-const MarketInfoWrapper = styled.div``;
+const MarketInfoWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+`;
 
 const DeleteButton = styled.div`
   width: 24px;

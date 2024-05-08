@@ -1,7 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import kakaoIcon from '@shared/assets/kakaoMapIcon.png';
-import naverIcon from '@shared/assets/naverMapIcon.png';
 import Image from 'next/image';
 import { Colors } from '@shared/constants';
 import Text from "../../Text";
@@ -78,83 +76,83 @@ const PriceItem = styled.li`
 `;
 
 
-function StoreInfoWindow({ store, onClose }) {    
-    const displayedItems = store.items.slice(0, 2);
-    const moreItemsCount = store.items.length - 2;
-    return (
-        <WindowContainer>
-            <CloseButton onClick={onClose}>&times;</CloseButton>
-            <Text
-                variant='Body1'
-                color={Colors.Black900}
-                fontWeight="SemiBold">
-                {store.storeName}
-            </Text>
-            <Text
-                variant='Body4'
-                color={Colors.Black600}
-                fontWeight="Regular">
-                장소 | {store.address}
-            </Text>
-            <Text
-                variant='Body4'
-                color={Colors.Black600}
-                fontWeight="Regular">
-                번호 | {store.phoneNumber}
-            </Text>
-            <ItemsContainer>
-                <LeftItems>
-                {displayedItems.map(item => (
-                    <ItemText
-                        variant='Body4'
-                        color={Colors.Emerald600}
-                        fontWeight='SemiBold'
-                        key={item.itemId}>
-                        {item.item}
-                    </ItemText>
-                ))}
-                {moreItemsCount > 0 && (
-                    <MoreItemsText
-                    variant='Body4'
-                    color={Colors.Black800}
-                    fontWeight='SemiBold'>
-                    +{moreItemsCount}
-                    </MoreItemsText>
-                )}
-                </LeftItems>
-                <RightIcons>
-                <IconWrapper>
-                    <IconImageWrapper>
-                        <Image src={kakaoIcon} alt="카카오맵" width={24} height={24} />
-                    </IconImageWrapper>
-                    <IconImageWrapper>
-                        <Image src={naverIcon} alt="네이버맵" width={24} height={24} />
-                    </IconImageWrapper>
-                </IconWrapper>
-                </RightIcons>
-            </ItemsContainer>
+function StoreInfoWindow({ store, onClose }) {
+  const displayedItems = store.items.slice(0, 2);
+  const moreItemsCount = store.items.length - 2;
+  return (
+    <WindowContainer>
+      <CloseButton onClick={onClose}>&times;</CloseButton>
+      <Text
+        variant='Body1'
+        color={Colors.Black900}
+        fontWeight="SemiBold">
+        {store.storeName}
+      </Text>
+      <Text
+        variant='Body4'
+        color={Colors.Black600}
+        fontWeight="Regular">
+        장소 | {store.address}
+      </Text>
+      <Text
+        variant='Body4'
+        color={Colors.Black600}
+        fontWeight="Regular">
+        번호 | {store.phoneNumber}
+      </Text>
+      <ItemsContainer>
+        <LeftItems>
+          {displayedItems.map(item => (
+            <ItemText
+              variant='Body4'
+              color={Colors.Emerald600}
+              fontWeight='SemiBold'
+              key={item.itemId}>
+              {item.item}
+            </ItemText>
+          ))}
+          {moreItemsCount > 0 && (
+            <MoreItemsText
+              variant='Body4'
+              color={Colors.Black800}
+              fontWeight='SemiBold'>
+              +{moreItemsCount}
+            </MoreItemsText>
+          )}
+        </LeftItems>
+        <RightIcons>
+          <IconWrapper>
+            <IconImageWrapper>
+              <Image src="/images/kakaoMapIcon.svg" alt="카카오맵" width={24} height={24} />
+            </IconImageWrapper>
+            <IconImageWrapper>
+              <Image src="/images/naverMapIcon.svg" alt="네이버맵" width={24} height={24} />
+            </IconImageWrapper>
+          </IconWrapper>
+        </RightIcons>
+      </ItemsContainer>
 
-            <PriceList>
-                {store.items.map(item => (
-                    <PriceItem key={item.itemId}>
-                        <Text
-                            variant="Body3"
-                            color={Colors.Black900}
-                            fontWeight={"Medium"}>
-                            {item.item}
-                        </Text>
-                        <Text
-                            variant="Body3"
-                            color={Colors.Black900}
-                            fontWeight={"Medium"}>
-                            {item.price}원
-                        </Text>
-                    </PriceItem>
-                ))}
-            </PriceList>
+      <PriceList>
+        {store.items.map(item => (
+          <PriceItem key={item.itemId}>
+            <Text
+              variant="Body3"
+              color={Colors.Black900}
+              fontWeight={"Medium"}>
+              {item.item}
+            </Text>
+            <Text
+              variant="Body3"
+              color={Colors.Black900}
+              fontWeight={"Medium"}>
+              {item.price}원
+            </Text>
+          </PriceItem>
+        ))}
+      </PriceList>
 
-        </WindowContainer>
-    );
+    </WindowContainer>
+  );
 }
 
 export default StoreInfoWindow;

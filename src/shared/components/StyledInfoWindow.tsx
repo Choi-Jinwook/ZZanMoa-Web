@@ -1,13 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import kakaoIcon from '@shared/assets/kakaoMapIcon.png';
-import naverIcon from '@shared/assets/naverMapIcon.png';
 import mockImg from '@shared/assets/photo.png';
 import Image from 'next/image';
 import { Colors } from '@shared/constants';
-import { MarkerInfo } from '@shared/types';
-import { useRecoilState } from 'recoil';
-import selectedMarketsState from '@shared/atoms/MarketState';
 
 const InfoWindowContainer = styled.div`
   display: flex;
@@ -129,10 +124,10 @@ const StyledInfoWindow: React.FC<StyledInfoWindowProps> = ({ name, address, id, 
         <ActionsContainer>
           <IconWrapper>
             <IconImageWrapper>
-              <Image src={kakaoIcon} alt="카카오맵" width={24} height={24} />
+              <Image src="/images/kakaoMapIcon.svg" alt="카카오맵" width={24} height={24} />
             </IconImageWrapper>
             <IconImageWrapper>
-              <Image src={naverIcon} alt="네이버맵" width={24} height={24} />
+              <Image src="/images/naverMapIcon.svg" alt="네이버맵" width={24} height={24} />
             </IconImageWrapper>
           </IconWrapper>
           <AddButton onClick={handleButtonClick} added={isSelected}>

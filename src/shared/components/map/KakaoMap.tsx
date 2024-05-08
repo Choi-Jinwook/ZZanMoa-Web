@@ -3,13 +3,13 @@ import styled from "styled-components";
 import Marker_ComparePrice from "./Marker_ComparePrice";
 import { useState, useEffect } from "react";
 import { SyncLoader } from "react-spinners";
-import locateBtnImage from "@shared/assets/locateBtn.png";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { mapCenterState, markersState } from "@shared/atoms/MapState";
 import axios from "axios";
 import Marker_FindStore from "./Marker_FindStore";
 import { SelectedMenu } from "@shared/atoms";
 import DistrictSelector from "./DistrictSelector";
+
 
 const KakaoMap = () => {
   const [map, setMap] = useState<kakao.maps.Map | null>(null);
@@ -150,14 +150,19 @@ const MapContainer = styled.div<{ $isLoading?: boolean }>`
 const HandleLocateBtn = styled.button`
   position: absolute;
   right: 10px;
-  bottom: 50px;
-  background: url(${locateBtnImage.src}) no-repeat center center;
-  border: none;
-  width: 40px;
-  height: 50px;
+  bottom: 10px;
+  background: url("/images/locateBtn.svg") no-repeat center center;
+  border-radius: 4px;
+  border: 1px solid #E7E7E9;
+  width: 56px;
+  height: 56px;
   cursor: pointer;
   z-index: 3;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.14), 0px 0px 2px rgba(0, 0, 0, 0.12);
+  box-sizing: border-box;
 `;
+
+
 
 
 export default KakaoMap;

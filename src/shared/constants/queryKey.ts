@@ -7,6 +7,8 @@ export const QueryKey = {
   market: "market",
   itemSave: "itemSave",
   shoppingCart: "shoppingCart",
+  district: "district",
+  bargain: "bargain",
 };
 
 Object.freeze(QueryKey);

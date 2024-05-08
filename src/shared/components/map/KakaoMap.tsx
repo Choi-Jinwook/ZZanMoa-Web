@@ -23,7 +23,7 @@ const KakaoMap = () => {
   const updateMapCenter = (lng: number, lat: number) => {
     setMapCenter({ lng, lat });
     map.setCenter(new kakao.maps.LatLng(lat, lng));
-    map.setLevel(5); 
+    map.setLevel(5);
 
   };
 
@@ -67,7 +67,7 @@ const KakaoMap = () => {
     const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
     if (currentMenu === '시장 가격 비교') {
-      setIsLoading(true);
+      // setIsLoading(true);
       loadMarketData(apiUrl);
     }
 
@@ -79,9 +79,9 @@ const KakaoMap = () => {
           lat: 37.5545, // 임시로 현재위치를 서울역 으로 설정
           lng: 126.9706,
         };
-        if (userCoords.lat !== mapCenter.lat || userCoords.lng !== mapCenter.lng) {
+        // if (userCoords.lat !== mapCenter.lat || userCoords.lng !== mapCenter.lng) {
           setMapCenter(userCoords);
-        }
+        // }
         setIsLoading(false);
       },
       (error) => {
@@ -116,7 +116,7 @@ const KakaoMap = () => {
         </>
       ) : (
         <>
-            <DistrictSelector onDistrictChange={handleDistrictChange} currentLocation={mapCenter} />
+          <DistrictSelector onDistrictChange={handleDistrictChange} currentLocation={mapCenter} />
           <Map
             key={mapKey}
             center={{ lat: mapCenter.lat, lng: mapCenter.lng }}

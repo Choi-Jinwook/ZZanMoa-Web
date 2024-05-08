@@ -2,7 +2,7 @@ import { atom } from "recoil";
 
 export const SelectedCategory = atom<string>({
   key: "SelectedCategory",
-  default: "",
+  default: "한식",
 });
 
 export const MinMaxPrice = atom<{ minPrice: number; maxPrice: number }>({

@@ -1,14 +1,21 @@
-import { Map } from "react-kakao-maps-sdk";
+import { Map, MapMarker } from "react-kakao-maps-sdk";
 import styled from "styled-components";
 import Marker_ComparePrice from "./Marker_ComparePrice";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { SyncLoader } from "react-spinners";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { mapCenterState, markersState } from "@shared/atoms/MapState";
 import axios from "axios";
-import Marker_FindStore from "./Marker_FindStore";
 import { SelectedMenu } from "@shared/atoms";
 import DistrictSelector from "./DistrictSelector";
+import { CurrentPrice, SelectedCategory } from "@shared/atoms";
+import { useQuery } from "@tanstack/react-query";
+import { StoreData } from "@shared/types";
+import { QueryKey } from "@shared/constants";
+import { storeMarkerState } from "@shared/atoms/storeMarkerState";
+import { createRoot } from 'react-dom/client';
+import StoreInfoWindow from '../SideNavigation/FindStore/StoreInfoWindow';
+
 
 
 const KakaoMap = () => {
@@ -19,12 +26,24 @@ const KakaoMap = () => {
   const currentMenu = useRecoilValue(SelectedMenu);
   const [mapKey, setMapKey] = useState(Date.now());
 
+  const setStoreMarkers = useSetRecoilState(storeMarkerState);
+  const infoWindowRef = useRef<kakao.maps.InfoWindow | null>(null);
+
+  const [currentCategory] = useRecoilState(SelectedCategory);
+  const [currentPrice] = useRecoilState(CurrentPrice);
+  const { data: storeData } = useQuery([QueryKey.store], async () => {
+    const res = await axios.get<StoreData[]>(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/saving-place/get/store`,
+    );
+
+    return res.data;
+  });
+
 
   const updateMapCenter = (lng: number, lat: number) => {
     setMapCenter({ lng, lat });
     map.setCenter(new kakao.maps.LatLng(lat, lng));
     map.setLevel(5);
-
   };
 
   const handleDistrictChange = (location: { latitude: number; longitude: number; }) => {
@@ -43,22 +62,45 @@ const KakaoMap = () => {
     axios
       .get(`${apiUrl}/market/market-place/get`)
       .then((response) => {
-        const filteredData = response.data.filter(
-          (market) => market.marketName !== '약수시장 골목형 상가'
-        );
-        const newMarkers = filteredData.map(
-          (market: { marketName: any }, index: any) => ({
+        const newMarkers = response.data.map(
+          (market: { marketName: string, latitude: number, longitude: number }, index: number) => ({
             id: index,
             name: market.marketName,
+            position: {
+              lat: market.latitude,
+              lng: market.longitude
+            },
             added: false,
             focus: false,
           }),
         );
         setMarkers(newMarkers);
-        console.log(response.data);
+        console.log("Markers loaded:", newMarkers);
       })
-      .catch((error) => console.error("Failed to fetch market data:", error));
+      .catch((error) => {
+        console.error("Failed to fetch market data:", error);
+      });
   };
+
+  const getFilteredStores = (stores: StoreData[]) => {
+    return stores.filter(({ items }) => {
+      if (currentCategory === "") {
+        return true;
+      } else {
+        return items.some(
+          ({ category, price }) =>
+            category.includes(currentCategory.split(" ").reverse()[0]) &&
+            price >= currentPrice.minPrice &&
+            price <= currentPrice.maxPrice,
+        );
+      }
+    });
+  };
+
+  useEffect(() => {
+    const filteredStores = getFilteredStores(storeData || []);
+    setStoreMarkers(filteredStores);
+  }, [currentCategory])
 
   useEffect(() => {
     console.log("카카오맵 렌더링");
@@ -69,6 +111,9 @@ const KakaoMap = () => {
     if (currentMenu === '시장 가격 비교') {
       // setIsLoading(true);
       loadMarketData(apiUrl);
+    } else if (currentMenu === '알뜰 가게 찾기') {
+      const filteredStores = getFilteredStores(storeData || []);
+      setStoreMarkers(filteredStores);
     }
 
     geolocation.getCurrentPosition(
@@ -79,9 +124,7 @@ const KakaoMap = () => {
           lat: 37.5545, // 임시로 현재위치를 서울역 으로 설정
           lng: 126.9706,
         };
-        // if (userCoords.lat !== mapCenter.lat || userCoords.lng !== mapCenter.lng) {
         setMapCenter(userCoords);
-        // }
         setIsLoading(false);
       },
       (error) => {
@@ -92,10 +135,10 @@ const KakaoMap = () => {
     if (map) {
       const zoomControl = new kakao.maps.ZoomControl();
       map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
-
-      kakao.maps.event.addListener(map, 'infowindowopen', removeBorderFromMapElement);
     }
   }, [map, currentMenu]);
+
+  const filteredStores = getFilteredStores(storeData || []);
 
   // Javascript - infoWindow  CSS 강제로 변경하기 (infoWindow 테두리 부분) --> 실패
   function removeBorderFromMapElement() {
@@ -108,6 +151,32 @@ const KakaoMap = () => {
   useEffect(() => {
     setMapKey(Date.now());
   }, [currentMenu])
+
+  const handleMarkerClick = (store, map) => {
+    const infoWindowContent = document.createElement("div");
+    const root = createRoot(infoWindowContent);
+    root.render(<StoreInfoWindow store={store} onClose={() => infoWindowRef.current?.close()} />);
+
+    function closeInfoWindow() {
+        if (infoWindowRef.current) {
+            infoWindowRef.current.close();
+            infoWindowRef.current = null;
+        }
+    }
+    kakao.maps.event.addListener(map, 'click', closeInfoWindow);
+
+    const marker = new kakao.maps.Marker({
+      position: new kakao.maps.LatLng(store.latitude, store.longitude),
+      map: map,
+      title: store.storeName
+    });
+
+    infoWindowRef.current = new kakao.maps.InfoWindow({
+      content: infoWindowContent,
+    });
+
+    infoWindowRef.current.open(map, marker);
+  };
 
   return (
     <MapContainer $isLoading={isLoading}>
@@ -126,10 +195,18 @@ const KakaoMap = () => {
             level={3}
             onCreate={setMap}
           >
-            {currentMenu == '시장 가격 비교' && map && <Marker_ComparePrice map={map} />}
-            {currentMenu == '알뜰 가게 찾기' && map && <Marker_FindStore map={map} />}
-            {/* { map && <Marker map={map} />} */}
+            {currentMenu === '알뜰 가게 찾기' && map &&
+              filteredStores.map(store => (
+                <MapMarker
+                  position={{ lat: store.latitude, lng: store.longitude }}
+                  key={store.storeId}
+                  onClick={() => handleMarkerClick(store, map)}
+                />
+              ))
+            }
+            {currentMenu === '시장 가격 비교' && map && <Marker_ComparePrice map={map} />}
           </Map>
+
           <HandleLocateBtn onClick={handleLocate} />
         </>
       )}
@@ -163,8 +240,5 @@ const HandleLocateBtn = styled.button`
   box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.14), 0px 0px 2px rgba(0, 0, 0, 0.12);
   box-sizing: border-box;
 `;
-
-
-
 
 export default KakaoMap;

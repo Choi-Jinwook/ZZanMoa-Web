@@ -13,7 +13,8 @@ export interface StoreData {
   phoneNumber: string;
   address: string;
   items: StoreItems[];
-  position: Coords;
+  latitude: number;
+  longitude: number;
 }
 
 export interface StoreCategory {

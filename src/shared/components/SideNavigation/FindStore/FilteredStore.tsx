@@ -12,41 +12,40 @@ import { debounce } from 'lodash';
 
 
 const FilteredStore = () => {
-  const { data: storeData } = useQuery([QueryKey.store], async () => {
-    const res = await axios.get<StoreData[]>(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/saving-place/get/store`,
-    );
+  // const { data: storeData } = useQuery([QueryKey.store], async () => {
+  //   const res = await axios.get<StoreData[]>(
+  //     `${process.env.NEXT_PUBLIC_API_BASE_URL}/saving-place/get/store`,
+  //   );
 
-    return res.data;
-  });
-  const [currentCategory] = useRecoilState(SelectedCategory);
-  const [currentPrice] = useRecoilState(CurrentPrice);
-  const setStoreMarkers = useSetRecoilState(storeMarkerState);
-  // const [storeMarkers, setStoreMarkers] = useRecoilState(storeMarkerState);
+  //   return res.data;
+  // });
+  // const [currentCategory] = useRecoilState(SelectedCategory);
+  // const [currentPrice] = useRecoilState(CurrentPrice);
+  const [storeMarkers, setStoreMarkers] = useRecoilState(storeMarkerState);
 
     // debounce 함수 생성
-    const debouncedSetStoreMarkers = debounce((filteredStores: StoreData[] | ((currVal: StoreData[]) => StoreData[])) => {
-      setStoreMarkers(filteredStores);
-    }, 2000);
+    // const debouncedSetStoreMarkers = debounce((filteredStores: StoreData[] | ((currVal: StoreData[]) => StoreData[])) => {
+    //   setStoreMarkers(filteredStores);
+    // }, 1000);
 
-    useEffect(() => {
-      if (!currentCategory) return;
+    // useEffect(() => {
+    //   if (!currentCategory) return;
   
-      const filteredStores = storeData?.filter(store =>
-        store.items.some(item =>
-          item.category.includes(currentCategory) &&
-          item.price >= currentPrice.minPrice &&
-          item.price <= currentPrice.maxPrice
-        )
-      ) || [];
+    //   const filteredStores = storeData?.filter(store =>
+    //     store.items.some(item =>
+    //       item.category.includes(currentCategory) &&
+    //       item.price >= currentPrice.minPrice &&
+    //       item.price <= currentPrice.maxPrice
+    //     )
+    //   ) || [];
   
-      debouncedSetStoreMarkers(filteredStores);
-      console.log(filteredStores.length);
+    //   debouncedSetStoreMarkers(filteredStores);
+    //   console.log(filteredStores.length);
   
-      // else {
-      //   setStoreMarkers([]);
-      // }
-    }, [storeData, currentCategory, currentPrice, setStoreMarkers]);
+    //   // else {
+    //   //   setStoreMarkers([]);
+    //   // }
+    // }, [storeData, currentCategory, currentPrice, setStoreMarkers]);
     
 
   // const filteredStores = getFilteredStores(storeData || []);
@@ -54,7 +53,7 @@ const FilteredStore = () => {
 
   return (
     <Container>
-      {storeData && storeData.map(({ storeId, storeName, address, items, phoneNumber }) => (
+      {storeMarkers.map(({ storeId, storeName, address, items, phoneNumber }) => (
         <StoreCard key={storeId}>
           <Text variant="Body1" color={Colors.Black900} fontWeight="SemiBold">{storeName}</Text>
           <StoreDetail>

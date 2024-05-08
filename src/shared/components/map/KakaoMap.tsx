@@ -23,7 +23,7 @@ const KakaoMap = () => {
   const updateMapCenter = (lng: number, lat: number) => {
     setMapCenter({ lng, lat });
     map.setCenter(new kakao.maps.LatLng(lat, lng));
-    map.setLevel(3); 
+    map.setLevel(5); 
 
   };
 
@@ -79,7 +79,9 @@ const KakaoMap = () => {
           lat: 37.5545, // 임시로 현재위치를 서울역 으로 설정
           lng: 126.9706,
         };
-        setMapCenter(userCoords);
+        if (userCoords.lat !== mapCenter.lat || userCoords.lng !== mapCenter.lng) {
+          setMapCenter(userCoords);
+        }
         setIsLoading(false);
       },
       (error) => {
@@ -114,7 +116,7 @@ const KakaoMap = () => {
         </>
       ) : (
         <>
-            <DistrictSelector onDistrictChange={handleDistrictChange} />
+            <DistrictSelector onDistrictChange={handleDistrictChange} currentLocation={mapCenter} />
           <Map
             key={mapKey}
             center={{ lat: mapCenter.lat, lng: mapCenter.lng }}

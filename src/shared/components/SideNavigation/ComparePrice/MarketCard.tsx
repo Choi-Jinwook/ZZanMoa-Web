@@ -90,7 +90,7 @@ const SelectedMarket = styled.div`
   height: 80px;
   border: 1px solid ${Colors.Black500};
   border-radius: 4px;
-  padding: 16px;
+  padding: 8px;
   gap: 16px;
 `;
 

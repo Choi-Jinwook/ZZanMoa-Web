@@ -7,7 +7,8 @@ export interface MarkerInfo {
   id: number;
   name: string;
   address: string;
-  position: Coords;
+  latitude: number;
+  longitude: number;
   added: boolean;
   focus: boolean;
 }

@@ -66,10 +66,8 @@ const KakaoMap = () => {
           (market: { marketName: string, latitude: number, longitude: number }, index: number) => ({
             id: index,
             name: market.marketName,
-            position: {
-              lat: market.latitude,
-              lng: market.longitude
-            },
+            latitude: market.latitude,
+            longitude: market.longitude,
             added: false,
             focus: false,
           }),

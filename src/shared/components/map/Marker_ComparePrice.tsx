@@ -74,47 +74,36 @@ const Marker_ComparePrice = ({ map }: { map: kakao.maps.Map }) => {
 
   useEffect(() => {
     if (!map) return;
+    const geocoder = new kakao.maps.services.Geocoder();
 
-    const places = new kakao.maps.services.Places();
-    const savedMarkers = JSON.parse(
-      localStorage.getItem("addedMarkers") || "[]",
-    );
-
-    const markerUpdates = markers
-      .filter((marker) => !marker.position)
-      .map(
-        (marker) =>
-          new Promise((resolve) => {
-            places.keywordSearch(marker.name, (result, status) => {
-              if (status === kakao.maps.services.Status.OK && result[0]) {
-                const updatedMarker = {
-                  ...marker,
-                  address: result[0].address_name,
-                  position: {
-                    lat: parseFloat(result[0].y),
-                    lng: parseFloat(result[0].x),
-                  },
-                  added: savedMarkers.includes(marker.id),
-                };
-                updateMarkerOnMap(updatedMarker, updatedMarker.added);
-                resolve(updatedMarker);
-              } else {
-                console.error(`Failed to find location: ${marker.name}`);
-                resolve({ ...marker });
-              }
-            });
-          }),
-      );
-
-    Promise.all(markerUpdates).then((newMarkers) => {
-      setMarkers((prev: MarkerInfo[]): MarkerInfo[] => {
-        return prev.map((marker) => {
-          const updated = (newMarkers as MarkerInfo[]).find(
-            (m) => m.id === marker.id,
-          );
-          return updated || marker;
+    // const savedMarkers = JSON.parse(
+    //   localStorage.getItem("addedMarkers") || "[]",
+    // );
+    const markerUpdates = markers.map(marker => {
+      return new Promise(resolve => {
+        geocoder.coord2Address(marker.longitude, marker.latitude, (result, status) => {
+          if (status === kakao.maps.services.Status.OK) {
+            const address = result[0].address.address_name;
+            const updatedMarker = {
+              ...marker,
+              address: address,
+              lat: marker.latitude,
+              lng: marker.longitude,
+              added: false,
+              focus: false,
+            };
+            updateMarkerOnMap(updatedMarker, updatedMarker.added);
+            resolve(updatedMarker);
+          } else {
+            console.error(`Failed: ${marker.name}`);
+            resolve(marker);
+          }
         });
       });
+    });
+
+    Promise.all(markerUpdates).then(newMarkers => {
+      setMarkers(newMarkers);
     });
 
     kakao.maps.event.addListener(map, "click", closeInfoWindow);
@@ -124,8 +113,8 @@ const Marker_ComparePrice = ({ map }: { map: kakao.maps.Map }) => {
 
   function updateMarkerOnMap(marker: any, added: boolean) {
     const markerPosition = new kakao.maps.LatLng(
-      marker.position.lat,
-      marker.position.lng,
+      marker.lat,
+      marker.lng,
     );
     const imageSrc = getMarkerImage(marker.focus);
     const markerImage = new kakao.maps.MarkerImage(
@@ -185,8 +174,8 @@ const Marker_ComparePrice = ({ map }: { map: kakao.maps.Map }) => {
       circleOverlay = new kakao.maps.CustomOverlay({
         map: map,
         position: new kakao.maps.LatLng(
-          marker.position.lat,
-          marker.position.lng,
+          marker.latitude,
+          marker.longitude,
         ),
         content: circleContent,
         zIndex: -1,

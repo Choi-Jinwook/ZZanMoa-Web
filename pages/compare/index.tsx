@@ -4,6 +4,7 @@ import { Colors } from "@shared/constants";
 import { SavingList } from "@shared/types";
 import { toJpeg } from "html-to-image";
 import Image from "next/image";
+import { useRouter } from "next/router";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
@@ -16,6 +17,7 @@ const Compare = () => {
   const [priceSum, setPriceSum] = useState<number>(0);
   const [topMarket, setTopMarket] = useState("");
   const [rankData] = useRecoilState(rank);
+  const { push } = useRouter();
 
   const handleSum = (savingList: SavingList[], isReciept?: boolean) => {
     let sum = 0;
@@ -73,7 +75,9 @@ const Compare = () => {
   return (
     <Container>
       <LogoContainer>
-        <Image src="/images/logo.svg" alt="logo" width={98} height={30} />
+        <Logo onClick={() => push("/")}>
+          <Image src="/images/logo.svg" alt="logo" width={98} height={30} />
+        </Logo>
       </LogoContainer>
       <ContentContainer>
         <ContentWrapper>
@@ -331,6 +335,10 @@ const LogoContainer = styled.div`
   height: 60px;
   background-color: white;
   padding: 15px 24px;
+`;
+
+const Logo = styled.div`
+  cursor: pointer;
 `;
 
 const ContentContainer = styled.div`

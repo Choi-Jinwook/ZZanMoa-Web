@@ -40,6 +40,10 @@ const Container = styled.div<{ $focus: boolean }>`
   padding: 6px 16px;
   gap: 8px;
   cursor: pointer;
+
+  &:hover {
+    ${({ $focus }) => !$focus && `background-color: ${Colors.Emerald100};`}
+  }
 `;
 
 export default Category;

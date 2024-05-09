@@ -639,6 +639,10 @@ const DropDown = styled.div<{ $isLast?: boolean }>`
     }
   }}
   cursor: pointer;
+
+  &:hover {
+    background-color: ${Colors.Black200};
+  }
 `;
 
 const RecentPost = styled.div`

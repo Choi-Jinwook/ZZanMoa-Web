@@ -16,8 +16,6 @@ import { storeMarkerState } from "@shared/atoms/storeMarkerState";
 import { createRoot } from 'react-dom/client';
 import StoreInfoWindow from '../SideNavigation/FindStore/StoreInfoWindow';
 
-
-
 const KakaoMap = () => {
   const [map, setMap] = useState<kakao.maps.Map | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -27,10 +25,11 @@ const KakaoMap = () => {
   const [mapKey, setMapKey] = useState(Date.now());
 
   const setStoreMarkers = useSetRecoilState(storeMarkerState);
-  const infoWindowRef = useRef<kakao.maps.InfoWindow | null>(null);
+  const [activeInfoWindow, setActiveInfoWindow] = useState(null);
 
   const [currentCategory] = useRecoilState(SelectedCategory);
   const [currentPrice] = useRecoilState(CurrentPrice);
+
   const { data: storeData } = useQuery([QueryKey.store], async () => {
     const res = await axios.get<StoreData[]>(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/saving-place/get/store`,
@@ -150,30 +149,26 @@ const KakaoMap = () => {
     setMapKey(Date.now());
   }, [currentMenu])
 
-  const handleMarkerClick = (store, map) => {
-    const infoWindowContent = document.createElement("div");
-    const root = createRoot(infoWindowContent);
-    root.render(<StoreInfoWindow store={store} onClose={() => infoWindowRef.current?.close()} />);
-
-    function closeInfoWindow() {
-        if (infoWindowRef.current) {
-            infoWindowRef.current.close();
-            infoWindowRef.current = null;
-        }
+  useEffect(() => {
+    if (map) {
+      const handleClick = () => {
+        setActiveInfoWindow(null);
+      };
+      kakao.maps.event.addListener(map, 'click', handleClick);
+  
+      return () => {
+        kakao.maps.event.removeListener(map, 'click', handleClick);
+      };
     }
-    kakao.maps.event.addListener(map, 'click', closeInfoWindow);
+  }, [map]);
+  
 
-    const marker = new kakao.maps.Marker({
-      position: new kakao.maps.LatLng(store.latitude, store.longitude),
-      map: map,
-      title: store.storeName
-    });
+  const handleMarkerClick = (storeId) => {
+    setActiveInfoWindow(prev => prev === storeId ? null : storeId);
+  };
 
-    infoWindowRef.current = new kakao.maps.InfoWindow({
-      content: infoWindowContent,
-    });
-
-    infoWindowRef.current.open(map, marker);
+  const closeInfoWindow = () => {
+    setActiveInfoWindow(null);
   };
 
   return (
@@ -198,8 +193,12 @@ const KakaoMap = () => {
                 <MapMarker
                   position={{ lat: store.latitude, lng: store.longitude }}
                   key={store.storeId}
-                  onClick={() => handleMarkerClick(store, map)}
-                />
+                  onClick={() => handleMarkerClick(store.storeId)}
+                >
+                  {activeInfoWindow === store.storeId && (
+                    <StoreInfoWindow store={store} onClose={closeInfoWindow} />
+                  )}
+                </MapMarker>
               ))
             }
             {currentMenu === '시장 가격 비교' && map && <Marker_ComparePrice map={map} />}

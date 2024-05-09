@@ -33,6 +33,11 @@ const FilteredStore = () => {
     });
   };
 
+  const handleStoreClick = (storeId: string) => {
+    console.log(storeId);
+    // TODO: onClick 이벤트 추가
+  };
+
   const filteredStores = getFilteredStores(storeData || []);
 
   return (
@@ -40,7 +45,7 @@ const FilteredStore = () => {
       {filteredStores.map(
         ({ storeId, storeName, address, items, phoneNumber }) => {
           return (
-            <StoreCard key={storeId}>
+            <StoreCard onClick={() => handleStoreClick(storeId)} key={storeId}>
               <Text
                 variant="Body1"
                 color={Colors.Black900}
@@ -107,6 +112,11 @@ const StoreCard = styled.div`
   border-bottom: 1px solid ${Colors.Black600};
   gap: 8px;
   padding: 16px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: ${Colors.Black200};
+  }
 `;
 
 const StoreDetail = styled.div`

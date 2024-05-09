@@ -15,6 +15,9 @@ const WindowContainer = styled.div`
   border-radius: 5px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   width: 327px;
+  position: absolute;
+  z-index: 3;
+  top: 80px;
 `;
 
 const CloseButton = styled.button`

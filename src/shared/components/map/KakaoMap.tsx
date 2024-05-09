@@ -1,7 +1,7 @@
 import { Map, MapMarker } from "react-kakao-maps-sdk";
 import styled from "styled-components";
 import Marker_ComparePrice from "./Marker_ComparePrice";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, memo } from "react";
 import { SyncLoader } from "react-spinners";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { mapCenterState, markersState } from "@shared/atoms/MapState";
@@ -15,6 +15,9 @@ import { QueryKey } from "@shared/constants";
 import { storeMarkerState } from "@shared/atoms/storeMarkerState";
 import { createRoot } from 'react-dom/client';
 import StoreInfoWindow from '../SideNavigation/FindStore/StoreInfoWindow';
+import StoreOverlay from "@shared/components/map/StoreOverlay"
+import Marker_FindStore from "./Marker_FindStore";
+
 
 const KakaoMap = () => {
   const [map, setMap] = useState<kakao.maps.Map | null>(null);
@@ -29,6 +32,7 @@ const KakaoMap = () => {
 
   const [currentCategory] = useRecoilState(SelectedCategory);
   const [currentPrice] = useRecoilState(CurrentPrice);
+  const [activeMarker, setActiveMarker] = useState(null); // 활성 마커 상태 관리
 
   const { data: storeData } = useQuery([QueryKey.store], async () => {
     const res = await axios.get<StoreData[]>(
@@ -47,7 +51,7 @@ const KakaoMap = () => {
 
   const handleDistrictChange = (location: { latitude: number; longitude: number; }) => {
     if (location.latitude && location.longitude) {
-      updateMapCenter(location.latitude, location.longitude);
+      updateMapCenter(location.latitude, location.longitude);      
     }
   };
 
@@ -97,7 +101,7 @@ const KakaoMap = () => {
   useEffect(() => {
     const filteredStores = getFilteredStores(storeData || []);
     setStoreMarkers(filteredStores);
-  }, [currentCategory])
+  }, [currentCategory, currentPrice])
 
   useEffect(() => {
     console.log("카카오맵 렌더링");
@@ -149,22 +153,24 @@ const KakaoMap = () => {
     setMapKey(Date.now());
   }, [currentMenu])
 
-  useEffect(() => {
-    if (map) {
-      const handleClick = () => {
-        setActiveInfoWindow(null);
-      };
-      kakao.maps.event.addListener(map, 'click', handleClick);
-  
-      return () => {
-        kakao.maps.event.removeListener(map, 'click', handleClick);
-      };
-    }
-  }, [map]);
-  
+  // useEffect(() => {
+  //   if (map) {
+  //     const handleClick = () => {
+  //       setActiveInfoWindow(null);
+  //     };
+  //     // kakao.maps.event.addListener(map, 'click', handleClick);
+
+  //     return () => {
+  //       kakao.maps.event.removeListener(map, 'click', handleClick);
+  //     };
+  //   }
+  // }, [map]);
+
 
   const handleMarkerClick = (storeId) => {
     setActiveInfoWindow(prev => prev === storeId ? null : storeId);
+    setActiveMarker(storeId === activeMarker ? null : storeId);
+
   };
 
   const closeInfoWindow = () => {
@@ -190,15 +196,18 @@ const KakaoMap = () => {
           >
             {currentMenu === '알뜰 가게 찾기' && map &&
               filteredStores.map(store => (
-                <MapMarker
-                  position={{ lat: store.latitude, lng: store.longitude }}
+                <Marker_FindStore
                   key={store.storeId}
-                  onClick={() => handleMarkerClick(store.storeId)}
-                >
-                  {activeInfoWindow === store.storeId && (
-                    <StoreInfoWindow store={store} onClose={closeInfoWindow} />
-                  )}
-                </MapMarker>
+                  map={map}
+                  position={{ lat: store.latitude, lng: store.longitude }}
+                  storeId={store.storeId}
+                  onClick={handleMarkerClick}
+                  isActive={activeMarker === store.storeId}
+                  isInfoActive={activeInfoWindow === store.storeId}
+                  content={store.storeName}
+                  onClose={closeInfoWindow}
+                  store={store}
+                />
               ))
             }
             {currentMenu === '시장 가격 비교' && map && <Marker_ComparePrice map={map} />}

@@ -1,80 +1,51 @@
-// import { useState, useEffect, useRef } from 'react';
-// import { useRecoilValue } from 'recoil';
-// import { storeMarkerState } from '@shared/atoms/storeMarkerState';
-// import { createRoot } from 'react-dom/client';
-// import StoreInfoWindow from '../SideNavigation/FindStore/StoreInfoWindow';
+import React, { memo, useState, useEffect } from 'react';
+import { MapMarker } from "react-kakao-maps-sdk";
+import StoreOverlay from './StoreOverlay';
+import StoreInfoWindow from '../SideNavigation/FindStore/StoreInfoWindow';
 
-// const Marker_FindStore = ({ map }: { map: kakao.maps.Map }) => {
-//     const storeMarkers = useRecoilValue(storeMarkerState);
-//     const geocoder = new kakao.maps.services.Geocoder();
-//     const [markers, setMarkers] = useState(new Map());
+const Marker_FindStore = memo(({ map, position, storeId, content, store, onClose }) => {
+    const [isActive, setIsActive] = useState(false);
+    const [isInfoActive, setIsInfoActive] = useState(false);
 
-//     const infoWindowRef = useRef<kakao.maps.InfoWindow | null>(null);
+    const handleMarkerClick = () => {
+        setIsActive(!isActive);
+        setIsInfoActive(!isInfoActive);
+    };
 
-//     useEffect(() => {
-//         // info 닫기
-//         function closeInfoWindow() {
-//             if (infoWindowRef.current) {
-//                 infoWindowRef.current.close();
-//             }
-//         }
+    useEffect(() => {
+        if (map) {
+          const handleClick = () => {
+            setIsInfoActive(null);
+          };
+          kakao.maps.event.addListener(map, 'click', handleClick);
+    
+          return () => {
+            kakao.maps.event.removeListener(map, 'click', handleClick);
+          };
+        }
+      }, [map]);
 
-//         function removeAllMarkers() {
-//             markers.forEach((value, key) => {
-//                 value.marker.setMap(null);
-//                 markers.delete(key);
-//             });
-//             setMarkers(new Map());
-//         }
+    return (
+        <MapMarker
+          map={map}
+          position={position}
+          onClick={handleMarkerClick}
+        >
+          <StoreOverlay
+            map={map}
+            position={position}
+            content={content}
+            isActive={isActive}
+            toggleActive={handleMarkerClick}
+          />
+          {isInfoActive && (
+            <StoreInfoWindow store={store} onClose={() => {
+                setIsInfoActive(false);
+                onClose();
+            }} />
+          )}
+        </MapMarker>
+    );
+});
 
-//         kakao.maps.event.addListener(map, 'click', closeInfoWindow);
-
-//         // 마커 추가
-//         function addNewMarkers() {
-//             console.log(storeMarkers);
-            
-//             const newMarkers = new Map();
-//             storeMarkers.forEach(store => {
-
-//                 if ( store.latitude && store.longitude) {
-//                     const newPos = new kakao.maps.LatLng(store.latitude, store.longitude);
-                    
-//                     const marker = new kakao.maps.Marker({
-//                         map: map,
-//                         position: newPos,
-//                         title: store.storeName
-//                     });
-
-//                     const infoWindowContent = document.createElement("div");
-//                     const root = createRoot(infoWindowContent);
-//                     root.render(
-//                         <StoreInfoWindow store={store} onClose={closeInfoWindow} />
-//                     );
-
-//                     kakao.maps.event.addListener(marker, 'click', () => {
-//                         if (infoWindowRef.current) {
-//                             infoWindowRef.current.close();
-//                         }
-//                         infoWindowRef.current = new kakao.maps.InfoWindow({
-//                             content: infoWindowContent,
-//                         });
-//                         infoWindowRef.current.open(map, marker);
-//                     });
-
-//                     newMarkers.set(store.storeId, { marker, overlay: null }); // overlay 관련 코드가 주석 처리되어 있으므로 여기도 반영
-//                 } else {
-//                     console.error("Location data missing for store:", store.storeName);
-//                 }
-//             });
-//             setMarkers(newMarkers);
-//         }
-
-
-//         removeAllMarkers();
-//         addNewMarkers();
-//     }, [storeMarkers, map]);
-//     return null;
-// };
-
-// export default Marker_FindStore;
-
+export default Marker_FindStore;

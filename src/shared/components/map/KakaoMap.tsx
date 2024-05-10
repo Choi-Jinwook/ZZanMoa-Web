@@ -55,11 +55,36 @@ const KakaoMap = () => {
     }
   };
 
-  const handleLocate = () => {
-    if (map) {
-      setMapCenter({ lat: 37.554722, lng: 126.970833 }); // 서울역 좌표
+  const updateCurrentLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        ({ coords }) => {
+          const userCoords = {
+          // lat: coords.latitude,
+          // lng: coords.longitude,
+          lat: 37.5545, // 임시로 현재위치를 서울역 으로 설정
+          lng: 126.9706,
+          };
+          setMapCenter(userCoords);
+          map.setCenter(new kakao.maps.LatLng(userCoords.lat, userCoords.lng));
+          map.setLevel(3);
+        },
+        (error) => {
+          console.error("Geolocation error:", error);
+          alert("위치 정보를 가져오는데 실패했습니다. 위치 권한을 확인해주세요.");
+        }
+      );
+    } else {
+      alert("이 브라우저에서는 위치 서비스를 사용할 수 없습니다.");
     }
   };
+
+  const handleLocate = () => {
+    if (map) {
+      updateCurrentLocation();
+    }
+  };
+  
 
   const loadMarketData = (apiUrl: string | undefined) => {
     axios
@@ -245,6 +270,16 @@ const HandleLocateBtn = styled.button`
   z-index: 3;
   box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.14), 0px 0px 2px rgba(0, 0, 0, 0.12);
   box-sizing: border-box;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+
+  &:hover {
+    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2); 
+  }
+
+  &:active {
+    transform: scale(0.95);
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+  }
 `;
 
 export default KakaoMap;

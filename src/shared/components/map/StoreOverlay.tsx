@@ -9,8 +9,8 @@ const OverlayContainer = styled.div<{ $isActive?: boolean }>`
   position: absolute;
   background-color: ${({ $isActive }) => ($isActive ? `${Colors.Emerald500}` : "white")};
   height: 44px;
-  bottom: 7px;
-  right: -90px;
+  bottom: 10px;
+  right: -100px;
   padding: 8px 14px;
   display: flex;
   gap: 10px;
@@ -21,6 +21,32 @@ const OverlayContainer = styled.div<{ $isActive?: boolean }>`
   align-items: center;
   justify-content: center;
   z-index: 2;
+
+  &:after {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 20%;
+    width: 0;
+    height: 0;
+    border-width: 9px 9px 2px 9px; 
+    border-style: solid;
+    border-color: ${({ $isActive }) => ($isActive ? `${Colors.Emerald500}` : "white")} transparent transparent transparent;
+    transform: translateX(-50%);
+  }
+
+  &:before {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 20%;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 9px 9px 1px 9px; 
+    border-color: #0A6F4D transparent transparent transparent;
+    transform: translateX(-50%);
+  }
 `;
 
 const CustomText = styled(Text) <{ $isActive?: boolean }>`
@@ -55,6 +81,12 @@ const StoreOverlay = ({ map, position, content, onClose, store }) => {
                     fontWeight="SemiBold">
                     {content}
                 </CustomText>
+                {isInfoActive && (
+                <StoreInfoWindow store={store} onClose={() => {
+                    setIsInfoActive(false);
+                    onClose();
+                }} />
+            )}
             </OverlayContainer>
         );
 
@@ -81,16 +113,7 @@ const StoreOverlay = ({ map, position, content, onClose, store }) => {
         };
     }, [map, position, content, isActive, isInfoActive]);
 
-    return (
-        <>
-            {isInfoActive && (
-                <StoreInfoWindow store={store} onClose={() => {
-                    setIsInfoActive(false);
-                    onClose();
-                }} />
-            )}
-        </>
-    );
+    return null;
 };
 
 export default StoreOverlay;

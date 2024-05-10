@@ -9,42 +9,56 @@ const Marker_FindStore = memo(({ map, position, storeId, content, store, onClose
 
     const handleMarkerClick = () => {
         setIsActive(!isActive);
-        setIsInfoActive(!isInfoActive);
+        setIsInfoActive(!isInfoActive);        
     };
 
     useEffect(() => {
         if (map) {
-          const handleClick = () => {
-            setIsInfoActive(null);
-          };
-          kakao.maps.event.addListener(map, 'click', handleClick);
-    
-          return () => {
-            kakao.maps.event.removeListener(map, 'click', handleClick);
-          };
+            const handleClick = () => {
+                setIsInfoActive(false);
+            };
+            kakao.maps.event.addListener(map, 'click', handleClick);
+
+            return () => {
+                kakao.maps.event.removeListener(map, 'click', handleClick);
+            };
         }
-      }, [map]);
+    }, [map]);
+
 
     return (
-        <MapMarker
-          map={map}
-          position={position}
-          onClick={handleMarkerClick}
-        >
-          <StoreOverlay
-            map={map}
-            position={position}
-            content={content}
-            isActive={isActive}
-            toggleActive={handleMarkerClick}
-          />
-          {isInfoActive && (
-            <StoreInfoWindow store={store} onClose={() => {
-                setIsInfoActive(false);
-                onClose();
-            }} />
-          )}
-        </MapMarker>
+        <>
+            <MapMarker
+                map={map}
+                position={position}
+                image={{
+                    src: "/images/transparentIcon.svg",
+                    size: {
+                        width: 1,
+                        height: 1,
+                    },
+                    options: {
+                        offset: {
+                            x: 0,
+                            y: 0,
+                        },
+                    },
+                }}
+            />
+            <StoreOverlay
+                map={map}
+                position={position}
+                content={content}
+                isActive={isActive}
+                toggleActive={handleMarkerClick}
+            />
+            {isInfoActive && (
+                <StoreInfoWindow store={store} onClose={() => {
+                    setIsInfoActive(false);
+                    onClose();
+                }} />
+            )}
+        </>
     );
 });
 

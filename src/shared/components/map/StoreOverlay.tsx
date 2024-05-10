@@ -7,10 +7,9 @@ import Text from '@shared/components/Text';
 const OverlayContainer = styled.div<{ $isActive?: boolean }>`
   position: absolute;
   background-color: ${({ $isActive }) => ($isActive ? `${Colors.Emerald500}` : "white" )};
-  width: 150px;
   height: 44px;
-  bottom: 40px;
-  right: -70px;
+  bottom: 7px;
+  right: -90px;
   padding: 8px 14px;
   display: flex;
   gap: 10px;
@@ -24,11 +23,12 @@ const OverlayContainer = styled.div<{ $isActive?: boolean }>`
 `;
 
 const CustomText = styled(Text)<{ $isActive?: boolean}>`
-  color: ${({ $isActive }) => $isActive ? "white" : `${Colors.Black900}`};
+  color: ${({ $isActive }) => ($isActive ? "white" : `${Colors.Black900}`)};
 
 `
 
 const StoreOverlay = ({ map, position, content, isActive, toggleActive }) => {
+    
     useEffect(() => {
         if (!map) return;
 

@@ -1,4 +1,4 @@
-import { Map, MapMarker } from "react-kakao-maps-sdk";
+import { Map } from "react-kakao-maps-sdk";
 import styled from "styled-components";
 import Marker_ComparePrice from "./Marker_ComparePrice";
 import { useState, useEffect, useRef, memo } from "react";
@@ -13,9 +13,6 @@ import { useQuery } from "@tanstack/react-query";
 import { StoreData } from "@shared/types";
 import { QueryKey } from "@shared/constants";
 import { storeMarkerState } from "@shared/atoms/storeMarkerState";
-import { createRoot } from 'react-dom/client';
-import StoreInfoWindow from '../SideNavigation/FindStore/StoreInfoWindow';
-import StoreOverlay from "@shared/components/map/StoreOverlay"
 import Marker_FindStore from "./Marker_FindStore";
 
 
@@ -129,6 +126,7 @@ const KakaoMap = () => {
   }, [currentCategory, currentPrice])
 
   useEffect(() => {
+
     console.log("카카오맵 렌더링");
 
     const { geolocation } = navigator;
@@ -138,8 +136,8 @@ const KakaoMap = () => {
       // setIsLoading(true);
       loadMarketData(apiUrl);
     } else if (currentMenu === '알뜰 가게 찾기') {
-      const filteredStores = getFilteredStores(storeData || []);
-      setStoreMarkers(filteredStores);
+      // const filteredStores = getFilteredStores(storeData || []);
+      // setStoreMarkers(filteredStores);
     }
 
     geolocation.getCurrentPosition(
@@ -158,6 +156,7 @@ const KakaoMap = () => {
         alert("위치 정보 사용에 동의해주세요");
       },
     );
+
     if (map) {
       const zoomControl = new kakao.maps.ZoomControl();
       map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
@@ -166,13 +165,6 @@ const KakaoMap = () => {
 
   const filteredStores = getFilteredStores(storeData || []);
 
-  // Javascript - infoWindow  CSS 강제로 변경하기 (infoWindow 테두리 부분) --> 실패
-  function removeBorderFromMapElement() {
-    const element = document.querySelector("#__react-kakao-maps-sdk___Map > div:nth-child(1) > div > div:nth-child(6)") as HTMLElement;
-    if (element) {
-      element.style.border = "none";
-    }
-  }
 
   useEffect(() => {
     setMapKey(Date.now());
@@ -191,6 +183,13 @@ const KakaoMap = () => {
   //   }
   // }, [map]);
 
+    // Javascript - infoWindow  CSS 강제로 변경하기 (infoWindow 테두리 부분) --> 실패
+    function removeBorderFromMapElement() {
+      const element = document.querySelector("#__react-kakao-maps-sdk___Map > div:nth-child(1) > div > div:nth-child(6)") as HTMLElement;
+      if (element) {
+        element.style.border = "none";
+      }
+    }
 
   const handleMarkerClick = (storeId) => {
     setActiveInfoWindow(prev => prev === storeId ? null : storeId);
@@ -201,6 +200,24 @@ const KakaoMap = () => {
   const closeInfoWindow = () => {
     setActiveInfoWindow(null);
   };
+
+  // useEffect(() => {
+  //   if (!map) return;
+
+  //   const hideFirstDirectChild = () => {
+  //     const mapContainer = document.querySelector("#__react-kakao-maps-sdk___Map > div:nth-child(1) > div > div:nth-child(6)");
+  //     if (mapContainer && mapContainer.firstChild) {
+  //       const firstChild = mapContainer.firstChild as HTMLElement;
+  //       firstChild.style.display = 'none';
+  //     }
+  //   };
+
+  //   kakao.maps.event.addListener(map, 'idle', hideFirstDirectChild);
+
+  //   return () => {
+  //     kakao.maps.event.removeListener(map, 'idle', hideFirstDirectChild);
+  //   };
+  // }, [map]); 
 
   return (
     <MapContainer $isLoading={isLoading}>

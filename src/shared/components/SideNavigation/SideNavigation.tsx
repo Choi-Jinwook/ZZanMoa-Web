@@ -6,12 +6,11 @@ import { FindStore, MenuList } from "./FindStore";
 import { ComparePrice } from "./ComparePrice";
 import { useRecoilState } from "recoil";
 import { SelectedMenu } from "@shared/atoms";
-import { navigationState } from "@shared/atoms/navigation";
-
+import { useRouter } from "next/router";
 
 const SideNavigation = () => {
   const [currentMenu, setCurrentMenu] = useRecoilState(SelectedMenu);
-  // const [currentMenu, setCurrentMenu] = useState<Menu>("알뜰 가게 찾기");
+  const { push } = useRouter();
 
   const handleCurrentMenu = (value: Menu) => {
     setCurrentMenu(value);
@@ -28,7 +27,9 @@ const SideNavigation = () => {
   return (
     <Container $currentMenu={currentMenu}>
       <LogoContainer>
-        <Image src="/images/logo.svg" alt="logo" width={98} height={30} />
+        <Logo onClick={() => push("/")}>
+          <Image src="/images/logo.svg" alt="logo" width={98} height={30} />
+        </Logo>
       </LogoContainer>
       <ListContainer>
         <MenuList
@@ -75,6 +76,10 @@ const LogoContainer = styled.div`
   align-items: center;
   gap: 11px;
   padding: 0px 24px;
+`;
+
+const Logo = styled.div`
+  cursor: pointer;
 `;
 
 const ListContainer = styled.div`

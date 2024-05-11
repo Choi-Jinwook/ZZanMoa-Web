@@ -2,24 +2,47 @@ import { rank } from "@shared/atoms";
 import { Divider, Text } from "@shared/components";
 import { Colors } from "@shared/constants";
 import { SavingList } from "@shared/types";
+import { toJpeg } from "html-to-image";
 import Image from "next/image";
-import { Fragment, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/router";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
 
 const Compare = () => {
   const listRef = useRef<HTMLDivElement | null>(null);
   const averageRef = useRef<HTMLDivElement | null>(null);
+  const saveRef = useRef<HTMLDivElement | null>(null);
   const [width, setWidth] = useState({ first: 0, second: 0 });
   const [priceSum, setPriceSum] = useState<number>(0);
+  const [topMarket, setTopMarket] = useState("");
   const [rankData] = useRecoilState(rank);
+  const { push } = useRouter();
 
-  const handleSum = (savingList: SavingList[]) => {
+  const handleSum = (savingList: SavingList[], isReciept?: boolean) => {
     let sum = 0;
     savingList.forEach(({ marketItem: { price } }) => (sum += price));
 
-    return sum;
+    if (isReciept) return sum === 0 ? "품목 없음" : sum.toLocaleString();
+
+    return sum === 0 ? "품목 없음" : `${sum.toLocaleString()}원`;
   };
+
+  const handleSave = useCallback(
+    (marketName: string) => {
+      if (!saveRef.current) return;
+
+      toJpeg(saveRef.current, { cacheBust: true, type: "jpeg" })
+        .then((dataUrl) => {
+          const link = document.createElement("a");
+          link.download = `짠영수증_${marketName}.jpeg`;
+          link.href = dataUrl;
+          link.click();
+        })
+        .catch((error) => console.log(error));
+    },
+    [saveRef],
+  );
 
   useEffect(() => {
     if (listRef && averageRef) {
@@ -38,10 +61,23 @@ const Compare = () => {
     setPriceSum(sum);
   }, []);
 
+  useEffect(() => {
+    setTopMarket(() => {
+      let name = "";
+      rankData?.rankList.forEach(({ rank, market }) => {
+        if (rank === 1) name = market.marketName;
+      });
+
+      return name;
+    });
+  }, []);
+
   return (
     <Container>
       <LogoContainer>
-        <Image src="/images/logo.svg" alt="logo" width={98} height={30} />
+        <Logo onClick={() => push("/")}>
+          <Image src="/images/logo.svg" alt="logo" width={98} height={30} />
+        </Logo>
       </LogoContainer>
       <ContentContainer>
         <ContentWrapper>
@@ -69,7 +105,7 @@ const Compare = () => {
                           variant="Body3"
                           color={rank === 1 ? "white" : Colors.Black700}
                           fontWeight="Medium"
-                        >{`${totalSaving > 0 ? `${totalSaving}원 비싸요` : `${Math.abs(totalSaving)}원 절약해요`}`}</Text>
+                        >{`${totalSaving < 0 ? `${Math.abs(totalSaving).toLocaleString()}원 비싸요` : `${Math.abs(totalSaving).toLocaleString()}원 절약해요`}`}</Text>
                       </SavingMoney>
                     </MarketInfo>
                     <Graph $rank={rank} />
@@ -106,13 +142,16 @@ const Compare = () => {
                 {rankData?.itemList.map(({ average_price }, index) => {
                   return (
                     <PriceItem key={average_price + index}>
-                      {`${average_price}원`}
+                      <Text
+                        variant="Body2"
+                        color={Colors.Black900}
+                      >{`${average_price.toLocaleString()}원`}</Text>
                     </PriceItem>
                   );
                 })}
                 <PriceSumCell>
                   <Text variant="Body2" color={Colors.Black900}>
-                    {`${priceSum}원`}
+                    {`${priceSum.toLocaleString()}원`}
                   </Text>
                 </PriceSumCell>
               </PriceItemCell>
@@ -129,13 +168,17 @@ const Compare = () => {
                     return (
                       <Fragment key={itemId + saving + index}>
                         <SavingPrice $saving={saving}>
-                          {`${price}원`}
+                          <Text variant="Body2" color={Colors.Black900}>
+                            {price === 0
+                              ? "품목 없음"
+                              : `${price.toLocaleString()}원`}
+                          </Text>
                         </SavingPrice>
                       </Fragment>
                     );
                   },
                 )}
-                <Sum>{`${handleSum(savingList)}원`}</Sum>
+                <Sum>{`${handleSum(savingList)}`}</Sum>
               </Market>
             ))}
           </PriceTable>
@@ -165,7 +208,7 @@ const Compare = () => {
             })}
           </TotalSave>
         </ContentWrapper>
-        <Receipt>
+        <Receipt ref={saveRef}>
           <ReceiptImageContainerUpper>
             <Image
               src="/images/receipt_up.svg"
@@ -251,7 +294,7 @@ const Compare = () => {
                             color={Colors.Red100}
                             fontWeight="SemiBold"
                           >
-                            {handleSum(savingList).toLocaleString()}
+                            {handleSum(savingList, true).toLocaleString()}
                             <span style={{ color: Colors.Black900 }}>원</span>
                           </Text>
                         </TotalSaving>
@@ -261,7 +304,7 @@ const Compare = () => {
                 );
               })}
             </PriceList>
-            <SaveButton>
+            <SaveButton onClick={() => handleSave(topMarket)}>
               <Text variant="Body1" color="white" fontWeight="SemiBold">
                 저장하기
               </Text>
@@ -292,6 +335,10 @@ const LogoContainer = styled.div`
   height: 60px;
   background-color: white;
   padding: 15px 24px;
+`;
+
+const Logo = styled.div`
+  cursor: pointer;
 `;
 
 const ContentContainer = styled.div`
@@ -569,6 +616,7 @@ const SaveButton = styled.button`
   background-color: ${Colors.Black900};
   padding: 4px 18px;
   align-self: self-end;
+  cursor: pointer;
 `;
 
 export default Compare;

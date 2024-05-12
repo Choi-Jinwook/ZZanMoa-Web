@@ -233,6 +233,7 @@ const HandleLocateBtn = styled.button`
   bottom: 10px;
   background: url("/images/locateBtn.svg") no-repeat center center;
   border-radius: 4px;
+  background-color: white;
   border: 1px solid #E7E7E9;
   width: 56px;
   height: 56px;

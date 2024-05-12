@@ -3,9 +3,6 @@ import styled from 'styled-components';
 import Image from 'next/image';
 import { Colors } from '@shared/constants';
 import Text from "@shared/components/Text";
-import selectedMarketsState from "@shared/atoms/MarketState";
-import { useRecoilState } from 'recoil';
-
 
 const InfoWindowContainer = styled.div`
   display: flex;
@@ -22,8 +19,6 @@ const InfoWindowContainer = styled.div`
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25), 0px 8px 16px rgba(0, 0, 0, 0.14);
   gap: 8px;
 `;
-
-
 
 const Section = styled.div`
 
@@ -76,24 +71,24 @@ interface AddButtonProps {
   added: boolean;
 }
 
-
 const MarketInfoWindow: React.FC<MarketInfoWindowProps> = ({ name, address, id, overlayRef, onToggleAdded, added }) => {
   const [isSelected, setIsSelected] = useState(false);
-  // const [selectedMarkets, setSelectedMarkets] = useRecoilState(selectedMarketsState); // 선택된 시장 상태
 
   useEffect(() => {
     setIsSelected(added);
   }, [added]);
 
   const handleButtonClick = () => {
-    // if (!isSelected && selectedMarkets.length >= 4) {
-    //   alert('최대 4개의 시장만 추가할 수 있습니다.');
-    //   return;
-    // }
-    setIsSelected(!isSelected);
-    onToggleAdded();
+    const addedMarkers = JSON.parse(localStorage.getItem("addedMarkers") || "[]");
+
+    if (!isSelected && addedMarkers.length >= 4) {
+      alert('최대 4개의 시장만 추가할 수 있습니다.');
+      return;
+    } else {
+      setIsSelected(!isSelected);
+      onToggleAdded();
+    }
   };
-  
 
   useEffect(() => {
     if (overlayRef && overlayRef.current) {
@@ -135,7 +130,6 @@ const MarketInfoWindow: React.FC<MarketInfoWindowProps> = ({ name, address, id, 
           </AddButton>
         </ActionsContainer>
       </Section>
-
     </InfoWindowContainer>
   );
 };

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Image from 'next/image';
 import { Colors } from '@shared/constants';
 import Text from "../../Text";
-import { IconImageWrapper, IconWrapper } from '@shared/components/StyledInfoWindow';
+import { IconImageWrapper, IconWrapper } from '@shared/components/map/ComparePrice/MarketInfoWindow';
 
 
 const WindowContainer = styled.div`

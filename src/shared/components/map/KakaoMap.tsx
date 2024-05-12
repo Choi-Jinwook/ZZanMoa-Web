@@ -1,7 +1,7 @@
 import { Map } from "react-kakao-maps-sdk";
 import styled from "styled-components";
-import Marker_ComparePrice from "./Marker_ComparePrice";
-import { useState, useEffect, useRef, memo } from "react";
+import Marker_ComparePrice from "./ComparePrice/Marker_ComparePrice";
+import { useState, useEffect } from "react";
 import { SyncLoader } from "react-spinners";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { mapCenterState, markersState } from "@shared/atoms/MapState";
@@ -13,7 +13,7 @@ import { useQuery } from "@tanstack/react-query";
 import { StoreData } from "@shared/types";
 import { QueryKey } from "@shared/constants";
 import { storeMarkerState } from "@shared/atoms/storeMarkerState";
-import Marker_FindStore from "./Marker_FindStore";
+import Marker_FindStore from "./FindStore/Marker_FindStore";
 
 
 const KakaoMap = () => {
@@ -29,7 +29,7 @@ const KakaoMap = () => {
 
   const [currentCategory] = useRecoilState(SelectedCategory);
   const [currentPrice] = useRecoilState(CurrentPrice);
-  const [activeMarker, setActiveMarker] = useState(null); // 활성 마커 상태 관리
+  const [activeMarker, setActiveMarker] = useState(null); 
 
   const { data: storeData } = useQuery([QueryKey.store], async () => {
     const res = await axios.get<StoreData[]>(
@@ -77,6 +77,7 @@ const KakaoMap = () => {
   };
 
   const handleLocate = () => {
+    // setIsLoading(true);
     if (map) {
       updateCurrentLocation();
     }
@@ -170,54 +171,10 @@ const KakaoMap = () => {
     setMapKey(Date.now());
   }, [currentMenu])
 
-  // useEffect(() => {
-  //   if (map) {
-  //     const handleClick = () => {
-  //       setActiveInfoWindow(null);
-  //     };
-  //     // kakao.maps.event.addListener(map, 'click', handleClick);
-
-  //     return () => {
-  //       kakao.maps.event.removeListener(map, 'click', handleClick);
-  //     };
-  //   }
-  // }, [map]);
-
-    // Javascript - infoWindow  CSS 강제로 변경하기 (infoWindow 테두리 부분) --> 실패
-    function removeBorderFromMapElement() {
-      const element = document.querySelector("#__react-kakao-maps-sdk___Map > div:nth-child(1) > div > div:nth-child(6)") as HTMLElement;
-      if (element) {
-        element.style.border = "none";
-      }
-    }
-
-  const handleMarkerClick = (storeId) => {
-    setActiveInfoWindow(prev => prev === storeId ? null : storeId);
-    setActiveMarker(storeId === activeMarker ? null : storeId);
-
-  };
-
   const closeInfoWindow = () => {
     setActiveInfoWindow(null);
   };
 
-  // useEffect(() => {
-  //   if (!map) return;
-
-  //   const hideFirstDirectChild = () => {
-  //     const mapContainer = document.querySelector("#__react-kakao-maps-sdk___Map > div:nth-child(1) > div > div:nth-child(6)");
-  //     if (mapContainer && mapContainer.firstChild) {
-  //       const firstChild = mapContainer.firstChild as HTMLElement;
-  //       firstChild.style.display = 'none';
-  //     }
-  //   };
-
-  //   kakao.maps.event.addListener(map, 'idle', hideFirstDirectChild);
-
-  //   return () => {
-  //     kakao.maps.event.removeListener(map, 'idle', hideFirstDirectChild);
-  //   };
-  // }, [map]); 
 
   return (
     <MapContainer $isLoading={isLoading}>
@@ -242,10 +199,6 @@ const KakaoMap = () => {
                   key={store.storeId}
                   map={map}
                   position={{ lat: store.latitude, lng: store.longitude }}
-                  storeId={store.storeId}
-                  onClick={handleMarkerClick}
-                  isActive={activeMarker === store.storeId}
-                  isInfoActive={activeInfoWindow === store.storeId}
                   content={store.storeName}
                   onClose={closeInfoWindow}
                   store={store}

@@ -3,11 +3,15 @@ import styled from 'styled-components';
 import Image from 'next/image';
 import { Colors } from '@shared/constants';
 import Text from "@shared/components/Text";
-
+import selectedMarketsState from "@shared/atoms/MarketState";
+import { useRecoilState } from 'recoil';
 
 
 const InfoWindowContainer = styled.div`
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   background-color: white;
   border-radius: 4px;
   min-width: 195px;
@@ -19,11 +23,9 @@ const InfoWindowContainer = styled.div`
   gap: 8px;
 `;
 
-const LeftSection = styled.div`
-  margin-right: 10px;
-`
 
-const RightSection = styled.div`
+
+const Section = styled.div`
 
 `
 
@@ -61,7 +63,7 @@ export const IconImageWrapper = styled.div`
   margin-right: 8px;
 `;
 
-interface StyledInfoWindowProps {
+interface MarketInfoWindowProps {
   name: string;
   address: string;
   id: number;
@@ -75,17 +77,23 @@ interface AddButtonProps {
 }
 
 
-const StyledInfoWindow: React.FC<StyledInfoWindowProps> = ({ name, address, id, overlayRef, onToggleAdded, added }) => {
+const MarketInfoWindow: React.FC<MarketInfoWindowProps> = ({ name, address, id, overlayRef, onToggleAdded, added }) => {
   const [isSelected, setIsSelected] = useState(false);
+  // const [selectedMarkets, setSelectedMarkets] = useRecoilState(selectedMarketsState); // 선택된 시장 상태
 
   useEffect(() => {
     setIsSelected(added);
   }, [added]);
 
   const handleButtonClick = () => {
+    // if (!isSelected && selectedMarkets.length >= 4) {
+    //   alert('최대 4개의 시장만 추가할 수 있습니다.');
+    //   return;
+    // }
     setIsSelected(!isSelected);
     onToggleAdded();
   };
+  
 
   useEffect(() => {
     if (overlayRef && overlayRef.current) {
@@ -96,14 +104,9 @@ const StyledInfoWindow: React.FC<StyledInfoWindowProps> = ({ name, address, id, 
     }
   }, [isSelected, overlayRef]);
 
-  
-
-
   return (
     <InfoWindowContainer>
-      <LeftSection>
-      </LeftSection>
-      <RightSection>
+      <Section>
         <Text
           variant="Body1"
           color={Colors.Black900}
@@ -131,10 +134,10 @@ const StyledInfoWindow: React.FC<StyledInfoWindowProps> = ({ name, address, id, 
             {isSelected ? '삭제하기' : '추가하기'}&emsp;{isSelected ? 'x' : '+'}
           </AddButton>
         </ActionsContainer>
-      </RightSection>
+      </Section>
 
     </InfoWindowContainer>
   );
 };
 
-export default StyledInfoWindow;
+export default MarketInfoWindow;

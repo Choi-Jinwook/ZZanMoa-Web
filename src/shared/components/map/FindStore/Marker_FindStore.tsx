@@ -2,7 +2,15 @@ import React, { memo } from 'react';
 import { MapMarker } from "react-kakao-maps-sdk";
 import StoreOverlay from './StoreOverlay';
 
-const Marker_FindStore = memo(({ map, position, content, store, onClose }) => {
+interface MarkerFindStoreProps {
+    map: kakao.maps.Map;
+    position: { lat: number; lng: number };
+    content: string;
+    store: any; 
+    onClose: () => void;
+  }
+
+  const Marker_FindStore = memo<MarkerFindStoreProps>(({ map, position, content, store, onClose }) => {
     return (
         <>
             <MapMarker

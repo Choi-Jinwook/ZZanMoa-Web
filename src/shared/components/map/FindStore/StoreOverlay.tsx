@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { createRoot } from 'react-dom/client';
 import { Colors } from '@shared/constants';
 import Text from '@shared/components/Text';
-import StoreInfoWindow from "../SideNavigation/FindStore/StoreInfoWindow";
+import StoreInfoWindow from "./StoreInfoWindow";
 
 const OverlayContainer = styled.div<{ $isActive?: boolean }>`
   position: absolute;
@@ -29,7 +29,7 @@ const OverlayContainer = styled.div<{ $isActive?: boolean }>`
     left: 20%;
     width: 0;
     height: 0;
-    border-width: 9px 9px 2px 9px; 
+    border-width: 10px 10px 3px 10px; 
     border-style: solid;
     border-color: ${({ $isActive }) => ($isActive ? `${Colors.Emerald500}` : "white")} transparent transparent transparent;
     transform: translateX(-50%);

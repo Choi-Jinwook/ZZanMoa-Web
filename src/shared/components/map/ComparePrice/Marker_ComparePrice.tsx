@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import StyledInfoWindow from "@shared/components/StyledInfoWindow";
+import MarketInfoWindow from "@shared/components/map/ComparePrice/MarketInfoWindow";
 import { createRoot } from "react-dom/client";
 import { MarkerInfo } from "@shared/types";
 import { useRecoilState, useSetRecoilState } from "recoil";
@@ -79,6 +79,8 @@ const Marker_ComparePrice = ({ map }: { map: kakao.maps.Map }) => {
     // const savedMarkers = JSON.parse(
     //   localStorage.getItem("addedMarkers") || "[]",
     // );
+    console.log("두번째 useEffect");
+
     const markerUpdates = markers.map(marker => {
       return new Promise(resolve => {
         geocoder.coord2Address(marker.longitude, marker.latitude, (result, status) => {
@@ -139,7 +141,7 @@ const Marker_ComparePrice = ({ map }: { map: kakao.maps.Map }) => {
     infoWindowContent.style.border = 'none';
     const root = createRoot(infoWindowContent);
     root.render(
-      <StyledInfoWindow
+      <MarketInfoWindow
         {...marker}
         added={added}
         onToggleAdded={onToggleAdded}

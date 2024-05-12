@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import Image from 'next/image';
 import { Colors } from '@shared/constants';
 import Text from "@shared/components/Text";
+import OpenMapLink from '../KakaoMap';
 
 const InfoWindowContainer = styled.div`
   display: flex;
@@ -54,24 +55,35 @@ export const IconWrapper = styled.div`
   margin-right: 8px;
 `;
 
-export const IconImageWrapper = styled.div`
+export const IconImageWrapper = styled.button`
   margin-right: 8px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  &:hover, &:focus {
+    outline: none;
+  }
 `;
+
 
 interface MarketInfoWindowProps {
   name: string;
   address: string;
-  id: number;
+  latitude: number;
+  longitude: number;
   overlayRef: React.RefObject<kakao.maps.CustomOverlay>;
   onToggleAdded: () => void;
-  added: boolean
+  added: boolean;
 }
 
 interface AddButtonProps {
   added: boolean;
 }
 
-const MarketInfoWindow: React.FC<MarketInfoWindowProps> = ({ name, address, id, overlayRef, onToggleAdded, added }) => {
+const MarketInfoWindow = ({ name, address, latitude, longitude, overlayRef, onToggleAdded, added } : MarketInfoWindowProps) => {
   const [isSelected, setIsSelected] = useState(false);
 
   useEffect(() => {
@@ -88,6 +100,14 @@ const MarketInfoWindow: React.FC<MarketInfoWindowProps> = ({ name, address, id, 
       setIsSelected(!isSelected);
       onToggleAdded();
     }
+  };
+
+  const openKakaoMap = () => {
+    window.open(`https://map.kakao.com/link/to/${name},${latitude},${longitude}`, '_blank');
+  };
+
+  const openNaverMap = () => {
+    window.open(`https://map.naver.com/v5/search/${name}/place/${latitude},${longitude}`, '_blank');
   };
 
   useEffect(() => {
@@ -118,13 +138,19 @@ const MarketInfoWindow: React.FC<MarketInfoWindowProps> = ({ name, address, id, 
         </Text>
         <ActionsContainer>
           <IconWrapper>
-            <IconImageWrapper>
+            <IconImageWrapper onClick={openKakaoMap}>
               <Image src="/images/kakaoMapIcon.svg" alt="카카오맵" width={24} height={24} />
             </IconImageWrapper>
-            <IconImageWrapper>
+            <IconImageWrapper onClick={openNaverMap}>
               <Image src="/images/naverMapIcon.svg" alt="네이버맵" width={24} height={24} />
             </IconImageWrapper>
           </IconWrapper>
+          {/* <OpenMapLink
+          name={name}
+          latitude={latitude}
+          longitude={longitude}
+          >
+          </OpenMapLink> */}
           <AddButton onClick={handleButtonClick} added={isSelected}>
             {isSelected ? '삭제하기' : '추가하기'}&emsp;{isSelected ? 'x' : '+'}
           </AddButton>

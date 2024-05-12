@@ -19,7 +19,7 @@ interface DistrictSelectorProps {
 
 const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-const DistrictSelector: React.FC<DistrictSelectorProps> = ({ onDistrictChange, currentLocation }) => {
+const DistrictSelector = ({ onDistrictChange, currentLocation } : DistrictSelectorProps) => {
     const [districts, setDistricts] = useState<District[]>([]);
     const [selectedDistrict, setSelectedDistrict] = useState<string>('');
     const [subDistricts, setSubDistricts] = useState<SubDistrict[]>([]);

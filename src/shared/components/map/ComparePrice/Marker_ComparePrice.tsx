@@ -104,9 +104,10 @@ const Marker_ComparePrice = ({ map }: { map: kakao.maps.Map }) => {
       });
     });
 
-    Promise.all(markerUpdates).then(newMarkers => {
-      setMarkers(newMarkers);
+    Promise.all(markerUpdates).then((newMarkers: unknown[]) => {
+      setMarkers(newMarkers as MarkerInfo[]);
     });
+    
 
     kakao.maps.event.addListener(map, "click", closeInfoWindow);
     return () => kakao.maps.event.removeListener(map, "click", closeInfoWindow);

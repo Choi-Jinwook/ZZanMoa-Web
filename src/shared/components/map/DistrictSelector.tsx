@@ -13,9 +13,10 @@ interface District {
     subDistricts: SubDistrict[];
 }
 interface DistrictSelectorProps {
-    onDistrictChange: (location: SubDistrict | District) => void;
+    onDistrictChange: (location: { latitude: number; longitude: number }) => void;
     currentLocation: { lat: number; lng: number };
 }
+
 
 const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -54,9 +55,9 @@ const DistrictSelector = ({ onDistrictChange, currentLocation } : DistrictSelect
         });
 
         if (nearestDistrict && nearestSubDistrict) {
-            setSelectedDistrict(nearestDistrict.district);
-            setSelectedSubDistrict(nearestSubDistrict.dong);
-            setSubDistricts(nearestDistrict.subDistricts);
+            setSelectedDistrict((nearestDistrict as District).district);
+            setSelectedSubDistrict((nearestSubDistrict as SubDistrict).dong);
+            setSubDistricts((nearestDistrict as District).subDistricts);
         }
     };
 

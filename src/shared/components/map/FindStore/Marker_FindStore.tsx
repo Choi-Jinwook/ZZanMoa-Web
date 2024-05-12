@@ -1,20 +1,21 @@
 import React, { memo } from 'react';
 import { MapMarker } from "react-kakao-maps-sdk";
 import StoreOverlay from './StoreOverlay';
+import { StoreData } from '@shared/types';
 
-interface MarkerFindStoreProps {
+export interface MarkerFindStoreProps {
     map: kakao.maps.Map;
     position: { lat: number; lng: number };
     content: string;
-    store: any; 
+    store: StoreData; 
     onClose: () => void;
-  }
+}
 
   const Marker_FindStore = memo<MarkerFindStoreProps>(({ map, position, content, store, onClose }) => {
     return (
         <>
             <MapMarker
-                map={map}
+                // map={map}
                 position={position}
                 image={{
                     src: "/images/transparentIcon.svg",

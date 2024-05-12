@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
-import Image from 'next/image';
 import { Colors } from '@shared/constants';
 import Text from "../../Text";
-import { IconImageWrapper, IconWrapper } from '@shared/components/map/ComparePrice/MarketInfoWindow';
+import OpenMapLink from '../OpenMapLink';
+import { StoreData } from '@shared/types';
 
 
 const WindowContainer = styled.div`
@@ -78,12 +78,24 @@ const PriceItem = styled.li`
   }
 `;
 
+interface StoreInfoWindowProps {
+  store: StoreData;
+  onClose: () => void;
+}
 
-function StoreInfoWindow({ store, onClose }) {
+const StoreInfoWindow = ({ store, onClose } : StoreInfoWindowProps) => {
   const displayedItems = store.items.slice(0, 2);
   const moreItemsCount = store.items.length - 2;
+
+  console.log(store.storeName);
+  console.log(store.latitude);
+
+  const handleWindowClick = (e: { stopPropagation: () => void; }) => {
+    e.stopPropagation();
+};
+  
   return (
-    <WindowContainer>
+    <WindowContainer id="store-info-window" onClick={handleWindowClick}>
       <CloseButton onClick={onClose}>&times;</CloseButton>
       <Text
         variant='Body1'
@@ -124,14 +136,12 @@ function StoreInfoWindow({ store, onClose }) {
           )}
         </LeftItems>
         <RightIcons>
-          <IconWrapper>
-            <IconImageWrapper>
-              <Image src="/images/kakaoMapIcon.svg" alt="카카오맵" width={24} height={24} />
-            </IconImageWrapper>
-            <IconImageWrapper>
-              <Image src="/images/naverMapIcon.svg" alt="네이버맵" width={24} height={24} />
-            </IconImageWrapper>
-          </IconWrapper>
+            <OpenMapLink
+            name={store.storeName}
+            latitude={store.latitude}
+            longitude={store.longitude}
+            >  
+            </OpenMapLink>
         </RightIcons>
       </ItemsContainer>
 

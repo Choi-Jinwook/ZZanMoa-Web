@@ -4,6 +4,7 @@ import { createRoot } from 'react-dom/client';
 import { Colors } from '@shared/constants';
 import Text from '@shared/components/Text';
 import StoreInfoWindow from "./StoreInfoWindow";
+import { MarkerFindStoreProps } from "./Marker_FindStore";
 
 const OverlayContainer = styled.div<{ $isActive?: boolean }>`
   position: absolute;
@@ -54,14 +55,17 @@ const CustomText = styled(Text) <{ $isActive?: boolean }>`
 
 `
 
-const StoreOverlay = ({ map, position, content, onClose, store }) => {
+export interface StoreOverlayProps extends MarkerFindStoreProps {
+    onClose: () => void;
+}
+
+const StoreOverlay = ({ map, position, content, onClose, store } : StoreOverlayProps) => {
     const [isActive, setIsActive] = useState(false);
     const [isInfoActive, setIsInfoActive] = useState(false);
 
     const handleOverlayClick = () => {
         setIsActive(!isActive);
         setIsInfoActive(!isInfoActive);
-        console.log("Overlay clicked!");
     };
 
     useEffect(() => {
@@ -82,11 +86,11 @@ const StoreOverlay = ({ map, position, content, onClose, store }) => {
                     {content}
                 </CustomText>
                 {isInfoActive && (
-                <StoreInfoWindow store={store} onClose={() => {
-                    setIsInfoActive(false);
-                    onClose();
-                }} />
-            )}
+                    <StoreInfoWindow store={store} onClose={() => {
+                        setIsInfoActive(false);
+                        onClose();
+                    }} />
+                )}
             </OverlayContainer>
         );
 
@@ -103,7 +107,7 @@ const StoreOverlay = ({ map, position, content, onClose, store }) => {
         const handleClick = () => {
             setIsInfoActive(false);
             setIsActive(false);
-        };
+        }
         kakao.maps.event.addListener(map, 'click', handleClick);
 
         return () => {

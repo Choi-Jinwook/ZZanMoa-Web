@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import Image from 'next/image';
 import { Colors } from '@shared/constants';
 import Text from "@shared/components/Text";
-import OpenMapLink from '../KakaoMap';
+import OpenMapLink from '../OpenMapLink';
 
 const InfoWindowContainer = styled.div`
   display: flex;
@@ -102,14 +101,6 @@ const MarketInfoWindow = ({ name, address, latitude, longitude, overlayRef, onTo
     }
   };
 
-  const openKakaoMap = () => {
-    window.open(`https://map.kakao.com/link/to/${name},${latitude},${longitude}`, '_blank');
-  };
-
-  const openNaverMap = () => {
-    window.open(`https://map.naver.com/v5/search/${name}/place/${latitude},${longitude}`, '_blank');
-  };
-
   useEffect(() => {
     if (overlayRef && overlayRef.current) {
       const content = overlayRef.current.getContent();
@@ -137,20 +128,12 @@ const MarketInfoWindow = ({ name, address, latitude, longitude, overlayRef, onTo
           {address}
         </Text>
         <ActionsContainer>
-          <IconWrapper>
-            <IconImageWrapper onClick={openKakaoMap}>
-              <Image src="/images/kakaoMapIcon.svg" alt="카카오맵" width={24} height={24} />
-            </IconImageWrapper>
-            <IconImageWrapper onClick={openNaverMap}>
-              <Image src="/images/naverMapIcon.svg" alt="네이버맵" width={24} height={24} />
-            </IconImageWrapper>
-          </IconWrapper>
-          {/* <OpenMapLink
+          <OpenMapLink
           name={name}
           latitude={latitude}
           longitude={longitude}
           >
-          </OpenMapLink> */}
+          </OpenMapLink>
           <AddButton onClick={handleButtonClick} added={isSelected}>
             {isSelected ? '삭제하기' : '추가하기'}&emsp;{isSelected ? 'x' : '+'}
           </AddButton>

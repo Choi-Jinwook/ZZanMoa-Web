@@ -41,10 +41,15 @@ const KakaoMap = () => {
 
 
   const updateMapCenter = (lng: number, lat: number) => {
-    setMapCenter({ lng, lat });
-    map.setCenter(new kakao.maps.LatLng(lat, lng));
-    map.setLevel(5);
+    if (map) {
+      setMapCenter({ lng, lat });
+      map.setCenter(new kakao.maps.LatLng(lat, lng));
+      map.setLevel(5);
+    } else {
+      console.error("Map 객체가 초기화되지 않았습니다.");
+    }
   };
+  
 
   const handleDistrictChange = (location: { latitude: number; longitude: number; }) => {
     if (location.latitude && location.longitude) {
@@ -53,28 +58,31 @@ const KakaoMap = () => {
   };
 
   const updateCurrentLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        ({ coords }) => {
-          const userCoords = {
-          // lat: coords.latitude,
-          // lng: coords.longitude,
-          lat: 37.5545, // 임시로 현재위치를 서울역 으로 설정
-          lng: 126.9706,
-          };
-          setMapCenter(userCoords);
-          map.setCenter(new kakao.maps.LatLng(userCoords.lat, userCoords.lng));
-          map.setLevel(3);
-        },
-        (error) => {
-          console.error("Geolocation error:", error);
-          alert("위치 정보를 가져오는데 실패했습니다. 위치 권한을 확인해주세요.");
-        }
-      );
+    if (map) {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          ({ coords }) => {
+            const userCoords = {
+              lat: 37.5545, // 임시로 현재위치를 서울역으로 설정
+              lng: 126.9706,
+            };
+            setMapCenter(userCoords);
+            map.setCenter(new kakao.maps.LatLng(userCoords.lat, userCoords.lng));
+            map.setLevel(3);
+          },
+          (error) => {
+            console.error("Geolocation error:", error);
+            alert("위치 정보를 가져오는데 실패했습니다. 위치 권한을 확인해주세요.");
+          }
+        );
+      } else {
+        alert("이 브라우저에서는 위치 서비스를 사용할 수 없습니다.");
+      }
     } else {
-      alert("이 브라우저에서는 위치 서비스를 사용할 수 없습니다.");
+      console.error("Map 객체가 초기화되지 않았습니다.");
     }
   };
+  
 
   const handleLocate = () => {
     // setIsLoading(true);
@@ -172,7 +180,7 @@ const KakaoMap = () => {
   }, [currentMenu])
 
   const closeInfoWindow = () => {
-    setActiveInfoWindow(null);
+    // setActiveInfoWindow(null);
   };
 
 

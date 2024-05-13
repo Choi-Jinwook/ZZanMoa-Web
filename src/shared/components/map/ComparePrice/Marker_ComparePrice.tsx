@@ -1,38 +1,17 @@
 import { useEffect, useRef, useState } from "react";
-import StyledInfoWindow from "@shared/components/StyledInfoWindow";
+import MarketInfoWindow from "@shared/components/map/ComparePrice/MarketInfoWindow";
 import { createRoot } from "react-dom/client";
 import { MarkerInfo } from "@shared/types";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import selectedMarketsState from "@shared/atoms/MarketState";
 import { markersState } from "@shared/atoms/MapState";
 
-const Marker = ({ map }: { map: kakao.maps.Map }) => {
+const Marker_ComparePrice = ({ map }: { map: kakao.maps.Map }) => {
   const [markers, setMarkers] = useRecoilState(markersState);
   const setSelectedMarkets = useSetRecoilState(selectedMarketsState);
   const infoWindowRef = useRef<kakao.maps.InfoWindow | null>(null);
   const circleOverlaysRef = useRef(new Map());
-
   const [focusedMarkerId, setFocusedMarkerId] = useState<number | null>(null);
-
-  const closeInfoWindow = () => {
-    if (infoWindowRef.current) {
-      infoWindowRef.current.close();
-      infoWindowRef.current = null;
-      if (focusedMarkerId !== null) {
-        setMarkers((prevMarkers) =>
-          prevMarkers.map((marker) => {
-            if (marker.id === focusedMarkerId) {
-              const updatedMarker = { ...marker, focus: false };
-              updateMarkerOnMap(updatedMarker, marker.added);
-              return updatedMarker;
-            }
-            return marker;
-          }),
-        );
-        setFocusedMarkerId(null);
-      }
-    }
-  };
 
   const toggleAdded = (id: number) => {
     setMarkers((prevMarkers) => {
@@ -47,6 +26,42 @@ const Marker = ({ map }: { map: kakao.maps.Map }) => {
     });
   };
 
+  const handleMarkerClick = (markerId: number) => {
+    closeInfoWindow();
+    setMarkers((prevMarkers) =>
+      prevMarkers.map((marker) => {
+        const isFocused = marker.id === markerId;
+        if (marker.id === markerId) {
+          if (!marker.focus) {
+            updateMarkerOnMap({ ...marker, focus: true }, marker.added);
+          }
+        } else {
+          if (marker.focus) {
+            updateMarkerOnMap({ ...marker, focus: false }, marker.added);
+          }
+        }
+        return { ...marker, focus: isFocused };
+      })
+    );
+    setFocusedMarkerId(markerId);
+  };
+
+  const closeInfoWindow = () => {
+    if (infoWindowRef.current) {
+      infoWindowRef.current.close();
+      infoWindowRef.current = null;
+      setMarkers((prevMarkers) =>
+        prevMarkers.map((marker) => {
+          if (marker.focus) {
+            updateMarkerOnMap({ ...marker, focus: false }, marker.added);
+          }
+          return { ...marker, focus: false };
+        })
+      );
+      setFocusedMarkerId(null);
+    }
+  };
+
   useEffect(() => {
     const selectedMarkets = markers.filter((marker) => marker.added);
     setSelectedMarkets(selectedMarkets);
@@ -54,86 +69,55 @@ const Marker = ({ map }: { map: kakao.maps.Map }) => {
       "addedMarkers",
       JSON.stringify(selectedMarkets.map((market) => market.id)),
     );
+    console.log("첫번째 useEffect");
   }, [markers]);
 
   useEffect(() => {
-    const places = new kakao.maps.services.Places();
-    const savedMarkers = JSON.parse(
-      localStorage.getItem("addedMarkers") || "[]",
-    );
-
     if (!map) return;
+    const geocoder = new kakao.maps.services.Geocoder();
 
-    const markerUpdates = markers
-      .filter((marker) => !marker.position)
-      .map(
-        (marker) =>
-          new Promise((resolve) => {
-            places.keywordSearch(marker.name, (result, status) => {
-              if (status === kakao.maps.services.Status.OK && result[0]) {
-                const updatedMarker = {
-                  ...marker,
-                  address: result[0].address_name,
-                  position: {
-                    lat: parseFloat(result[0].y),
-                    lng: parseFloat(result[0].x),
-                  },
-                  added: savedMarkers.includes(marker.id),
-                  src: "/images/sample.png",
-                };
-                updateMarkerOnMap(updatedMarker, updatedMarker.added);
-                resolve(updatedMarker);
-              } else {
-                console.error(`Failed to find location: ${marker.name}`);
-                resolve({ ...marker });
-              }
-            });
-          }),
-      );
+    // const savedMarkers = JSON.parse(
+    //   localStorage.getItem("addedMarkers") || "[]",
+    // );
+    console.log("두번째 useEffect");
 
-    Promise.all(markerUpdates).then((newMarkers) => {
-      setMarkers((prev: MarkerInfo[]): MarkerInfo[] => {
-        return prev.map((marker) => {
-          const updated = (newMarkers as MarkerInfo[]).find(
-            (m) => m.id === marker.id,
-          );
-          return updated || marker;
+    const markerUpdates = markers.map(marker => {
+      return new Promise(resolve => {
+        geocoder.coord2Address(marker.longitude, marker.latitude, (result, status) => {
+          if (status === kakao.maps.services.Status.OK) {
+            const address = result[0].address.address_name;
+            const updatedMarker = {
+              ...marker,
+              address: address,
+              lat: marker.latitude,
+              lng: marker.longitude,
+              added: false,
+              focus: false,
+            };
+            updateMarkerOnMap(updatedMarker, updatedMarker.added);
+            resolve(updatedMarker);
+          } else {
+            console.error(`Failed: ${marker.name}`);
+            resolve(marker);
+          }
         });
       });
     });
 
-    const handleMapClick = () => {
-      if (infoWindowRef.current) {
-        infoWindowRef.current.close();
-        infoWindowRef.current = null;
-        setMarkers((prev) =>
-          prev.map((marker) => ({ ...marker, focus: false })),
-        );
-      }
-    };
+    Promise.all(markerUpdates).then((newMarkers: unknown[]) => {
+      setMarkers(newMarkers as MarkerInfo[]);
+    });
+    
 
-    kakao.maps.event.addListener(map, "click", handleMapClick);
-    return () => kakao.maps.event.removeListener(map, "click", handleMapClick);
+    kakao.maps.event.addListener(map, "click", closeInfoWindow);
+    return () => kakao.maps.event.removeListener(map, "click", closeInfoWindow);
   }, [map]);
 
-  const handleMarkerClick = (markerId: any) => {
-    closeInfoWindow();
-    setMarkers((prevMarkers) =>
-      prevMarkers.map((marker) => {
-        const focused = marker.id === markerId ? !marker.focus : false;
-        if (marker.id === markerId) {
-          updateMarkerOnMap({ ...marker, focus: true }, marker.added);
-        }
-        return { ...marker, focus: false };
-      }),
-    );
-    setFocusedMarkerId(markerId);
-  };
 
   function updateMarkerOnMap(marker: any, added: boolean) {
     const markerPosition = new kakao.maps.LatLng(
-      marker.position.lat,
-      marker.position.lng,
+      marker.lat,
+      marker.lng,
     );
     const imageSrc = getMarkerImage(marker.focus);
     const markerImage = new kakao.maps.MarkerImage(
@@ -154,9 +138,11 @@ const Marker = ({ map }: { map: kakao.maps.Map }) => {
     };
 
     const infoWindowContent = document.createElement("div");
+    infoWindowContent.style.backgroundColor = 'transparent';
+    infoWindowContent.style.border = 'none';
     const root = createRoot(infoWindowContent);
     root.render(
-      <StyledInfoWindow
+      <MarketInfoWindow
         {...marker}
         added={added}
         onToggleAdded={onToggleAdded}
@@ -191,8 +177,8 @@ const Marker = ({ map }: { map: kakao.maps.Map }) => {
       circleOverlay = new kakao.maps.CustomOverlay({
         map: map,
         position: new kakao.maps.LatLng(
-          marker.position.lat,
-          marker.position.lng,
+          marker.latitude,
+          marker.longitude,
         ),
         content: circleContent,
         zIndex: -1,
@@ -209,4 +195,4 @@ const Marker = ({ map }: { map: kakao.maps.Map }) => {
 
   return null;
 };
-export default Marker;
+export default Marker_ComparePrice;

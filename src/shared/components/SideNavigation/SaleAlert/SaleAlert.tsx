@@ -271,37 +271,39 @@ const SaleAlert = () => {
         </CategoryContainer>
         <LocateFilter>
           <LocateContainer>
-            <SelectBox ref={dropdownButtonRef}>
-              <Text
-                variant="Body1"
-                color={Colors.Emerald600}
-                fontWeight="Medium"
-              >
-                {currentDistrict}
-              </Text>
-              <SelectChevron $isOpen={isOpen} onClick={handleClickDropDown}>
-                <Chevron color={Colors.Emerald600} width={28} height={28} />
-              </SelectChevron>
-              {isOpen && (
-                <DropDownContainer ref={selectBoxRef}>
-                  {district?.map(({ districtId, districtName }, index) => (
-                    <DropDown
-                      key={districtId}
-                      $isLast={index === district.length - 1}
-                      onClick={() => handleDistrict(districtName, districtId)}
-                    >
-                      <Text
-                        variant="Body3"
-                        color={Colors.Black900}
-                        fontWeight="Medium"
+            {currentCategory !== "물가정보" && (
+              <SelectBox ref={dropdownButtonRef}>
+                <Text
+                  variant="Body1"
+                  color={Colors.Emerald600}
+                  fontWeight="Medium"
+                >
+                  {currentDistrict}
+                </Text>
+                <SelectChevron $isOpen={isOpen} onClick={handleClickDropDown}>
+                  <Chevron color={Colors.Emerald600} width={28} height={28} />
+                </SelectChevron>
+                {isOpen && (
+                  <DropDownContainer ref={selectBoxRef}>
+                    {district?.map(({ districtId, districtName }, index) => (
+                      <DropDown
+                        key={districtId}
+                        $isLast={index === district.length - 1}
+                        onClick={() => handleDistrict(districtName, districtId)}
                       >
-                        {districtName}
-                      </Text>
-                    </DropDown>
-                  ))}
-                </DropDownContainer>
-              )}
-            </SelectBox>
+                        <Text
+                          variant="Body3"
+                          color={Colors.Black900}
+                          fontWeight="Medium"
+                        >
+                          {districtName}
+                        </Text>
+                      </DropDown>
+                    ))}
+                  </DropDownContainer>
+                )}
+              </SelectBox>
+            )}
             <RecentPost>
               <Text variant="Body1" color={Colors.Black700}>
                 최근 일주일 게시물&nbsp;

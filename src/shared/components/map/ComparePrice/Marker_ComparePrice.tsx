@@ -12,6 +12,8 @@ const Marker_ComparePrice = ({ map }: { map: kakao.maps.Map }) => {
   const infoWindowRef = useRef<kakao.maps.InfoWindow | null>(null);
   const circleOverlaysRef = useRef(new Map());
   const [focusedMarkerId, setFocusedMarkerId] = useState<number | null>(null);
+  // const [isLoading, setIsLoading] = useState(true);
+
 
   const toggleAdded = (id: number) => {
     setMarkers((prevMarkers) => {
@@ -69,17 +71,20 @@ const Marker_ComparePrice = ({ map }: { map: kakao.maps.Map }) => {
       "addedMarkers",
       JSON.stringify(selectedMarkets.map((market) => market.id)),
     );
-    console.log("첫번째 useEffect");
+    markers.forEach(marker => {
+      updateCircleOverlay(marker, marker.added);
+    });
   }, [markers]);
 
   useEffect(() => {
+    // if (!map || !isLoading) return;
     if (!map) return;
+
     const geocoder = new kakao.maps.services.Geocoder();
 
     // const savedMarkers = JSON.parse(
     //   localStorage.getItem("addedMarkers") || "[]",
     // );
-    console.log("두번째 useEffect");
 
     const markerUpdates = markers.map(marker => {
       return new Promise(resolve => {
@@ -107,7 +112,6 @@ const Marker_ComparePrice = ({ map }: { map: kakao.maps.Map }) => {
     Promise.all(markerUpdates).then((newMarkers: unknown[]) => {
       setMarkers(newMarkers as MarkerInfo[]);
     });
-    
 
     kakao.maps.event.addListener(map, "click", closeInfoWindow);
     return () => kakao.maps.event.removeListener(map, "click", closeInfoWindow);
@@ -163,31 +167,33 @@ const Marker_ComparePrice = ({ map }: { map: kakao.maps.Map }) => {
   function updateCircleOverlay(marker: MarkerInfo, display: boolean) {
     let circleOverlay = circleOverlaysRef.current.get(marker.id);
     if (!circleOverlay) {
-      const circleContent = document.createElement("div");
-      circleContent.style.position = "absolute";
-      circleContent.style.width = "75px";
-      circleContent.style.height = "75px";
-      circleContent.style.borderRadius = "50%";
-      circleContent.style.backgroundColor = "rgba(16, 185, 129, 0.3)";
-      circleContent.style.display = display ? "block" : "none";
-      circleContent.style.transform = "translate(-50%, -80%)";
-      circleContent.style.zIndex = "-3";
-      circleContent.style.pointerEvents = "none";
-
+      const circleContent = createCircleContent(display); 
       circleOverlay = new kakao.maps.CustomOverlay({
         map: map,
-        position: new kakao.maps.LatLng(
-          marker.latitude,
-          marker.longitude,
-        ),
+        position: new kakao.maps.LatLng(marker.latitude, marker.longitude),
         content: circleContent,
-        zIndex: -1,
+        zIndex: -1
       });
       circleOverlaysRef.current.set(marker.id, circleOverlay);
     } else {
       circleOverlay.getContent().style.display = display ? "block" : "none";
     }
-  }
+  };
+
+  const createCircleContent = (display: boolean) => {
+    const circleContent = document.createElement("div");
+    circleContent.style.position = "absolute";
+    circleContent.style.width = "75px";
+    circleContent.style.height = "75px";
+    circleContent.style.borderRadius = "50%";
+    circleContent.style.backgroundColor = "rgba(16, 185, 129, 0.3)";
+    circleContent.style.display = display ? "block" : "none";
+    circleContent.style.transform = "translate(-50%, -80%)";
+    circleContent.style.zIndex = "-3";
+    circleContent.style.pointerEvents = "none";
+    return circleContent;
+  };
+
 
   function getMarkerImage(focus: boolean) {
     return focus ? "/images/selectedMarker.png" : "/images/defaultMarker.png";

@@ -1,49 +1,28 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import kakaoIcon from '@shared/assets/kakaoMapIcon.png';
-import naverIcon from '@shared/assets/naverMapIcon.png';
-import mockImg from '@shared/assets/photo.png';
-import Image from 'next/image';
 import { Colors } from '@shared/constants';
-import { MarkerInfo } from '@shared/types';
-import { useRecoilState } from 'recoil';
-import selectedMarketsState from '@shared/atoms/MarketState';
+import Text from "@shared/components/Text";
+import OpenMapLink from '../OpenMapLink';
 
 const InfoWindowContainer = styled.div`
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   background-color: white;
   border-radius: 4px;
-  min-width: 295px;
+  min-width: 195px;
   max-width: 116px;
   padding: 8px;
-  border: 1px solid #ccc;
   z-index: 3;
+  border: none;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25), 0px 8px 16px rgba(0, 0, 0, 0.14);
+  gap: 8px;
 `;
 
-const LeftSection = styled.div`
-  margin-right: 10px;
-`
-
-const ImgContainer = styled.div`
-  width: 86px;
-  height: 86px;
-`
-
-const RightSection = styled.div`
+const Section = styled.div`
 
 `
-
-const InfoTitle = styled.h1`
-  color: ${Colors.Black900};
-  font-size: 18px;
-  margin: 0 0 5px 0;
-`;
-
-const InfoDescription = styled.div`
-  color: ${Colors.Black800};
-  font-size: 12px;
-  margin-bottom: 10px;
-`;
 
 const ActionsContainer = styled.div`
   display: flex;
@@ -69,32 +48,41 @@ const AddButton = styled.button.attrs(props => ({
   }
 `;
 
-const IconWrapper = styled.div`
+export const IconWrapper = styled.div`
   display: flex;
   align-items: center;
   margin-right: 8px;
 `;
 
-const IconImageWrapper = styled.div`
+export const IconImageWrapper = styled.button`
   margin-right: 8px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  &:hover, &:focus {
+    outline: none;
+  }
 `;
 
-interface StyledInfoWindowProps {
+
+interface MarketInfoWindowProps {
   name: string;
   address: string;
-  id: number;
+  latitude: number;
+  longitude: number;
   overlayRef: React.RefObject<kakao.maps.CustomOverlay>;
   onToggleAdded: () => void;
-  added: boolean
+  added: boolean;
 }
 
 interface AddButtonProps {
   added: boolean;
 }
 
-
-const StyledInfoWindow: React.FC<StyledInfoWindowProps> = ({ name, address, id, overlayRef, onToggleAdded, added }) => {
-  // const [selectedMarkets, setSelectedMarkets] = useRecoilState(selectedMarketsState);
+const MarketInfoWindow = ({ name, address, latitude, longitude, overlayRef, onToggleAdded, added } : MarketInfoWindowProps) => {
   const [isSelected, setIsSelected] = useState(false);
 
   useEffect(() => {
@@ -102,8 +90,15 @@ const StyledInfoWindow: React.FC<StyledInfoWindowProps> = ({ name, address, id, 
   }, [added]);
 
   const handleButtonClick = () => {
-    setIsSelected(!isSelected);
-    onToggleAdded();
+    const addedMarkers = JSON.parse(localStorage.getItem("addedMarkers") || "[]");
+
+    if (!isSelected && addedMarkers.length >= 4) {
+      alert('최대 4개의 시장만 추가할 수 있습니다.');
+      return;
+    } else {
+      setIsSelected(!isSelected);
+      onToggleAdded();
+    }
   };
 
   useEffect(() => {
@@ -115,34 +110,37 @@ const StyledInfoWindow: React.FC<StyledInfoWindowProps> = ({ name, address, id, 
     }
   }, [isSelected, overlayRef]);
 
-
   return (
     <InfoWindowContainer>
-      <LeftSection>
-        <ImgContainer>
-          <Image src={mockImg} />
-        </ImgContainer>
-      </LeftSection>
-      <RightSection>
-        <InfoTitle>{name}</InfoTitle>
-        <InfoDescription>{address}</InfoDescription>
+      <Section>
+        <Text
+          variant="Body1"
+          color={Colors.Black900}
+          fontWeight="SemiBold"
+        >
+          {name}
+        </Text>
+        <Text
+          variant="Body4"
+          color={Colors.Black800}
+          fontWeight="Regular"
+        >
+          {address}
+        </Text>
         <ActionsContainer>
-          <IconWrapper>
-            <IconImageWrapper>
-              <Image src={kakaoIcon} alt="카카오맵" width={24} height={24} />
-            </IconImageWrapper>
-            <IconImageWrapper>
-              <Image src={naverIcon} alt="네이버맵" width={24} height={24} />
-            </IconImageWrapper>
-          </IconWrapper>
+          <OpenMapLink
+          name={name}
+          latitude={latitude}
+          longitude={longitude}
+          >
+          </OpenMapLink>
           <AddButton onClick={handleButtonClick} added={isSelected}>
             {isSelected ? '삭제하기' : '추가하기'}&emsp;{isSelected ? 'x' : '+'}
           </AddButton>
         </ActionsContainer>
-      </RightSection>
-
+      </Section>
     </InfoWindowContainer>
   );
 };
 
-export default StyledInfoWindow;
+export default MarketInfoWindow;

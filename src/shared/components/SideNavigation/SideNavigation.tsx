@@ -16,6 +16,14 @@ const SideNavigation = () => {
     setCurrentMenu(value);
   };
 
+  // const [navState, setNavState] = useRecoilState(navigationState);
+
+  // const handleNavChange = (newState: Menu) => {
+  //   setNavState(newState);
+  //   console.log("navStateChanged: ", navState);
+    
+  // };
+
   return (
     <Container $currentMenu={currentMenu}>
       <LogoContainer>

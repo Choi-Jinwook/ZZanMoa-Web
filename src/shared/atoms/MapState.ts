@@ -10,3 +10,8 @@ export const markersState = atom<MarkerInfo[]>({
     key: 'markersState',
     default: [],
 });
+
+export const selectedLocationState = atom<string>({
+    key: "selectedLocationState",
+    default: "",
+});

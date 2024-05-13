@@ -1,51 +1,36 @@
-import { Colors, QueryKey } from "@shared/constants";
+import { Colors } from "@shared/constants";
 import styled from "styled-components";
 import Text from "../../Text";
-import { StoreData } from "@shared/types";
 import { useRecoilState } from "recoil";
-import { CurrentPrice, SelectedCategory } from "@shared/atoms";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
+import { storeMarkerState } from "@shared/atoms/storeMarkerState";
+
 
 const FilteredStore = () => {
-  const { data: storeData } = useQuery([QueryKey.store], async () => {
-    const res = await axios.get<StoreData[]>(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/saving-place/get/store`,
-    );
+  // const { data: storeData } = useQuery([QueryKey.store], async () => {
+  //   const res = await axios.get<StoreData[]>(
+  //     `${process.env.NEXT_PUBLIC_API_BASE_URL}/saving-place/get/store`,
+  //   );
 
-    return res.data;
-  });
-  const [currentCategory] = useRecoilState(SelectedCategory);
-  const [currentPrice] = useRecoilState(CurrentPrice);
-
-  const getFilteredStores = (stores: StoreData[]) => {
-    return stores.filter(({ items }) => {
-      if (currentCategory === "") {
-        return true;
-      } else {
-        return items.some(
-          ({ category, price }) =>
-            category.includes(currentCategory.split(" ").reverse()[0]) &&
-            price >= currentPrice.minPrice &&
-            price <= currentPrice.maxPrice,
-        );
-      }
-    });
-  };
+  //   return res.data;
+  // });
+  // const [currentCategory] = useRecoilState(SelectedCategory);
+  // const [currentPrice] = useRecoilState(CurrentPrice);
+  const [storeMarkers, setStoreMarkers] = useRecoilState(storeMarkerState);
 
   const handleStoreClick = (storeId: string) => {
     console.log(storeId);
     // TODO: onClick 이벤트 추가
   };
 
-  const filteredStores = getFilteredStores(storeData || []);
+  // const filteredStores = getFilteredStores(storeData || []);
 
   return (
     <Container>
-      {filteredStores.map(
+      {storeMarkers.map(
         ({ storeId, storeName, address, items, phoneNumber }) => {
           return (
-            <StoreCard onClick={() => handleStoreClick(storeId)} key={storeId}>
+            // <StoreCard onClick={() => handleStoreClick(storeId)} key={storeId}>
+            <StoreCard key={storeId}>
               <Text
                 variant="Body1"
                 color={Colors.Black900}

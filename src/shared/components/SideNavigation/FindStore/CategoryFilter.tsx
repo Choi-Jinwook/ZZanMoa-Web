@@ -1,28 +1,30 @@
 import styled from "styled-components";
 import { Colors } from "@shared/constants";
-import { useState } from "react";
-import Text from "@shared/components/Text";
+import { useGetCategory } from "@shared/apis";
+import { useRecoilState } from "recoil";
+import { MinMaxPrice, SelectedCategory } from "@shared/atoms";
+import { useEffect } from "react";
+import { Category, Text } from "@shared/components";
 
 const CategoryFilter = () => {
-  const [currentCategory, setCurrentCategory] = useState("");
-
-  const CATEGORY = [
-    "🍚 한식",
-    "🍜 중식",
-    "🍝 경양식",
-    "🍣 일식",
-    "☕ 다방",
-    "🍴 기타 음식업",
-    "💈 미용/이용",
-    "👕 세탁",
-    "🎬 영화",
-    "🛏️ 숙박",
-    "기타 서비스",
-  ];
+  const { data: categories } = useGetCategory();
+  const [, setPrice] = useRecoilState(MinMaxPrice);
+  const [currentCategory, setCurrentCategory] =
+    useRecoilState(SelectedCategory);
 
   const handleClick = (value: string) => {
     setCurrentCategory(value);
   };
+
+  useEffect(() => {
+    const categoryData = categories?.find(
+      ({ category }) => category === currentCategory.split(" ").reverse()[0],
+    );
+    if (categoryData) {
+      const { minPrice, maxPrice } = categoryData;
+      setPrice({ minPrice, maxPrice });
+    }
+  }, [currentCategory]);
 
   return (
     <Container>
@@ -30,17 +32,44 @@ const CategoryFilter = () => {
         카테고리
       </Text>
       <CategoryContainer>
-        {CATEGORY.map((category) => (
-          <Category
-            $focus={currentCategory === category}
-            key={category}
-            onClick={() => handleClick(category)}
-          >
-            <Text variant="Body3" color={Colors.Black800}>
-              {category}
+        <CategoryWrapper>
+          <TextContainer>
+            <Text color="#000000" variant="Body3" fontWeight="Medium">
+              음식
             </Text>
-          </Category>
-        ))}
+          </TextContainer>
+          <CategoryContent>
+            {categories
+              ?.slice(0, 6)
+              .map(({ category }) => (
+                <Category
+                  key={category}
+                  category={category}
+                  currentCategory={currentCategory}
+                  handleClick={handleClick}
+                />
+              ))}
+          </CategoryContent>
+        </CategoryWrapper>
+        <CategoryWrapper>
+          <TextContainer>
+            <Text color="#000000" variant="Body3" fontWeight="Medium">
+              서비스
+            </Text>
+          </TextContainer>
+          <CategoryContent>
+            {categories
+              ?.slice(6, 15)
+              .map(({ category }) => (
+                <Category
+                  key={category}
+                  category={category}
+                  currentCategory={currentCategory}
+                  handleClick={handleClick}
+                />
+              ))}
+          </CategoryContent>
+        </CategoryWrapper>
       </CategoryContainer>
     </Container>
   );
@@ -55,19 +84,22 @@ const Container = styled.div`
 const CategoryContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 12px 8px;
+  gap: 16px;
 `;
 
-const Category = styled.div<{ $focus: boolean }>`
+const CategoryContent = styled.div`
   display: flex;
-  border: 1px solid
-    ${({ $focus }) => ($focus ? Colors.Emerald600 : Colors.Black600)};
-  border-radius: 2rem;
-  background-color: ${({ $focus }) => ($focus ? Colors.Emerald50 : "white")};
-  align-items: center;
-  justify-content: center;
-  padding: 6px 16px;
+  flex-wrap: wrap;
   gap: 8px;
+`;
+
+const TextContainer = styled.div`
+  min-width: 40px;
+`;
+
+const CategoryWrapper = styled.div`
+  display: flex;
+  gap: 16px;
 `;
 
 export default CategoryFilter;

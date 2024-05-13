@@ -1,12 +1,10 @@
-import { rank } from "@shared/atoms";
 import { Divider, Text } from "@shared/components";
 import { Colors } from "@shared/constants";
-import { SavingList } from "@shared/types";
+import { Rank, SavingList } from "@shared/types";
 import { toJpeg } from "html-to-image";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
-import { useRecoilState } from "recoil";
 import styled from "styled-components";
 
 const Compare = () => {
@@ -16,8 +14,11 @@ const Compare = () => {
   const [width, setWidth] = useState({ first: 0, second: 0 });
   const [priceSum, setPriceSum] = useState<number>(0);
   const [topMarket, setTopMarket] = useState("");
-  const [rankData] = useRecoilState(rank);
-  const { push } = useRouter();
+  const [rankData, setRankData] = useState<Rank>();
+  const {
+    push,
+    query: { data: queryData },
+  } = useRouter();
 
   const handleSum = (savingList: SavingList[], isReciept?: boolean) => {
     let sum = 0;
@@ -72,6 +73,15 @@ const Compare = () => {
     });
   }, []);
 
+  useEffect(() => {
+    if (queryData) {
+      const decodedData = Array.isArray(queryData)
+        ? queryData.map((item) => JSON.parse(decodeURIComponent(item)))
+        : JSON.parse(decodeURIComponent(queryData));
+      setRankData(decodedData);
+    }
+  }, [queryData]);
+
   return (
     <Container>
       <LogoContainer>
@@ -105,7 +115,7 @@ const Compare = () => {
                           variant="Body3"
                           color={rank === 1 ? "white" : Colors.Black700}
                           fontWeight="Medium"
-                        >{`${totalSaving < 0 ? `${Math.abs(totalSaving).toLocaleString()}원 비싸요` : `${Math.abs(totalSaving).toLocaleString()}원 절약해요`}`}</Text>
+                        >{`${totalSaving > 0 ? `${Math.abs(totalSaving).toLocaleString()}원 비싸요` : `${Math.abs(totalSaving).toLocaleString()}원 절약해요`}`}</Text>
                       </SavingMoney>
                     </MarketInfo>
                     <Graph $rank={rank} />
@@ -201,7 +211,7 @@ const Compare = () => {
                     color={rank === 1 ? "white" : Colors.Black700}
                     fontWeight="Medium"
                   >
-                    {`${Math.abs(totalSaving)}원 ${totalSaving < 0 ? "비싸요" : "절약해요"}`}
+                    {`${Math.abs(totalSaving)}원 ${totalSaving > 0 ? "비싸요" : "절약해요"}`}
                   </Text>
                 </MarketSaving>
               );

@@ -15,7 +15,6 @@ import { QueryKey } from "@shared/constants";
 import { storeMarkerState } from "@shared/atoms/storeMarkerState";
 import Marker_FindStore from "./FindStore/Marker_FindStore";
 
-
 const KakaoMap = () => {
   const [map, setMap] = useState<kakao.maps.Map | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -50,11 +49,13 @@ const KakaoMap = () => {
       console.error("Map 객체가 초기화되지 않았습니다.");
     }
   };
-  
 
-  const handleDistrictChange = (location: { latitude: number; longitude: number; }) => {
+  const handleDistrictChange = (location: {
+    latitude: number;
+    longitude: number;
+  }) => {
     if (location.latitude && location.longitude) {
-      updateMapCenter(location.latitude, location.longitude);      
+      updateMapCenter(location.latitude, location.longitude);
     }
   };
 
@@ -68,13 +69,17 @@ const KakaoMap = () => {
               lng: 126.9706,
             };
             setMapCenter(userCoords);
-            map.setCenter(new kakao.maps.LatLng(userCoords.lat, userCoords.lng));
+            map.setCenter(
+              new kakao.maps.LatLng(userCoords.lat, userCoords.lng),
+            );
             map.setLevel(3);
           },
           (error) => {
             console.error("Geolocation error:", error);
-            alert("위치 정보를 가져오는데 실패했습니다. 위치 권한을 확인해주세요.");
-          }
+            alert(
+              "위치 정보를 가져오는데 실패했습니다. 위치 권한을 확인해주세요.",
+            );
+          },
         );
       } else {
         alert("이 브라우저에서는 위치 서비스를 사용할 수 없습니다.");
@@ -85,7 +90,6 @@ const KakaoMap = () => {
   };
 
   const handleLocate = () => {
-    // setIsLoading(true);
     if (map) {
       updateCurrentLocation();
     }
@@ -94,14 +98,19 @@ const KakaoMap = () => {
   const loadMarketData = (apiUrl: string | undefined) => {
     return axios.get(`${apiUrl}/market/market-place/get`)
       .then((response) => {
-        const newMarkers = response.data.map((market: { marketName: any; latitude: any; longitude: any; }, index: any) => ({
-          id: index,
-          name: market.marketName,
-          latitude: market.latitude,
-          longitude: market.longitude,
-          added: false,
-          focus: false,
-        }));
+        const newMarkers = response.data.map(
+          (
+            market: { marketName: string; latitude: number; longitude: number },
+            index: number,
+          ) => ({
+            id: index,
+            name: market.marketName,
+            latitude: market.latitude,
+            longitude: market.longitude,
+            added: false,
+            focus: false,
+          }),
+        );
         setMarkers(newMarkers);
         console.log("Markers loaded:", newMarkers);
       })
@@ -128,26 +137,17 @@ const KakaoMap = () => {
   useEffect(() => {
     const filteredStores = getFilteredStores(storeData || []);
     setStoreMarkers(filteredStores);
-  }, [currentCategory, currentPrice])
+  }, [currentCategory, currentPrice]);
 
   useEffect(() => {
-    const { geolocation } = navigator;
-    // const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-    // if (currentMenu === '시장 가격 비교') {
-    //   loadMarketData(apiUrl);
-    // } else if (currentMenu === '알뜰 가게 찾기') {
-    //   // const filteredStores = getFilteredStores(storeData || []);
-    //   // setStoreMarkers(filteredStores);
-    // }
+    const { geolocation } = navigator;
 
     geolocation.getCurrentPosition(
       ({ coords }) => {
         const userCoords = {
-          // lat: coords.latitude,
-          // lng: coords.longitude,
-          lat: 37.5545, // 임시로 현재위치를 서울역 으로 설정
-          lng: 126.9706,
+          lat: coords.latitude || 37.5545,
+          lng: coords.longitude || 126.9706,
         };
         setMapCenter(userCoords);
         setIsLoading(false);
@@ -181,15 +181,13 @@ const KakaoMap = () => {
 
   const filteredStores = getFilteredStores(storeData || []);
 
-
   useEffect(() => {
     setMapKey(Date.now());
-  }, [currentMenu])
+  }, [currentMenu]);
 
   const closeInfoWindow = () => {
     // setActiveInfoWindow(null);
   };
-
 
   return (
     <MapContainer $isLoading={isLoading}>
@@ -200,7 +198,10 @@ const KakaoMap = () => {
         </>
       ) : (
         <>
-          <DistrictSelector onDistrictChange={handleDistrictChange} currentLocation={mapCenter} />
+          <DistrictSelector
+            onDistrictChange={handleDistrictChange}
+            currentLocation={mapCenter}
+          />
           <Map
             key={mapKey}
             center={{ lat: mapCenter.lat, lng: mapCenter.lng }}
@@ -208,8 +209,9 @@ const KakaoMap = () => {
             level={3}
             onCreate={setMap}
           >
-            {currentMenu === '알뜰 가게 찾기' && map &&
-              filteredStores.map(store => (
+            {currentMenu === "알뜰 가게 찾기" &&
+              map &&
+              filteredStores.map((store) => (
                 <Marker_FindStore
                   key={store.storeId}
                   map={map}
@@ -218,13 +220,10 @@ const KakaoMap = () => {
                   onClose={closeInfoWindow}
                   store={store}
                 />
-              ))
-            }
-            {currentMenu === '시장 가격 비교' && map &&
-            <Marker_ComparePrice
-            map={map}
-            // onMarkersLoaded={() => setIsLoading(false)}
-            />}
+              ))}
+            {currentMenu === "시장 가격 비교" && map && (
+              <Marker_ComparePrice map={map} />
+            )}
           </Map>
 
           <HandleLocateBtn onClick={handleLocate} />
@@ -253,17 +252,21 @@ const HandleLocateBtn = styled.button`
   background: url("/images/locateBtn.svg") no-repeat center center;
   border-radius: 4px;
   background-color: white;
-  border: 1px solid #E7E7E9;
+  border: 1px solid #e7e7e9;
   width: 56px;
   height: 56px;
   cursor: pointer;
   z-index: 3;
-  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.14), 0px 0px 2px rgba(0, 0, 0, 0.12);
+  box-shadow:
+    0px 8px 16px rgba(0, 0, 0, 0.14),
+    0px 0px 2px rgba(0, 0, 0, 0.12);
   box-sizing: border-box;
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  transition:
+    transform 0.1s ease,
+    box-shadow 0.1s ease;
 
   &:hover {
-    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2); 
+    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
   }
 
   &:active {

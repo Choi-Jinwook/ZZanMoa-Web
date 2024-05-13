@@ -10,8 +10,6 @@ import { useGetMarketItems } from "@shared/apis";
 import selectedMarketsState from "@shared/atoms/MarketState";
 import { useRecoilState } from "recoil";
 import axios from "axios";
-import { useRouter } from "next/router";
-import { rank } from "@shared/atoms";
 
 const ComparePrice = () => {
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -20,8 +18,6 @@ const ComparePrice = () => {
   const [selectedList, setSelectedList] = useState<string[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedMarkets] = useRecoilState(selectedMarketsState);
-  const [, setRank] = useRecoilState(rank);
-  const { push } = useRouter();
   const { data: items } = useGetMarketItems();
 
   const handleSearch = (value: string) => {
@@ -58,8 +54,11 @@ const ComparePrice = () => {
       );
 
       if (res.status === 200) {
-        setRank(res.data);
-        push(`/compare`);
+        const query = encodeURIComponent(JSON.stringify(res.data));
+        window.open(
+          `https://zzanmoa.vercel.app/compare?data=${query}`,
+          "_blank",
+        );
       }
     } catch (error) {
       console.warn(error);

@@ -3,34 +3,40 @@ import styled from "styled-components";
 import Text from "../../Text";
 import { useRecoilState } from "recoil";
 import { storeMarkerState } from "@shared/atoms/storeMarkerState";
-
+import { CurrentStore, mapCenterState } from "@shared/atoms/MapState";
 
 const FilteredStore = () => {
-  // const { data: storeData } = useQuery([QueryKey.store], async () => {
-  //   const res = await axios.get<StoreData[]>(
-  //     `${process.env.NEXT_PUBLIC_API_BASE_URL}/saving-place/get/store`,
-  //   );
+  const [storeMarkers] = useRecoilState(storeMarkerState);
+  const [, setCurrentStore] = useRecoilState(CurrentStore);
+  const [, setMapCenter] = useRecoilState(mapCenterState);
 
-  //   return res.data;
-  // });
-  // const [currentCategory] = useRecoilState(SelectedCategory);
-  // const [currentPrice] = useRecoilState(CurrentPrice);
-  const [storeMarkers, setStoreMarkers] = useRecoilState(storeMarkerState);
-
-  const handleStoreClick = (storeId: string) => {
-    console.log(storeId);
-    // TODO: onClick 이벤트 추가
+  const handleStoreClick = (
+    storeId: string,
+    latitude?: number,
+    longitude?: number,
+  ) => {
+    console.log(storeId, latitude, longitude);
+    if (latitude && longitude) setMapCenter({ lat: latitude, lng: longitude });
+    setCurrentStore(storeId);
   };
-
-  // const filteredStores = getFilteredStores(storeData || []);
 
   return (
     <Container>
       {storeMarkers.map(
-        ({ storeId, storeName, address, items, phoneNumber }) => {
+        ({
+          storeId,
+          storeName,
+          address,
+          items,
+          phoneNumber,
+          latitude,
+          longitude,
+        }) => {
           return (
-            // <StoreCard onClick={() => handleStoreClick(storeId)} key={storeId}>
-            <StoreCard key={storeId}>
+            <StoreCard
+              onClick={() => handleStoreClick(storeId, latitude, longitude)}
+              key={storeId}
+            >
               <Text
                 variant="Body1"
                 color={Colors.Black900}

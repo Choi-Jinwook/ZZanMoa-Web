@@ -83,6 +83,9 @@ const StoreOverlay = ({
     if (currentStore === store.storeId) {
       setIsActive(true);
       setIsInfoActive(true);
+    } else {
+      setIsActive(false);
+      setIsInfoActive(false);
     }
   }, [currentStore]);
 

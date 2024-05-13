@@ -24,11 +24,11 @@ const KakaoMap = () => {
   const [mapKey, setMapKey] = useState(Date.now());
 
   const setStoreMarkers = useSetRecoilState(storeMarkerState);
-  const [activeInfoWindow, setActiveInfoWindow] = useState(null);
+  // const [activeInfoWindow, setActiveInfoWindow] = useState(null);
+  // const [activeMarker, setActiveMarker] = useState(null); 
 
   const [currentCategory] = useRecoilState(SelectedCategory);
   const [currentPrice] = useRecoilState(CurrentPrice);
-  const [activeMarker, setActiveMarker] = useState(null);
 
   const { data: storeData } = useQuery([QueryKey.store], async () => {
     const res = await axios.get<StoreData[]>(
@@ -37,6 +37,8 @@ const KakaoMap = () => {
 
     return res.data;
   });
+
+  const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   const updateMapCenter = (lng: number, lat: number) => {
     if (map) {
@@ -94,8 +96,7 @@ const KakaoMap = () => {
   };
 
   const loadMarketData = (apiUrl: string | undefined) => {
-    axios
-      .get(`${apiUrl}/market/market-place/get`)
+    return axios.get(`${apiUrl}/market/market-place/get`)
       .then((response) => {
         const newMarkers = response.data.map(
           (
@@ -139,14 +140,8 @@ const KakaoMap = () => {
   }, [currentCategory, currentPrice]);
 
   useEffect(() => {
-    console.log("카카오맵 렌더링");
 
     const { geolocation } = navigator;
-    const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-
-    if (currentMenu === "시장 가격 비교") {
-      loadMarketData(apiUrl);
-    }
 
     geolocation.getCurrentPosition(
       ({ coords }) => {
@@ -167,7 +162,22 @@ const KakaoMap = () => {
       const zoomControl = new kakao.maps.ZoomControl();
       map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
     }
-  }, [map, currentMenu]);
+  }, [map]);
+
+  useEffect(() => {
+    setIsLoading(true);
+
+    if (currentMenu === '시장 가격 비교') {
+      loadMarketData(apiUrl)
+        .then(() => {
+          setIsLoading(false);
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+          setIsLoading(false);
+        });
+    }
+  }, [currentMenu, apiUrl]);
 
   const filteredStores = getFilteredStores(storeData || []);
 

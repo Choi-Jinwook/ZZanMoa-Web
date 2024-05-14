@@ -185,6 +185,7 @@ const SaleAlert = () => {
       });
 
       handleToast("성공", "구독이 완료 되었습니다.");
+      setEmail("");
     } catch (error: any) {
       if (error.response.status === 409) {
         handleToast("실패", "이미 구독한 내역이 존재합니다.");
@@ -211,6 +212,7 @@ const SaleAlert = () => {
       );
 
       handleToast("성공", "구독이 해지되었습니다.");
+      setEmail("");
     } catch (error: any) {
       if (error.response.status === 404) {
         handleToast("실패", "존재하지 않는 구독 정보입니다.");

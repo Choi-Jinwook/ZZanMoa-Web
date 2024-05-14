@@ -46,23 +46,37 @@ const Compare = () => {
   );
 
   useEffect(() => {
-    if (listRef && averageRef) {
-      setWidth(() => {
-        const listWidth = listRef.current?.clientWidth;
-        const averageWidth = averageRef.current?.clientWidth;
-
-        return { first: listWidth ?? 0, second: averageWidth ?? 0 };
-      });
+    if (queryData) {
+      const decodedData = Array.isArray(queryData)
+        ? queryData.map((item) => JSON.parse(decodeURIComponent(item)))
+        : JSON.parse(decodeURIComponent(queryData));
+      setRankData(decodedData);
     }
-  }, [listRef, averageRef]);
+  }, [queryData]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (listRef.current && averageRef.current) {
+        const listWidth = listRef.current.clientWidth;
+        const averageWidth = averageRef.current.clientWidth;
+        setWidth({ first: listWidth, second: averageWidth });
+      }
+    };
+
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [listRef.current?.clientWidth, averageRef.current?.clientWidth]);
 
   useEffect(() => {
     let sum = 0;
     rankData?.itemList.forEach(({ average_price }) => (sum += average_price));
     setPriceSum(sum);
-  }, []);
 
-  useEffect(() => {
     setTopMarket(() => {
       let name = "";
       rankData?.rankList.forEach(({ rank, market }) => {
@@ -71,16 +85,7 @@ const Compare = () => {
 
       return name;
     });
-  }, []);
-
-  useEffect(() => {
-    if (queryData) {
-      const decodedData = Array.isArray(queryData)
-        ? queryData.map((item) => JSON.parse(decodeURIComponent(item)))
-        : JSON.parse(decodeURIComponent(queryData));
-      setRankData(decodedData);
-    }
-  }, [queryData]);
+  }, [rankData]);
 
   return (
     <Container>
@@ -540,7 +545,7 @@ const TotalSave = styled.div`
 `;
 
 const Saving = styled.div<{ $width: number }>`
-  width: ${({ $width }) => $width}px;
+  min-width: ${({ $width }) => $width}px;
   border-radius: 4px;
   background-color: ${Colors.Black100};
   padding: 6px 13px;

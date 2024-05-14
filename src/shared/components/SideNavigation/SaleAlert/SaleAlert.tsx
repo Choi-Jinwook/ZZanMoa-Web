@@ -1,9 +1,16 @@
 import { useGetBargainDistrict, useGetBargainInfo } from "@shared/apis/bargain";
 import { saleContent } from "@shared/atoms";
-import { Category, Chevron, Text } from "@shared/components";
+import {
+  Category,
+  Chevron,
+  Divider,
+  SectionTitle,
+  Text,
+} from "@shared/components";
 import { Colors } from "@shared/constants";
 import { convertCategoryId } from "@shared/hooks";
 import { District } from "@shared/types";
+import axios from "axios";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { KeyboardEvent, MouseEvent, useEffect, useRef, useState } from "react";
@@ -14,21 +21,29 @@ interface DistrictCheck extends District {
   checked: boolean;
 }
 
+type SubscribeType = "성공" | "실패";
+
 const SaleAlert = () => {
   const selectBoxRef = useRef<HTMLDivElement | null>(null);
   const dropdownButtonRef = useRef<HTMLDivElement | null>(null);
+  const modalRef = useRef<HTMLDivElement | null>(null);
   const [currentCategory, setCurrentCategory] = useState("할인 소식");
   const [currentCategoryId, setCurrentCategoryId] = useState(1);
   const [currentDistrict, setCurrentDistrict] = useState("서울시 전체");
   const [currentDistrictId, setCurrentDistrictId] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
-  const [, setContent] = useRecoilState(saleContent);
   const [isOpen, setIsOpen] = useState(false);
-  // const [modalOpen, setModalOpen] = useState(false);
-  // const [agree, setAgree] = useState(false);
-  // const [checked, setChecked] = useState<DistrictCheck[]>([]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [agree, setAgree] = useState(false);
+  const [checked, setChecked] = useState<DistrictCheck[]>([]);
   const [searchValue, setSearchValue] = useState("");
   const [currentSearchValue, setCurrentSearchValue] = useState("");
+  const [currentTab, setCurrentTab] = useState("구독하기");
+  const [email, setEmail] = useState("");
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertType, setAlertType] = useState<SubscribeType>("성공");
+  const [toastMessage, setToastMessage] = useState("");
+  const [, setContent] = useRecoilState(saleContent);
   const { push } = useRouter();
   const { data: district } = useGetBargainDistrict();
   const { data: saleInfo } = useGetBargainInfo(
@@ -98,30 +113,114 @@ const SaleAlert = () => {
     }
   };
 
-  // const handleClickSubscribe = () => {
-  //   setModalOpen(true);
-  // };
+  const handleClickSubscribe = () => {
+    setModalOpen(true);
+  };
 
-  // const handleSubscribeDistrict = (index: number) => {
-  //   setChecked((prev) => {
-  //     if (index === 0 && !prev[0].checked) {
-  //       return prev.map((item) => ({ ...item, checked: true }));
-  //     } else if (index === 0 && prev[0].checked) {
-  //       return prev.map((item) => ({ ...item, checked: false }));
-  //     } else if (index !== 0) {
-  //       return prev.map((item, i) =>
-  //         i === 0 || i === index ? { ...item, checked: false } : item,
-  //       );
-  //     }
-  //     const newArray = [...prev];
-  //     newArray[index] = {
-  //       ...newArray[index],
-  //       checked: !newArray[index].checked,
-  //     };
+  const handleSubscribeDistrict = (index: number) => {
+    setChecked((prev) => {
+      let newArray: DistrictCheck[] = [];
+      if (index === 0 && !prev[0].checked) {
+        newArray = prev.map((item) => ({ ...item, checked: true }));
+      } else if (index === 0 && prev[0].checked) {
+        newArray = prev.map((item) => ({ ...item, checked: false }));
+      } else if (index !== 0) {
+        newArray = prev.map((item, i) =>
+          (i === 0 && prev[i].checked) || i === index
+            ? { ...item, checked: !prev[index].checked }
+            : item,
+        );
+      } else {
+        newArray = [];
+      }
 
-  //     return newArray;
-  //   });
-  // };
+      if (index !== 0 && newArray.slice(1).every((item) => item.checked)) {
+        newArray[0].checked = true;
+      }
+
+      return newArray;
+    });
+  };
+
+  const handleTab = (value: string) => {
+    setCurrentTab(value);
+  };
+
+  const handleEmail = (value: string) => {
+    setEmail(value);
+  };
+
+  const handleToast = (type: SubscribeType, message: string) => {
+    setAlertType(type);
+    setToastMessage(message);
+    setShowAlert(true);
+    setTimeout(() => {
+      setShowAlert(false);
+    }, 2000);
+  };
+
+  const handleClickSubscribeButton = async () => {
+    const unChecked = checked.every(({ checked }) => !checked);
+
+    if (!agree || unChecked) {
+      handleToast(
+        "실패",
+        !agree ? "필수 항목이 작성되지 않았습니다." : "지역을 선택해 주세요.",
+      );
+
+      return;
+    }
+
+    try {
+      const selectedDistrict = checked
+        .filter(
+          ({ districtName, checked }) =>
+            checked && districtName !== "서울시 전체",
+        )
+        .map(({ districtName }) => districtName);
+
+      await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/subscription`, {
+        email: email,
+        district: selectedDistrict,
+      });
+
+      handleToast("성공", "구독이 완료 되었습니다.");
+    } catch (error: any) {
+      if (error.response.status === 409) {
+        handleToast("실패", "이미 구독한 내역이 존재합니다.");
+      } else if (error.response.status === 400) {
+        handleToast("실패", "이메일 형식이 올바르지 않습니다.");
+      } else {
+        handleToast("실패", "에러가 발생했습니다. 다시 시도해 주세요.");
+      }
+    }
+  };
+
+  const handleUnsubscribe = async () => {
+    if (email === "") {
+      handleToast("실패", "이메일을 입력해 주세요.");
+      return;
+    }
+
+    try {
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/subscription/cancel`,
+        {
+          email: email,
+        },
+      );
+
+      handleToast("성공", "구독이 해지되었습니다.");
+    } catch (error: any) {
+      if (error.response.status === 404) {
+        handleToast("실패", "존재하지 않는 구독 정보입니다.");
+      } else if (error.response.status === 400) {
+        handleToast("실패", "이메일 형식을 확인해 주세요.");
+      } else {
+        handleToast("실패", "에러가 발생했습니다.");
+      }
+    }
+  };
 
   useEffect(() => {
     const handleClickOutSide = (e: MouseEvent) => {
@@ -141,113 +240,209 @@ const SaleAlert = () => {
     };
   }, []);
 
-  // useEffect(() => {
-  //   if (district) {
-  //     setChecked(() => {
-  //       const initialChecked = district.map(({ districtId, districtName }) => {
-  //         return {
-  //           districtId: districtId,
-  //           districtName: districtName,
-  //           checked: false,
-  //         };
-  //       });
+  useEffect(() => {
+    if (district) {
+      setChecked(() => {
+        const initialChecked = district.map(({ districtId, districtName }) => {
+          return {
+            districtId: districtId,
+            districtName: districtName,
+            checked: false,
+          };
+        });
 
-  //       initialChecked.sort((a, b) => a.districtId - b.districtId);
+        initialChecked.sort((a, b) => a.districtId - b.districtId);
 
-  //       return initialChecked;
-  //     });
-  //   }
-  // }, [district]);
+        return initialChecked;
+      });
+    }
+  }, [district]);
 
   return (
     <Container>
-      {/* {modalOpen && (
+      {modalOpen && (
         <>
           <Dimmed onClick={() => setModalOpen(false)} />
-          <Modal>
-            <ModalTitle>
-              <Text variant="H2" color={Colors.Black900} fontWeight="SemiBold">
-                서울시 관심 지역
-              </Text>
-              <Text variant="H2" color={Colors.Black900} fontWeight="SemiBold">
-                할인 & 직거래 마켓 소식 받아보세요
-              </Text>
-            </ModalTitle>
-            <CheckBoxContainer>
-              {district?.map(({ districtId, districtName }, index) => {
+          <Modal ref={modalRef}>
+            <TabContainer>
+              {["구독하기", "해지하기"].map((title) => {
                 return (
-                  <CheckBoxWrapper key={districtId}>
-                    <HiddenCheckBox
-                      id={String(districtId)}
-                      checked={checked[index].checked}
-                      onChange={() => handleSubscribeDistrict(index)}
-                    />
-                    <SaveIDCheckBox
-                      checked={checked[index].checked}
-                      onChange={() => handleSubscribeDistrict(index)}
+                  <TabText key={title} $checked={currentTab === title}>
+                    <Text
+                      variant="Body2"
+                      color={currentTab === title ? "black" : Colors.Black700}
+                      fontWeight="SemiBold"
+                      onClick={() => handleTab(title)}
+                      style={{ cursor: "pointer" }}
                     >
-                      <Image
-                        src="/images/checked.svg"
-                        alt="checked"
-                        width={12}
-                        height={12}
-                      />
-                    </SaveIDCheckBox>
-                    <Label htmlFor={String(districtId)}>
-                      <Text variant="Body3" color={Colors.Black900}>
-                        {districtName}
-                      </Text>
-                    </Label>
-                  </CheckBoxWrapper>
+                      {title}
+                    </Text>
+                  </TabText>
                 );
               })}
-            </CheckBoxContainer>
-            <InputContainer>
-              <ModalInput placeholder="성명을 입력해주세요" />
-              <ModalInput placeholder="이메일 주소를 입력해주세요" />
-              <Agreements>
-                <HiddenCheckBox
-                  id="agree"
-                  checked={agree}
-                  onChange={() => setAgree((prev) => !prev)}
-                />
-                <SaveIDCheckBox
-                  checked={agree}
-                  onClick={() => setAgree((prev) => !prev)}
-                >
-                  <Image
-                    src="/images/checked.svg"
-                    alt="checked"
-                    width={12}
-                    height={12}
-                  />
-                </SaveIDCheckBox>
-                <Label htmlFor="agree">
-                  <Text variant="Body1" color={Colors.Black900}>
-                    개인정보 수집 및 이용약관에 동의합니다
-                  </Text>
-                </Label>
-              </Agreements>
-              <Buttons>
-                <Subscribe>
-                  <Text variant="Body2" color="white" fontWeight="SemiBold">
-                    구독하기
-                  </Text>
-                </Subscribe>
-                <UnSubscribe>
-                  <Text
-                    variant="Body2"
-                    color={Colors.Black600}
-                    fontWeight="SemiBold"
-                  >
-                    수신 거부
-                  </Text>
-                </UnSubscribe>
-              </Buttons>
-            </InputContainer>
+            </TabContainer>
+            <ModalContentContainer>
+              {currentTab === "구독하기" ? (
+                <>
+                  <CheckBoxContainer>
+                    <SectionTitle
+                      numbering={1}
+                      title="소식 지역 선택하기"
+                      subTitle=""
+                    />
+                    <Divider />
+                    {district?.map(({ districtId, districtName }, index) => {
+                      return (
+                        <CheckBoxWrapper key={districtId}>
+                          <HiddenCheckBox
+                            id={String(districtId)}
+                            checked={checked[index].checked}
+                            onChange={() => handleSubscribeDistrict(index)}
+                          />
+                          <SaveIDCheckBox
+                            checked={checked[index].checked}
+                            onClick={() => handleSubscribeDistrict(index)}
+                          >
+                            <Image
+                              src="/images/checked.svg"
+                              alt="checked"
+                              width={12}
+                              height={12}
+                            />
+                          </SaveIDCheckBox>
+                          <Label htmlFor={String(districtId)}>
+                            <Text variant="Body3" color={Colors.Black900}>
+                              {districtName}
+                            </Text>
+                          </Label>
+                        </CheckBoxWrapper>
+                      );
+                    })}
+                  </CheckBoxContainer>
+                  <InputContainer>
+                    <SectionTitle numbering={2} title="이메일 입력하기" />
+                    <Divider />
+                    <SubscribeInput
+                      placeholder="이메일 주소를 입력해주세요"
+                      value={email}
+                      onChange={({ target: { value } }) => handleEmail(value)}
+                    />
+                  </InputContainer>
+                  <AgreementsContainer>
+                    <SectionTitle numbering={3} title="약관 동의하기" />
+                    <Agreements>
+                      <TextContainer></TextContainer>
+                      <AgreeBox>
+                        <HiddenCheckBox
+                          id="agree"
+                          checked={agree}
+                          onChange={() => setAgree((prev) => !prev)}
+                        />
+                        <SaveIDCheckBox
+                          checked={agree}
+                          onClick={() => setAgree((prev) => !prev)}
+                        >
+                          <Image
+                            src="/images/checked.svg"
+                            alt="checked"
+                            width={12}
+                            height={12}
+                          />
+                        </SaveIDCheckBox>
+                        <Label htmlFor="agree">
+                          <Text variant="Body1" color={Colors.Black900}>
+                            개인정보 수집 및 이용약관에 동의합니다 (필수)
+                          </Text>
+                        </Label>
+                      </AgreeBox>
+                    </Agreements>
+                  </AgreementsContainer>
+                  <ButtonContainer>
+                    <ToastMessage $showAlert={showAlert} $type={alertType}>
+                      <Image
+                        src={
+                          alertType === "성공"
+                            ? "/images/success.svg"
+                            : "/images/warn.svg"
+                        }
+                        alt="toast"
+                        width={24}
+                        height={24}
+                      />
+                      <Text
+                        variant="Body1"
+                        color={
+                          alertType === "성공"
+                            ? Colors.Emerald800
+                            : Colors.Red100
+                        }
+                        fontWeight="Medium"
+                      >
+                        {toastMessage}
+                      </Text>
+                    </ToastMessage>
+                    <Subscribe onClick={handleClickSubscribeButton}>
+                      <Text variant="Body2" color="white" fontWeight="SemiBold">
+                        신청하기
+                      </Text>
+                    </Subscribe>
+                  </ButtonContainer>
+                </>
+              ) : (
+                <UnSubscribeContainer>
+                  <ContentWrapper>
+                    <UnSubscribeTitle>
+                      <Text
+                        variant="Body2"
+                        color={Colors.Black900}
+                        fontWeight="SemiBold"
+                      >
+                        이메일 입력하기
+                      </Text>
+                    </UnSubscribeTitle>
+                    <Divider />
+                    <SubscribeInput
+                      placeholder="이메일 주소를 입력해주세요"
+                      value={email}
+                      onChange={({ target: { value } }) => handleEmail(value)}
+                    />
+                  </ContentWrapper>
+                  <UnSubscribeButton>
+                    <ToastMessage $showAlert={showAlert} $type={alertType}>
+                      <Image
+                        src={
+                          alertType === "성공"
+                            ? "/images/success.svg"
+                            : "/images/warn.svg"
+                        }
+                        alt="toast"
+                        width={24}
+                        height={24}
+                      />
+                      <Text
+                        variant="Body1"
+                        color={
+                          alertType === "성공"
+                            ? Colors.Emerald800
+                            : Colors.Red100
+                        }
+                        fontWeight="Medium"
+                      >
+                        {toastMessage}
+                      </Text>
+                    </ToastMessage>
+                    <UnSubscribe onClick={handleUnsubscribe}>
+                      <Text variant="Body2" color="white" fontWeight="SemiBold">
+                        해지하기
+                      </Text>
+                    </UnSubscribe>
+                  </UnSubscribeButton>
+                </UnSubscribeContainer>
+              )}
+            </ModalContentContainer>
           </Modal>
         </>
-      )} */}
+      )}
       <Banner>
         <Image
           src="/images/banner.svg"
@@ -411,12 +606,12 @@ const SaleAlert = () => {
           </ChevronContainer>
         </PageNation>
       </ContentContainer>
-      {/* <SubscribeButton onClick={handleClickSubscribe}>
+      <SubscribeButton onClick={handleClickSubscribe}>
         <Image src="/images/mail.svg" alt="main" width={28} height={28} />
         <Text variant="Body1" color="white" fontWeight="SemiBold">
           구독하기
         </Text>
-      </SubscribeButton> */}
+      </SubscribeButton>
     </Container>
   );
 };
@@ -432,127 +627,204 @@ const Container = styled.div`
   overflow: auto;
 `;
 
-// const Dimmed = styled.div`
-//   position: absolute;
-//   left: 138px;
-//   top: 0;
-//   width: calc(100% - 138px);
-//   height: 100dvh;
-//   background-color: ${Colors.Black800};
-//   opacity: 0.6;
-//   z-index: 8;
-// `;
+const Dimmed = styled.div`
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100dvw;
+  height: 100dvh;
+  background-color: ${Colors.Black800};
+  opacity: 0.6;
+  z-index: 8;
+`;
 
-// const Modal = styled.div`
-//   position: absolute;
-//   display: flex;
-//   flex-direction: column;
-//   width: 80%;
-//   height: 80%;
-//   border-radius: 4px;
-//   background-color: white;
-//   padding: 68px 0;
-//   gap: 80px;
-//   text-align: center;
-//   z-index: 10;
-// `;
+const Modal = styled.div`
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  width: 40%;
+  right: 10%;
+  top: 3%;
+  border-radius: 16px;
+  background-color: white;
+  padding: 24px 0 36px 0;
+  text-align: center;
+  z-index: 10;
+`;
 
-// const ModalTitle = styled.div``;
+const TabContainer = styled.div`
+  display: flex;
+  border-bottom: 1px solid ${Colors.Black600};
+  padding: 0 15px;
+`;
 
-// const CheckBoxContainer = styled.div`
-//   display: flex;
-//   width: 62%;
-//   flex-wrap: wrap;
-//   margin: 0 auto;
-//   gap: 12px;
-// `;
+const TabText = styled.div<{ $checked: boolean }>`
+  ${({ $checked }) =>
+    $checked && `border-bottom: 3px solid ${Colors.Green100};`}
+  padding: 0px 0px 8px 0px;
+  margin-left: 47px;
+`;
 
-// const CheckBoxWrapper = styled.div`
-//   display: flex;
-//   min-width: 120px;
-//   align-items: center;
-//   gap: 8px;
-// `;
+const ModalContentContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 44px 57px 0 57px;
+  gap: 32px;
+`;
 
-// const HiddenCheckBox = styled.input.attrs(({ checked, onChange }) => ({
-//   type: "checkbox",
-//   checked: checked,
-//   onChange: onChange,
-// }))`
-//   border: 0;
-//   clip: rect(0 0 0 0);
-//   clippath: inset(50%);
-//   height: 1px;
-//   margin: -1px;
-//   overflow: hidden;
-//   padding: 0;
-//   position: absolute;
-//   white-space: nowrap;
-//   width: 1px;
-// `;
+const CheckBoxContainer = styled.div`
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+  margin: 0 auto;
+  gap: 12px;
+`;
 
-// const Icon = styled.svg`
-//   fill: none;
-//   stroke: #ffffff;
-//   stroke-width: 2px;
-// `;
+const CheckBoxWrapper = styled.div`
+  display: flex;
+  min-width: 90px;
+  align-items: center;
+  gap: 8px;
+`;
 
-// const SaveIDCheckBox = styled.div<{ checked: boolean }>`
-//   display: inline-block;
-//   width: 18px;
-//   height: 18px;
-//   border: ${({ checked }) => !checked && `2px solid ${Colors.Black600}`};
-//   background-color: ${({ checked }) =>
-//     checked ? `${Colors.Emerald600}` : "#ffffff"};
-//   border-radius: 2px;
-// `;
+const HiddenCheckBox = styled.input.attrs(({ checked, onChange }) => ({
+  type: "checkbox",
+  checked: checked,
+  onChange: onChange,
+}))`
+  border: 0;
+  clip: rect(0 0 0 0);
+  clippath: inset(50%);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+`;
 
-// const Label = styled.label``;
+const SaveIDCheckBox = styled.div<{ checked: boolean }>`
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: ${({ checked }) => !checked && `2px solid ${Colors.Black600}`};
+  background-color: ${({ checked }) =>
+    checked ? `${Colors.Emerald600}` : "#ffffff"};
+  border-radius: 2px;
+`;
 
-// const InputContainer = styled.div`
-//   display: flex;
-//   flex-direction: column;
-//   width: 37%;
-//   gap: 16px;
-//   align-self: center;
-// `;
+const Label = styled.label``;
 
-// const ModalInput = styled.input`
-//   width: 100%;
-//   height: 56px;
-//   font-size: 18px;
-//   border: 2px solid ${Colors.Emerald500};
-//   border-radius: 4px;
-//   outline: none;
-//   padding: 0 16px;
-// `;
+const InputContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 12px;
+`;
 
-// const Agreements = styled.div`
-//   display: flex;
-//   align-items: center;
-//   gap: 8px;
-// `;
+const AgreementsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+`;
 
-// const Buttons = styled.div`
-//   display: flex;
-//   gap: 15px;
-// `;
+const Agreements = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+`;
 
-// const Subscribe = styled.button`
-//   width: calc((100% - 15px) / 2);
-//   height: 44px;
-//   border: 2px solid ${Colors.Emerald500};
-//   border-radius: 4px;
-//   background-color: ${Colors.Emerald500};
-// `;
+const TextContainer = styled.div`
+  width: 100%;
+  height: 216px;
+  background-color: ${Colors.Black100};
+  border-top: 2px solid ${Colors.Black600};
+  overflow: auto;
+`;
 
-// const UnSubscribe = styled.button`
-//   width: calc((100% - 15px) / 2);
-//   height: 44px;
-//   border: 2px solid ${Colors.Black600};
-//   border-radius: 4px;
-//   background-color: white;
-// `;
+const AgreeBox = styled.div`
+  display: flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 8px;
+`;
+
+const ButtonContainer = styled.div`
+  position: relative;
+`;
+
+const UnSubscribeButton = styled.div`
+  position: relative;
+  display: flex;
+  width: 100%;
+`;
+
+const ToastMessage = styled.div<{ $showAlert: boolean; $type: SubscribeType }>`
+  position: absolute;
+  display: flex;
+  top: -52px;
+  width: 100%;
+  background-color: ${({ $type }) =>
+    $type === "성공" ? Colors.Emerald50 : "#feedec"};
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  align-items: center;
+  padding: 8px 16px;
+  gap: 16px;
+  opacity: ${({ $showAlert }) => ($showAlert ? "1" : "0")};
+  visibility: ${({ $showAlert }) => ($showAlert ? "visible" : "hidden")};
+  transition: all 0.2s ease-in-out;
+`;
+
+const Subscribe = styled.button`
+  position: relative;
+  width: 100%;
+  height: 44px;
+  border: 2px solid ${Colors.Emerald500};
+  border-radius: 4px;
+  background-color: ${Colors.Emerald500};
+  cursor: pointer;
+`;
+
+const UnSubscribeContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 48px;
+`;
+
+const ContentWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 12px;
+`;
+
+const UnSubscribeTitle = styled.div`
+  align-self: flex-start;
+`;
+
+const SubscribeInput = styled.input`
+  width: 100%;
+  height: 48px;
+  outline: none;
+  border: none;
+  border-radius: 4px;
+  background-color: ${Colors.Black300};
+  padding: 0 24px;
+`;
+
+const UnSubscribe = styled.button`
+  width: 100%;
+  height: 44px;
+  border: 1px solid ${Colors.Emerald500};
+  border-radius: 4px;
+  background-color: ${Colors.Emerald500};
+  cursor: pointer;
+`;
 
 const Banner = styled.div`
   width: 100%;
@@ -665,7 +937,6 @@ const Input = styled.input`
   border-radius: 4px;
   background-color: ${Colors.Black300};
   padding: 0 24px;
-  justify-content:;
 `;
 
 const TableContainer = styled.div`
@@ -756,16 +1027,16 @@ const Numbering = styled.div<{ $isSelected: boolean }>`
   }}
 `;
 
-// const SubscribeButton = styled.button`
-//   position: absolute;
-//   display: flex;
-//   bottom: 80px;
-//   right: 110px;
-//   border-radius: 60px;
-//   background-color: ${Colors.Black900};
-//   padding: 10px 24px;
-//   gap: 10px;
-//   cursor: pointer;
-// `;
+const SubscribeButton = styled.button`
+  position: absolute;
+  display: flex;
+  bottom: 80px;
+  right: 110px;
+  border-radius: 60px;
+  background-color: ${Colors.Black900};
+  padding: 10px 24px;
+  gap: 10px;
+  cursor: pointer;
+`;
 
 export default SaleAlert;

@@ -9,13 +9,15 @@ import {
   QueryClientProvider,
 } from "@tanstack/react-query";
 import "../styles/globals.css";
-import { QueryKey } from "@shared/constants";
+import { useRouter } from "next/router";
+import * as gtag from "../lib/gtag";
 
 function MyApp({
   Component,
   pageProps,
 }: AppProps<{ dehydratedState: DehydratedState }>) {
   RecoilEnv.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED = false; // recoil key 중복 콘솔 출력 안함 설정
+  const router = useRouter();
 
   const [queryClient] = useState(
     () =>
@@ -33,6 +35,19 @@ function MyApp({
         },
       }),
   );
+
+  useEffect(() => {
+    const handleRouteChange = (url: any) => {
+      gtag.pageview(url);
+      console.log(gtag);
+    };
+
+    router.events.on("routeChangeComplete", handleRouteChange);
+
+    return () => {
+      router.events.off("routeChangeComplete", handleRouteChange);
+    };
+  }, [router.events]);
 
   return (
     <RecoilRoot>

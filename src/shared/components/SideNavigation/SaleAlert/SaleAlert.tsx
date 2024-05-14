@@ -7,7 +7,7 @@ import {
   SectionTitle,
   Text,
 } from "@shared/components";
-import { Colors } from "@shared/constants";
+import { AGREEMENT_CONTENT, Colors } from "@shared/constants";
 import { convertCategoryId } from "@shared/hooks";
 import { District } from "@shared/types";
 import axios from "axios";
@@ -333,7 +333,16 @@ const SaleAlert = () => {
                   <AgreementsContainer>
                     <SectionTitle numbering={3} title="약관 동의하기" />
                     <Agreements>
-                      <TextContainer></TextContainer>
+                      <TextContainer>
+                        <Text
+                          variant="Body4"
+                          color={Colors.Black900}
+                          fontWeight="Regular"
+                          dangerouslySetInnerHTML={{
+                            __html: AGREEMENT_CONTENT,
+                          }}
+                        ></Text>
+                      </TextContainer>
                       <AgreeBox>
                         <HiddenCheckBox
                           id="agree"
@@ -744,6 +753,8 @@ const TextContainer = styled.div`
   background-color: ${Colors.Black100};
   border-top: 2px solid ${Colors.Black600};
   overflow: auto;
+  padding: 12px 10px;
+  text-align: left;
 `;
 
 const AgreeBox = styled.div`

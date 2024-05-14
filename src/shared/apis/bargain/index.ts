@@ -52,3 +52,29 @@ export const useGetBargainInfo = (
     },
   );
 };
+
+export const postSubscription = async (
+  email: string,
+  selectedDistrict: string[],
+) => {
+  const res = await axios.post(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/subscription`,
+    {
+      email: email,
+      district: selectedDistrict,
+    },
+  );
+
+  return res;
+};
+
+export const postSubscriptionCancel = async (email: string) => {
+  const res = await axios.post(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/subscription/cancel`,
+    {
+      email: email,
+    },
+  );
+
+  return res;
+};

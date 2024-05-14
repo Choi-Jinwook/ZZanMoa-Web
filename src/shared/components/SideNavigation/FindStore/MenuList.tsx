@@ -54,6 +54,7 @@ const MenuWrapper = styled.div<{ $isCurrentMenu: boolean }>`
   padding: 0px 18px;
   ${({ $isCurrentMenu }) =>
     $isCurrentMenu && `border-left: 3px solid ${Colors.Emerald600};`}
+  cursor: pointer;
 `;
 
 const TextContainer = styled.div<{ $focus: boolean }>`

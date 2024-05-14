@@ -7,22 +7,21 @@ import { ComparePrice } from "./ComparePrice";
 import { useRecoilState } from "recoil";
 import { SelectedMenu } from "@shared/atoms";
 import { useRouter } from "next/router";
+import { useEffect } from "react";
 
 const SideNavigation = () => {
   const [currentMenu, setCurrentMenu] = useRecoilState(SelectedMenu);
-  const { push } = useRouter();
+  const { push, pathname } = useRouter();
 
   const handleCurrentMenu = (value: Menu) => {
     setCurrentMenu(value);
   };
 
-  // const [navState, setNavState] = useRecoilState(navigationState);
-
-  // const handleNavChange = (newState: Menu) => {
-  //   setNavState(newState);
-  //   console.log("navStateChanged: ", navState);
-    
-  // };
+  useEffect(() => {
+    if (currentMenu !== "할인 소식" && pathname.includes("info")) {
+      push("/");
+    }
+  }, [currentMenu]);
 
   return (
     <Container $currentMenu={currentMenu}>

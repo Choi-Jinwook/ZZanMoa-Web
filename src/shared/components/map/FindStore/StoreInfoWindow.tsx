@@ -17,7 +17,8 @@ const WindowContainer = styled.div`
   width: 327px;
   position: absolute;
   z-index: 3;
-  top: 60px;
+  top: 35px;
+  left: -70px;
 `;
 
 const CloseButton = styled.button`

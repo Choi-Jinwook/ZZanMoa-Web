@@ -67,7 +67,9 @@ export interface StoreOverlayProps extends MarkerFindStoreProps {
 const StoreOverlay = ({ map, position, content, onClose, store }: StoreOverlayProps) => {
     const [isActive, setIsActive] = useState(false);
     const [isInfoActive, setIsInfoActive] = useState(false);
+    // const overlayRef = useRef(null); 
     const overlayRef = useRef<HTMLDivElement | null>(null);
+
 
     const handleOverlayClick = () => {
         setIsActive(!isActive);
@@ -92,6 +94,7 @@ const StoreOverlay = ({ map, position, content, onClose, store }: StoreOverlayPr
                     fontWeight="SemiBold">
                     {content}
                 </CustomText>
+                
                 {isInfoActive && (
                     <InfoContainer onClick={(e) => e.stopPropagation()}>
                         <StoreInfoWindow store={store} onClose={() => {
@@ -113,14 +116,15 @@ const StoreOverlay = ({ map, position, content, onClose, store }: StoreOverlayPr
             yAnchor: 1
         });
 
-        const handleClickOutside = (event: { target: Node | null; }) => {
-            if (overlayRef.current && !overlayRef.current.contains(event.target)) {
+        const handleClickOutside = () => {
+            if (!overlayContent.contains(event.target)) {
                 setIsInfoActive(false);
                 setIsActive(false);
             }
         };
 
         kakao.maps.event.addListener(map, 'click', handleClickOutside);
+        
 
         return () => {
             kakao.maps.event.removeListener(map, 'click', handleClickOutside);

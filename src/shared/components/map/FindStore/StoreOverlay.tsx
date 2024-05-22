@@ -117,7 +117,7 @@ const StoreOverlay = ({ map, position, content, onClose, store }: StoreOverlayPr
         });
 
         const handleClickOutside = () => {
-            if (!overlayContent.contains(event.target)) {
+            if (!overlayContent.contains((event as MouseEvent).target as Node)) {
                 setIsInfoActive(false);
                 setIsActive(false);
             }

@@ -25,7 +25,7 @@ const KakaoMap = () => {
 
   const setStoreMarkers = useSetRecoilState(storeMarkerState);
   // const [activeInfoWindow, setActiveInfoWindow] = useState(null);
-  // const [activeMarker, setActiveMarker] = useState(null); 
+  // const [activeMarker, setActiveMarker] = useState(null);
 
   const [currentCategory] = useRecoilState(SelectedCategory);
   const [currentPrice] = useRecoilState(CurrentPrice);
@@ -65,8 +65,8 @@ const KakaoMap = () => {
         navigator.geolocation.getCurrentPosition(
           ({ coords }) => {
             const userCoords = {
-              lat: 37.5545, // 임시로 현재위치를 서울역으로 설정
-              lng: 126.9706,
+              lat: coords.latitude,
+              lng: coords.longitude,
             };
             setMapCenter(userCoords);
             map.setCenter(
@@ -96,7 +96,8 @@ const KakaoMap = () => {
   };
 
   const loadMarketData = (apiUrl: string | undefined) => {
-    return axios.get(`${apiUrl}/market/market-place/get`)
+    return axios
+      .get(`${apiUrl}/market/market-place/get`)
       .then((response) => {
         const newMarkers = response.data.map(
           (
@@ -140,7 +141,6 @@ const KakaoMap = () => {
   }, [currentCategory, currentPrice]);
 
   useEffect(() => {
-
     const { geolocation } = navigator;
 
     geolocation.getCurrentPosition(
@@ -167,13 +167,13 @@ const KakaoMap = () => {
   useEffect(() => {
     setIsLoading(true);
 
-    if (currentMenu === '시장 가격 비교') {
+    if (currentMenu === "시장 가격 비교") {
       loadMarketData(apiUrl)
         .then(() => {
           setIsLoading(false);
         })
         .catch((error) => {
-          console.error('Error:', error);
+          console.error("Error:", error);
           setIsLoading(false);
         });
     }

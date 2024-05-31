@@ -67,6 +67,7 @@ const PriceFilter = () => {
               min={price.minPrice}
               max={price.maxPrice}
               onChange={({ target: { value } }) => handlePrice("start", value)}
+              step={100}
             />
             <PriceSliderRange
               type="range"
@@ -74,6 +75,7 @@ const PriceFilter = () => {
               min={price.minPrice}
               max={price.maxPrice}
               onChange={({ target: { value } }) => handlePrice("end", value)}
+              step={100}
             />
           </PriceSliderRangeContainer>
         </PriceSliderContainer>

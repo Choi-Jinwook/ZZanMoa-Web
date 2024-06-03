@@ -67,7 +67,7 @@ const Container = styled.div<{ $currentMenu: Menu }>`
   height: 100%;
 `;
 
-const LogoContainer = styled.div`
+const LogoContainer = styled.header`
   display: flex;
   width: 100%;
   height: 60px;
@@ -81,14 +81,14 @@ const Logo = styled.div`
   cursor: pointer;
 `;
 
-const ListContainer = styled.div`
+const ListContainer = styled.nav`
   display: flex;
   width: 100%;
   height: calc(100% - 60px);
   overflow: auto;
 `;
 
-const DetailContainer = styled.div`
+const DetailContainer = styled.article`
   width: 100%;
   height: 100%;
 `;

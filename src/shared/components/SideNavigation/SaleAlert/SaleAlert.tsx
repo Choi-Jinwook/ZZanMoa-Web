@@ -306,7 +306,7 @@ const SaleAlert = () => {
   );
 };
 
-const Container = styled.div`
+const Container = styled.section`
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -317,13 +317,13 @@ const Container = styled.div`
   overflow: auto;
 `;
 
-const Banner = styled.div`
+const Banner = styled.header`
   width: 100%;
   height: 175px;
   text-align: center;
 `;
 
-const ContentContainer = styled.div`
+const ContentContainer = styled.article`
   width: 100%;
   max-width: 1142px;
   height: fit-content;

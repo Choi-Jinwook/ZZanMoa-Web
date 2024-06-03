@@ -11,6 +11,7 @@ import {
 import "../styles/globals.css";
 import { useRouter } from "next/router";
 import * as gtag from "../lib/gtag";
+import Head from "next/head";
 
 function MyApp({
   Component,
@@ -49,13 +50,18 @@ function MyApp({
   }, [router.events]);
 
   return (
-    <RecoilRoot>
-      <QueryClientProvider client={queryClient}>
-        <Hydrate state={pageProps.dehydratedState}>
-          <Component {...pageProps} />
-        </Hydrate>
-      </QueryClientProvider>
-    </RecoilRoot>
+    <>
+      <Head>
+        <title>짠모아</title>
+      </Head>
+      <RecoilRoot>
+        <QueryClientProvider client={queryClient}>
+          <Hydrate state={pageProps.dehydratedState}>
+            <Component {...pageProps} />
+          </Hydrate>
+        </QueryClientProvider>
+      </RecoilRoot>
+    </>
   );
 }
 

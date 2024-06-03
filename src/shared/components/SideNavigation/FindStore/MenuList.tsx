@@ -37,11 +37,12 @@ const MenuList = ({ currentMenu, handleCurrentMenu }: MenuListProps) => {
   );
 };
 
-const ListContainer = styled.div`
+const ListContainer = styled.ul`
   min-width: 138px;
   height: 100%;
   border-right: 1px solid ${Colors.Black600};
   padding: 16px 0px;
+  margin: 0;
 `;
 
 const MenuContainer = styled.div`
@@ -50,7 +51,7 @@ const MenuContainer = styled.div`
   gap: 24px;
 `;
 
-const MenuWrapper = styled.div<{ $isCurrentMenu: boolean }>`
+const MenuWrapper = styled.li<{ $isCurrentMenu: boolean }>`
   padding: 0px 18px;
   ${({ $isCurrentMenu }) =>
     $isCurrentMenu && `border-left: 3px solid ${Colors.Emerald600};`}

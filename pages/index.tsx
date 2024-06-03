@@ -37,7 +37,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
   };
 };
 
-const Container = styled.div`
+const Container = styled.main`
   display: flex;
   width: 100dvw;
   height: 100dvh;

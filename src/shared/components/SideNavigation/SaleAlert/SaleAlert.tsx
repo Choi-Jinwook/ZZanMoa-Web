@@ -1,5 +1,5 @@
 import { useGetBargainDistrict, useGetBargainInfo } from "@shared/apis/bargain";
-import { saleContent } from "@shared/atoms";
+import { CurrentPageNumber, saleContent } from "@shared/atoms";
 import { Category, Chevron, Text } from "@shared/components";
 import { Colors } from "@shared/constants";
 import { convertCategoryId } from "@shared/hooks";
@@ -31,11 +31,11 @@ const SaleAlert = () => {
     currentDistrict: "서울시 전체",
     currentDistrictId: 0,
   });
-  const [currentPage, setCurrentPage] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [currentSearchValue, setCurrentSearchValue] = useState("");
+  const [currentPage, setCurrentPage] = useRecoilState(CurrentPageNumber);
   const [, setContent] = useRecoilState(saleContent);
   const { push } = useRouter();
   const { data: district } = useGetBargainDistrict();

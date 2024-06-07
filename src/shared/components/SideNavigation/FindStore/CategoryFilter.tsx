@@ -7,7 +7,7 @@ import { useEffect } from "react";
 import { Category, Text } from "@shared/components";
 
 const CategoryFilter = () => {
-  const { data: categories } = useGetCategory();
+  const { data: categories, isLoading } = useGetCategory();
   const [, setPrice] = useRecoilState(MinMaxPrice);
   const [currentCategory, setCurrentCategory] =
     useRecoilState(SelectedCategory);
@@ -24,7 +24,7 @@ const CategoryFilter = () => {
       const { minPrice, maxPrice } = categoryData;
       setPrice({ minPrice, maxPrice });
     }
-  }, [currentCategory]);
+  }, [currentCategory, isLoading]);
 
   return (
     <Container>

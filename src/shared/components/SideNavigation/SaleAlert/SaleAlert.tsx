@@ -491,6 +491,7 @@ const ChevronContainer = styled.div`
   border-radius: 6px;
   justify-content: center;
   align-items: center;
+  cursor: pointer;
 
   &:hover {
     border-color: ${Colors.Emerald600};
@@ -504,6 +505,7 @@ const Numbering = styled.div<{ $isSelected: boolean }>`
   border-radius: 6px;
   justify-content: center;
   align-items: center;
+  cursor: pointer;
   ${({ $isSelected }) => {
     if ($isSelected) {
       return `

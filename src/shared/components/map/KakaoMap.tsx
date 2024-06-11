@@ -165,9 +165,9 @@ const KakaoMap = () => {
   }, [map]);
 
   useEffect(() => {
-    setIsLoading(true);
 
     if (currentMenu === "시장 가격 비교") {
+      setIsLoading(true);
       loadMarketData(apiUrl)
         .then(() => {
           setIsLoading(false);

@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import styled from "styled-components";
 import { useRecoilState } from "recoil";
 import { CurrentPrice, MinMaxPrice, Range } from "@shared/atoms";
+import Accordion from "@shared/components/Accordion";
 
 const PriceFilter = () => {
   const [price] = useRecoilState(MinMaxPrice);
@@ -42,56 +43,55 @@ const PriceFilter = () => {
 
   return (
     <SetPrice>
-      <Text variant="H4" color={Colors.Black900} fontWeight="SemiBold">
-        가격 설정
-      </Text>
-      <PriceSetting>
-        <PriceRange>
-          <Text
-            variant="Body4"
-            color={Colors.Black800}
-          >{`최소 ${currentPrice.minPrice.toLocaleString()}원`}</Text>
-          <Text
-            variant="Body4"
-            color={Colors.Black800}
-          >{`최대 ${currentPrice.maxPrice.toLocaleString()}원`}</Text>
-        </PriceRange>
-        <PriceSliderContainer>
-          <PriceSlider>
-            <PriceSliderInner $start={range.start} $end={range.end} />
-          </PriceSlider>
-          <PriceSliderRangeContainer>
-            <PriceSliderRange
-              type="range"
-              value={currentPrice.minPrice}
-              min={price.minPrice}
-              max={price.maxPrice}
-              onChange={({ target: { value } }) => handlePrice("start", value)}
-              step={100}
-            />
-            <PriceSliderRange
-              type="range"
-              value={currentPrice.maxPrice}
-              min={price.minPrice}
-              max={price.maxPrice}
-              onChange={({ target: { value } }) => handlePrice("end", value)}
-              step={100}
-            />
-          </PriceSliderRangeContainer>
-        </PriceSliderContainer>
-        <PriceNotice>
-          <PriceBox>
-            <Text variant="Body2" color={Colors.Emerald700} fontWeight="Medium">
-              {currentPrice.minPrice.toLocaleString()}원
-            </Text>
-          </PriceBox>
-          <PriceBox>
-            <Text variant="Body2" color={Colors.Emerald700} fontWeight="Medium">
-              {currentPrice.maxPrice.toLocaleString()}원
-            </Text>
-          </PriceBox>
-        </PriceNotice>
-      </PriceSetting>
+      <Accordion title="가격 설정">
+        <PriceSetting>
+          <PriceRange>
+            <Text
+              variant="Body4"
+              color={Colors.Black800}
+            >{`최소 ${currentPrice.minPrice.toLocaleString()}원`}</Text>
+            <Text
+              variant="Body4"
+              color={Colors.Black800}
+            >{`최대 ${currentPrice.maxPrice.toLocaleString()}원`}</Text>
+          </PriceRange>
+          <PriceSliderContainer>
+            <PriceSlider>
+              <PriceSliderInner $start={range.start} $end={range.end} />
+            </PriceSlider>
+            <PriceSliderRangeContainer>
+              <PriceSliderRange
+                type="range"
+                value={currentPrice.minPrice}
+                min={price.minPrice}
+                max={price.maxPrice}
+                onChange={({ target: { value } }) => handlePrice("start", value)}
+                step={100}
+              />
+              <PriceSliderRange
+                type="range"
+                value={currentPrice.maxPrice}
+                min={price.minPrice}
+                max={price.maxPrice}
+                onChange={({ target: { value } }) => handlePrice("end", value)}
+                step={100}
+              />
+            </PriceSliderRangeContainer>
+          </PriceSliderContainer>
+          <PriceNotice>
+            <PriceBox>
+              <Text variant="Body2" color={Colors.Emerald700} fontWeight="Medium">
+                {currentPrice.minPrice.toLocaleString()}원
+              </Text>
+            </PriceBox>
+            <PriceBox>
+              <Text variant="Body2" color={Colors.Emerald700} fontWeight="Medium">
+                {currentPrice.maxPrice.toLocaleString()}원
+              </Text>
+            </PriceBox>
+          </PriceNotice>
+        </PriceSetting>
+      </Accordion>
     </SetPrice>
   );
 };

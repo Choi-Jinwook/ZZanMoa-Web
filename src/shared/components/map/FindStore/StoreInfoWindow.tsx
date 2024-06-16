@@ -82,9 +82,10 @@ const PriceItem = styled.li`
 interface StoreInfoWindowProps {
   store: StoreData;
   onClose: () => void;
+  onShowReviews: (storeId: number, storeName: string) => void;
 }
 
-const StoreInfoWindow = ({ store, onClose } : StoreInfoWindowProps) => {
+const StoreInfoWindow = ({ store, onClose, onShowReviews } : StoreInfoWindowProps) => {
   const displayedItems = store.items.slice(0, 2);
   const moreItemsCount = store.items.length - 2;
 
@@ -93,6 +94,17 @@ const StoreInfoWindow = ({ store, onClose } : StoreInfoWindowProps) => {
 
   const handleWindowClick = (e: { stopPropagation: () => void; }) => {
     e.stopPropagation();
+};
+
+const handleShowReviewsClick = () => {
+  const storeId = parseInt(store.storeId, 10);
+  if (!isNaN(storeId)) {
+    console.log("!!", storeId, store.storeName);
+    
+    onShowReviews(storeId, store.storeName);
+  } else {
+    console.error('Invalid store ID');
+  }
 };
   
   return (
@@ -164,7 +176,9 @@ const StoreInfoWindow = ({ store, onClose } : StoreInfoWindowProps) => {
           </PriceItem>
         ))}
       </PriceList>
-
+      <button onClick={handleShowReviewsClick}>
+        AI 리뷰 구경하기
+      </button>
     </WindowContainer>
   );
 }

@@ -4,13 +4,13 @@ import { ReactNode, useState } from "react";
 import { Text } from "@shared/components";
 
 interface AccordionProps {
-    title: string,
+    title: string;
     children: ReactNode;
 }
 
 const Accordion = ({ title, children }: AccordionProps) => {
     const [isOpen, setIsOpen] = useState(true);
-    const toggleAccordion = () => setIsOpen(!isOpen);
+    const toggleAccordion = () => setIsOpen(prev => !prev);
 
     return (<>
         <TitleRow>

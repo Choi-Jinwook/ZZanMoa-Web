@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 
 const useReviewModal = (apiEndpoint: string) => {
-    const [reviews, setReviews] = useState<string[] | undefined>(undefined);
+  const [reviews, setReviews] = useState<string[] | undefined>(undefined);
   const [storeName, setStoreName] = useState<string>("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 

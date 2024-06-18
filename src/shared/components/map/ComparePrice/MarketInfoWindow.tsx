@@ -69,6 +69,7 @@ export const IconImageWrapper = styled.button`
 
 
 interface MarketInfoWindowProps {
+  id: number;
   name: string;
   address: string;
   latitude: number;
@@ -76,13 +77,14 @@ interface MarketInfoWindowProps {
   overlayRef: React.RefObject<kakao.maps.CustomOverlay>;
   onToggleAdded: () => void;
   added: boolean;
+  onShowReviews: (id: number, name: string) => void;
 }
 
 interface AddButtonProps {
   added: boolean;
 }
 
-const MarketInfoWindow = ({ name, address, latitude, longitude, overlayRef, onToggleAdded, added } : MarketInfoWindowProps) => {
+const MarketInfoWindow = ({ id, name, address, latitude, longitude, overlayRef, onToggleAdded, added, onShowReviews } : MarketInfoWindowProps) => {
   const [isSelected, setIsSelected] = useState(false);
 
   useEffect(() => {
@@ -99,6 +101,11 @@ const MarketInfoWindow = ({ name, address, latitude, longitude, overlayRef, onTo
       setIsSelected(!isSelected);
       onToggleAdded();
     }
+  };
+
+  const handleShowReviewsClick = () => {
+    console.log('ID:', id, '이름:', name);
+    onShowReviews(id, name);
   };
 
   useEffect(() => {
@@ -138,6 +145,9 @@ const MarketInfoWindow = ({ name, address, latitude, longitude, overlayRef, onTo
             {isSelected ? '삭제하기' : '추가하기'}&emsp;{isSelected ? 'x' : '+'}
           </AddButton>
         </ActionsContainer>
+        <button onClick={handleShowReviewsClick}>
+        AI 리뷰 구경하기
+      </button>
       </Section>
     </InfoWindowContainer>
   );

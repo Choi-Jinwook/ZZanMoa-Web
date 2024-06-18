@@ -5,6 +5,8 @@ import { MarkerInfo } from "@shared/types";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import selectedMarketsState from "@shared/atoms/MarketState";
 import { markersState } from "@shared/atoms/MapState";
+import useReviewModal from "../UseReviewModal";
+import ReviewModal from "../ReviewModal";
 
 const Marker_ComparePrice = ({ map }: { map: kakao.maps.Map }) => {
   const [markers, setMarkers] = useRecoilState(markersState);
@@ -12,6 +14,8 @@ const Marker_ComparePrice = ({ map }: { map: kakao.maps.Map }) => {
   const infoWindowRef = useRef<kakao.maps.InfoWindow | null>(null);
   const circleOverlaysRef = useRef(new Map());
   const [focusedMarkerId, setFocusedMarkerId] = useState<number | null>(null);
+  const { reviews, storeName, isModalOpen, openModal, closeModal } = useReviewModal('market/market-place');
+
   // const [isLoading, setIsLoading] = useState(true);
 
 
@@ -62,6 +66,10 @@ const Marker_ComparePrice = ({ map }: { map: kakao.maps.Map }) => {
       );
       setFocusedMarkerId(null);
     }
+  };
+
+  const handleShowReviews = (id: number, name: string) => {
+    openModal(id, name);
   };
 
   useEffect(() => {
@@ -150,6 +158,7 @@ const Marker_ComparePrice = ({ map }: { map: kakao.maps.Map }) => {
         {...marker}
         added={added}
         onToggleAdded={onToggleAdded}
+        onShowReviews={handleShowReviews}
       />,
     );
 
@@ -199,6 +208,10 @@ const Marker_ComparePrice = ({ map }: { map: kakao.maps.Map }) => {
     return focus ? "/images/selectedMarker.png" : "/images/defaultMarker.png";
   }
 
-  return null;
+  return (
+    <>
+    {isModalOpen && <ReviewModal reviews={reviews} storeName={storeName} onClose={closeModal} />}
+  </>
+  );
 };
 export default Marker_ComparePrice;

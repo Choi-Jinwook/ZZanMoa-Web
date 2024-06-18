@@ -5,7 +5,6 @@ import { Colors } from '@shared/constants';
 import Text from '@shared/components/Text';
 import StoreInfoWindow from "./StoreInfoWindow";
 import { MarkerFindStoreProps } from "./Marker_FindStore";
-import ReviewModal from "../ReviewModal";
 
 const OverlayContainer = styled.div<{ $isActive?: boolean }>`
   position: absolute;
@@ -58,53 +57,27 @@ const CustomText = styled(Text) <{ $isActive?: boolean }>`
 
 const InfoContainer = styled.div`
   position: absolute;
-  
 `
 
 export interface StoreOverlayProps extends MarkerFindStoreProps {
     onClose: () => void;
+    closeModal: () => void;
+    handleShowReviews: (storeId: number, storeName: string) => void;
 }
 
-const StoreOverlay = ({ map, position, content, onClose, store }: StoreOverlayProps) => {
+const StoreOverlay = ({ map, position, content, onClose, store, closeModal, handleShowReviews }: StoreOverlayProps) => {
     const [isActive, setIsActive] = useState(false);
     const [isInfoActive, setIsInfoActive] = useState(false);
-    const [reviews, setReviews] = useState<string[] | undefined>(undefined);
-    const [storeName, setStoreName] = useState<string>("");
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const overlayRef = useRef<HTMLDivElement | null>(null);
-
 
     const handleOverlayClick = () => {
         setIsActive(!isActive);
         setIsInfoActive(!isInfoActive);
     };
 
-    const fetchAIReviews = async (storeId: number): Promise<string[]> => {
-        return new Promise(resolve => {
-          setTimeout(() => {
-            resolve([
-             "홍익분식은 서울 마포구 연남동에 위치한 작은 분식집으로, 다양한 분식 메뉴를 저렴한 가격에 즐길 수 있는 곳입니다. 이 가게는 특히 학생들과 인근 주민들에게 인기가 많으며, 떡볶이, 순대, 튀김 등 다양한 메뉴를 제공합니다.",
-             "홍익분식의 떡볶이는 특히 인기 있으며, 떡볶이 국물에 튀김을 찍어 먹는 것도 추천할 만합니다. 또한, 김밥과 라면도 함께 즐길 수 있어 다양한 분식 조합을 시도해볼 수 있습니다",
-             "가게는 크지 않지만 아늑한 분위기를 가지고 있으며, 친절한 서비스로 많은 단골 손님을 보유하고 있습니다. 홍익분식은 성미산로 99에 위치해 있으며, 영업시간은 11:30부터 20:00까지입니다. 주차는 불가능하지만, 포장 서비스를 제공하고 있어 편리하게 이용할 수 있습니다"
-            ]);
-          }, 2000);
-        });
-      };
-
-      const handleShowReviews = async (storeId: number, storeName: string) => {
-        console.log(storeId, storeName);
-        
-        setIsModalOpen(true);
-        setReviews(undefined);
-        setStoreName(storeName);
-
-        const reviews = await fetchAIReviews(storeId);
-        setReviews(reviews);
-    };
-
-    const handleCloseModal = () => {
-        setIsModalOpen(false);
-        setReviews(undefined);
+    const handleShowReviewsClick = (storeId: number, storeName: string) => {
+        closeModal();
+        handleShowReviews(storeId, storeName);
     };
 
     useEffect(() => {
@@ -132,7 +105,7 @@ const StoreOverlay = ({ map, position, content, onClose, store }: StoreOverlayPr
                             setIsInfoActive(false);
                             onClose();
                         }}
-                        onShowReviews={handleShowReviews}
+                        onShowReviews={handleShowReviewsClick}
                         />
                     </InfoContainer>
                 )}
@@ -166,11 +139,7 @@ const StoreOverlay = ({ map, position, content, onClose, store }: StoreOverlayPr
         };
     }, [map, position, content, isActive, isInfoActive]);
 
-    return(
-        <>
-            {isModalOpen && <ReviewModal reviews={reviews} storeName={storeName} onClose={handleCloseModal} />}
-    </>
-    )
+    return null;
 };
 
 export default StoreOverlay;

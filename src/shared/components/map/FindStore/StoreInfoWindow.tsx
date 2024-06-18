@@ -89,8 +89,6 @@ const StoreInfoWindow = ({ store, onClose, onShowReviews } : StoreInfoWindowProp
   const displayedItems = store.items.slice(0, 2);
   const moreItemsCount = store.items.length - 2;
 
-  console.log(store.storeName);
-  console.log(store.latitude);
 
   const handleWindowClick = (e: { stopPropagation: () => void; }) => {
     e.stopPropagation();

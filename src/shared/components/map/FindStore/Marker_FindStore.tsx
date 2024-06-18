@@ -2,6 +2,8 @@ import React, { memo } from "react";
 import { MapMarker } from "react-kakao-maps-sdk";
 import StoreOverlay from "./StoreOverlay";
 import { StoreData } from "@shared/types";
+import ReviewModal from "../ReviewModal";
+import useReviewModal from "../UseReviewModal";
 
 export interface MarkerFindStoreProps {
   map: kakao.maps.Map;
@@ -13,10 +15,16 @@ export interface MarkerFindStoreProps {
 
 const Marker_FindStore = memo<MarkerFindStoreProps>(
   ({ map, position, content, store, onClose }) => {
+    const {
+      reviews,
+      storeName,
+      isModalOpen,
+      openModal,
+      closeModal,
+    } = useReviewModal('saving-place'); 
     return (
       <>
         <MapMarker
-          // map={map}
           position={position}
           image={{
             src: "/images/transparentIcon.svg",
@@ -38,10 +46,13 @@ const Marker_FindStore = memo<MarkerFindStoreProps>(
           content={content}
           onClose={onClose}
           store={store}
+          closeModal={closeModal}
+          handleShowReviews={openModal}
         />
+        {isModalOpen && <ReviewModal reviews={reviews} storeName={storeName} onClose={closeModal} />}
       </>
     );
-  },
+  }
 );
 
 Marker_FindStore.displayName = "Marker_FindStore";

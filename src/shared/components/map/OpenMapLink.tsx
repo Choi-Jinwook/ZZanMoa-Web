@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import Image from "next/image";
+import { useConvertLatLng, useGetCurrentPosition } from "@shared/hooks";
 
 const IconWrapper = styled.div`
   display: flex;
@@ -24,7 +25,6 @@ const IconImageWrapper = styled.button`
 
 interface LinkProps {
   type: "kakao" | "naver";
-  name: string;
   latitude: number;
   longitude: number;
 }
@@ -33,25 +33,44 @@ interface OpenMapLinkProps {
   name: string;
   latitude: number;
   longitude: number;
+  isInfoActive?: boolean;
 }
 
-const openMapLink = ({ type, name, latitude, longitude }: LinkProps) => {
-  let link = "";
-  if (type === "kakao") {
-    link = `https://map.kakao.com/link/to/${name},${latitude},${longitude}`;
-  } else if (type === "naver") {
-    link = `https://map.naver.com/v5/search/${name}/place/${latitude},${longitude}`;
-  }
-  window.open(link, "_blank");
-};
 
-const OpenMapLink = ({ name, latitude, longitude }: OpenMapLinkProps) => {
+const OpenMapLink = ({
+  name,
+  latitude,
+  longitude,
+  isInfoActive,
+}: OpenMapLinkProps) => {
+  const { currentPosition } = useGetCurrentPosition();
+  const { coord: startPoint } = useConvertLatLng(
+    currentPosition.lat,
+    currentPosition.lng,
+    isInfoActive,
+  );
+  const { coord: endPoint } = useConvertLatLng(
+    latitude,
+    longitude,
+    isInfoActive,
+  );
+
+  const openMapLink = ({ type, latitude, longitude }: LinkProps) => {
+    let link = "";
+    if (type === "kakao") {
+      link = `https://map.kakao.com/?map_type=TYPE_MAP&target=car&rt=${startPoint.lng},${startPoint.lat},${endPoint.lng},${endPoint.lat}&rt1=%현위치&rt2=${name}`;
+    } else if (type === "naver") {
+      link = `http://map.naver.com/index.nhn?slng=${currentPosition.lng}&slat=${currentPosition.lat}&stext=현위치&elng=${longitude}&elat=${latitude}&pathType=0&showMap=true&etext=${name}&menu=route`;
+    }
+    window.open(link, "_blank");
+  };
+
   const handleKakaoClick = () => {
-    openMapLink({ type: "kakao", name, latitude, longitude });
+    openMapLink({ type: "kakao", latitude, longitude });
   };
 
   const handleNaverClick = () => {
-    openMapLink({ type: "naver", name, latitude, longitude });
+    openMapLink({ type: "naver", latitude, longitude });
   };
 
   return (

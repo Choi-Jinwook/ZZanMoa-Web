@@ -97,12 +97,14 @@ interface StoreInfoWindowProps {
   store: StoreData;
   onClose: () => void;
   onShowReviews: (storeId: number, storeName: string) => void;
+  isInfoActive: boolean;
 }
 
 const StoreInfoWindow = ({
   store,
   onClose,
   onShowReviews,
+  isInfoActive,
 }: StoreInfoWindowProps) => {
   const displayedItems = store.items.slice(0, 2);
   const moreItemsCount = store.items.length - 2;
@@ -169,6 +171,7 @@ const StoreInfoWindow = ({
           name={store.storeName}
           latitude={store.latitude}
           longitude={store.longitude}
+          isInfoActive={isInfoActive}
         />
       </ActionsContainer>
       <PriceList>

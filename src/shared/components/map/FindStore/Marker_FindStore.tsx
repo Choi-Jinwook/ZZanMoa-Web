@@ -15,13 +15,8 @@ export interface MarkerFindStoreProps {
 
 const Marker_FindStore = memo<MarkerFindStoreProps>(
   ({ map, position, content, store, onClose }) => {
-    const {
-      reviews,
-      storeName,
-      isModalOpen,
-      openModal,
-      closeModal,
-    } = useReviewModal('saving-place'); 
+    const { reviews, storeName, isModalOpen, openModal, closeModal } =
+      useReviewModal("saving-place");
     return (
       <>
         <MapMarker
@@ -49,10 +44,16 @@ const Marker_FindStore = memo<MarkerFindStoreProps>(
           closeModal={closeModal}
           handleShowReviews={openModal}
         />
-        {isModalOpen && <ReviewModal reviews={reviews} storeName={storeName} onClose={closeModal} />}
+        {isModalOpen && (
+          <ReviewModal
+            reviews={reviews}
+            storeName={storeName}
+            onClose={closeModal}
+          />
+        )}
       </>
     );
-  }
+  },
 );
 
 Marker_FindStore.displayName = "Marker_FindStore";

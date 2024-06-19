@@ -4,27 +4,28 @@ import { ReactNode, useState } from "react";
 import { Text } from "@shared/components";
 
 interface AccordionProps {
-    title: string;
-    children: ReactNode;
+  title: string;
+  children: ReactNode;
 }
 
 const Accordion = ({ title, children }: AccordionProps) => {
-    const [isOpen, setIsOpen] = useState(true);
-    const toggleAccordion = () => setIsOpen(prev => !prev);
+  const [isOpen, setIsOpen] = useState(true);
+  const toggleAccordion = () => setIsOpen((prev) => !prev);
 
-    return (<>
-        <TitleRow>
-            <Text variant="H4" color={Colors.Black900} fontWeight="SemiBold">
-                {title}
-            </Text>
-            <ToggleButton onClick={toggleAccordion}>
-                {isOpen ? '▼' : '▶'}
-            </ToggleButton>
-        </TitleRow>
-        {isOpen && children}
-
-    </>)
-}
+  return (
+    <>
+      <TitleRow>
+        <Text variant="H4" color={Colors.Black900} fontWeight="SemiBold">
+          {title}
+        </Text>
+        <ToggleButton onClick={toggleAccordion}>
+          {isOpen ? "▼" : "▶"}
+        </ToggleButton>
+      </TitleRow>
+      {isOpen && children}
+    </>
+  );
+};
 
 const ToggleButton = styled.button`
   background: none;

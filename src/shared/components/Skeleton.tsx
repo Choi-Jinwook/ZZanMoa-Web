@@ -1,5 +1,5 @@
-import React from 'react';
-import styled, { keyframes } from 'styled-components';
+import React from "react";
+import styled, { keyframes } from "styled-components";
 
 const pulse = keyframes`
   0% {
@@ -29,7 +29,7 @@ const SkeletonLine = styled.div<SkeletonLineProps>`
   height: 15px;
   border-radius: 4px;
   animation: ${pulse} 1.5s infinite ease-in-out;
-  width: ${props => props.width};
+  width: ${(props) => props.width};
 `;
 
 const Skeleton = () => (

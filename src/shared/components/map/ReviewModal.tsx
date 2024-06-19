@@ -1,8 +1,8 @@
-import React from 'react';
-import styled from 'styled-components';
-import { Colors } from '@shared/constants';
-import Text from '@shared/components/Text';
-import Skeleton from '@shared/components/Skeleton';
+import React from "react";
+import styled from "styled-components";
+import { Colors } from "@shared/constants";
+import Text from "@shared/components/Text";
+import Skeleton from "@shared/components/Skeleton";
 
 const ModalContainer = styled.div`
   position: fixed;
@@ -11,7 +11,7 @@ const ModalContainer = styled.div`
   transform: translateX(-50%);
   width: 345px;
   max-width: 90%;
-  max-height: 90%; 
+  max-height: 90%;
   overflow-y: auto;
   z-index: 10;
   padding-bottom: 20px;
@@ -85,7 +85,7 @@ const StoreName = styled(Text)`
   margin-bottom: 10px;
 
   &:after {
-    content: '';
+    content: "";
     display: block;
     width: 100%;
     height: 3px;
@@ -97,59 +97,78 @@ const StoreName = styled(Text)`
 `;
 
 const convertMarkdownToHtml = (markdown: string) => {
-    // **텍스트**를 <b>텍스트</b>로 변환
-    return markdown.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+  // **텍스트**를 <b>텍스트</b>로 변환
+  return markdown.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
 };
 
 interface ReviewModalProps {
-    reviews?: string[];
-    storeName: string;
-    onClose: () => void;
+  reviews?: string[];
+  storeName: string;
+  onClose: () => void;
 }
 
 const ReviewModal = ({ reviews, storeName, onClose }: ReviewModalProps) => (
-    <ModalContainer>
-        <ModalContent>
-            <CloseButton onClick={onClose}>&times;</CloseButton>
-            <Header>
-                <img src="/images/aiReviewIcon.svg" alt="리뷰 아이콘" style={{ width: 24, height: 24 }} />
-                <Text variant='Body1' color={Colors.Black900} fontWeight="SemiBold" style={{ marginLeft: '10px' }}>
-                    AI 리뷰
-                </Text>
-            </Header>
-            <StoreName variant='Body1' color={Colors.Black900} fontWeight="SemiBold">
-                {storeName}
-            </StoreName>
-            {reviews ? (
-                <ReviewContent>
-                    {reviews.map((review, index) => (
-                        <Text
-                            key={index}
-                            variant='Body3'
-                            color={Colors.Black900}
-                            fontWeight="Regular"
-                            style={{ marginBottom: '10px', whiteSpace: 'pre-wrap' }}
-                            dangerouslySetInnerHTML={{ __html: convertMarkdownToHtml(review) }}
-                        />
-                    ))}
-                    <CompleteText variant='Body3' fontWeight="Regular">
-                        <img src="/images/aiImage.svg" alt="리뷰 아이콘" style={{ width: 43, height: 38 }} />
-                        AI가 리뷰 요약을 완료했어요
-                    </CompleteText>
-                </ReviewContent>
-            ) : (
-                <>
-                    <Skeleton />
-                    <LoadingContainer>
-                        <img src="/images/aiImage.svg" alt="리뷰 아이콘" style={{ width: 43, height: 38 }} />
-                        <LoadingText variant='Body3' fontWeight="Regular">
-                            AI가 리뷰를 요약하고 있어요
-                        </LoadingText>
-                    </LoadingContainer>
-                </>
-            )}
-        </ModalContent>
-    </ModalContainer>
+  <ModalContainer>
+    <ModalContent>
+      <CloseButton onClick={onClose}>&times;</CloseButton>
+      <Header>
+        <img
+          src="/images/aiReviewIcon.svg"
+          alt="리뷰 아이콘"
+          style={{ width: 24, height: 24 }}
+        />
+        <Text
+          variant="Body1"
+          color={Colors.Black900}
+          fontWeight="SemiBold"
+          style={{ marginLeft: "10px" }}
+        >
+          AI 리뷰
+        </Text>
+      </Header>
+      <StoreName variant="Body1" color={Colors.Black900} fontWeight="SemiBold">
+        {storeName}
+      </StoreName>
+      {reviews ? (
+        <ReviewContent>
+          {reviews.map((review, index) => (
+            <Text
+              key={index}
+              variant="Body3"
+              color={Colors.Black900}
+              fontWeight="Regular"
+              style={{ marginBottom: "10px", whiteSpace: "pre-wrap" }}
+              dangerouslySetInnerHTML={{
+                __html: convertMarkdownToHtml(review),
+              }}
+            />
+          ))}
+          <CompleteText variant="Body3" fontWeight="Regular">
+            <img
+              src="/images/aiImage.svg"
+              alt="리뷰 아이콘"
+              style={{ width: 43, height: 38 }}
+            />
+            AI가 리뷰 요약을 완료했어요
+          </CompleteText>
+        </ReviewContent>
+      ) : (
+        <>
+          <Skeleton />
+          <LoadingContainer>
+            <img
+              src="/images/aiImage.svg"
+              alt="리뷰 아이콘"
+              style={{ width: 43, height: 38 }}
+            />
+            <LoadingText variant="Body3" fontWeight="Regular">
+              AI가 리뷰를 요약하고 있어요
+            </LoadingText>
+          </LoadingContainer>
+        </>
+      )}
+    </ModalContent>
+  </ModalContainer>
 );
 
 export default ReviewModal;

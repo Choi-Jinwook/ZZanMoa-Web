@@ -1,9 +1,9 @@
-import React from 'react';
-import styled from 'styled-components';
-import { Colors } from '@shared/constants';
+import React from "react";
+import styled from "styled-components";
+import { Colors } from "@shared/constants";
 import Text from "../../Text";
-import OpenMapLink from '../OpenMapLink';
-import { StoreData } from '@shared/types';
+import OpenMapLink from "../OpenMapLink";
+import { StoreData } from "@shared/types";
 
 const WindowContainer = styled.div`
   display: flex;
@@ -87,9 +87,9 @@ const PriceItem = styled.li`
   flex-direction: column;
   align-items: flex-start;
   padding: 4px 0px 0px 16px;
-  border-top: 1px solid #B9B9BA;
+  border-top: 1px solid #b9b9ba;
   &:last-child {
-    border-bottom: 1px solid #B9B9BA;
+    border-bottom: 1px solid #b9b9ba;
   }
 `;
 
@@ -99,7 +99,11 @@ interface StoreInfoWindowProps {
   onShowReviews: (storeId: number, storeName: string) => void;
 }
 
-const StoreInfoWindow = ({ store, onClose, onShowReviews }: StoreInfoWindowProps) => {
+const StoreInfoWindow = ({
+  store,
+  onClose,
+  onShowReviews,
+}: StoreInfoWindowProps) => {
   const displayedItems = store.items.slice(0, 2);
   const moreItemsCount = store.items.length - 2;
 
@@ -113,70 +117,67 @@ const StoreInfoWindow = ({ store, onClose, onShowReviews }: StoreInfoWindowProps
       console.log("!!", storeId, store.storeName);
       onShowReviews(storeId, store.storeName);
     } else {
-      console.error('Invalid store ID');
+      console.error("Invalid store ID");
     }
   };
 
   return (
     <WindowContainer id="store-info-window" onClick={handleWindowClick}>
       <CloseButton onClick={onClose}>&times;</CloseButton>
-      <Text
-        variant='Body1'
-        color={Colors.Black900}
-        fontWeight="SemiBold">
+      <Text variant="Body1" color={Colors.Black900} fontWeight="SemiBold">
         {store.storeName}
       </Text>
-      <Text
-        variant='Body4'
-        color={Colors.Black600}
-        fontWeight="Regular">
+      <Text variant="Body4" color={Colors.Black600} fontWeight="Regular">
         장소 | {store.address}
       </Text>
-      <Text
-        variant='Body4'
-        color={Colors.Black600}
-        fontWeight="Regular">
+      <Text variant="Body4" color={Colors.Black600} fontWeight="Regular">
         번호 | {store.phoneNumber}
       </Text>
       <ItemsContainer>
-      {displayedItems.map(item => (
-            <ItemText
-              variant='Body4'
-              color={Colors.Emerald600}
-              fontWeight='SemiBold'
-              key={item.itemId}>
-              {item.item}
-            </ItemText>
-          ))}
-          {moreItemsCount > 0 && (
-            <MoreItemsText
-              variant='Body4'
-              color={Colors.Black800}
-              fontWeight='SemiBold'>
-              +{moreItemsCount}
-            </MoreItemsText>
-          )}
+        {displayedItems.map((item) => (
+          <ItemText
+            variant="Body4"
+            color={Colors.Emerald600}
+            fontWeight="SemiBold"
+            key={item.itemId}
+          >
+            {item.item}
+          </ItemText>
+        ))}
+        {moreItemsCount > 0 && (
+          <MoreItemsText
+            variant="Body4"
+            color={Colors.Black800}
+            fontWeight="SemiBold"
+          >
+            +{moreItemsCount}
+          </MoreItemsText>
+        )}
       </ItemsContainer>
       <ActionsContainer>
         <ReviewButton onClick={handleShowReviewsClick}>
-          <img src="/images/aiReviewIcon.svg" alt="리뷰 아이콘" style={{ width: 16, height: 16 }} />
-          <Text variant='Body4' color={Colors.Black900} fontWeight='SemiBold'>AI 리뷰</Text>
+          <img
+            src="/images/aiReviewIcon.svg"
+            alt="리뷰 아이콘"
+            style={{ width: 16, height: 16 }}
+          />
+          <Text variant="Body4" color={Colors.Black900} fontWeight="SemiBold">
+            AI 리뷰
+          </Text>
         </ReviewButton>
-        <OpenMapLink name={store.storeName} latitude={store.latitude} longitude={store.longitude} />
+        <OpenMapLink
+          name={store.storeName}
+          latitude={store.latitude}
+          longitude={store.longitude}
+        />
       </ActionsContainer>
       <PriceList>
-        {store.items.map(item => (
+        {store.items.map((item) => (
           <PriceItem key={item.itemId}>
-            <Text
-              variant="Body3"
-              color={Colors.Black900}
-              fontWeight={"Medium"}>
+            <Text variant="Body3" color={Colors.Black900} fontWeight={"Medium"}>
               {item.item}
             </Text>
-            <Text
-              variant="Body3"
-              color={Colors.Black900}
-              fontWeight={"Medium"}>
+            <Text variant="Body3" color={Colors.Black900} fontWeight={"Medium"}>
               {item.price}원
             </Text>
           </PriceItem>

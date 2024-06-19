@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
-import styled, { createGlobalStyle } from 'styled-components';
-import { Colors } from '@shared/constants';
+import React, { useState, useEffect, useRef } from "react";
+import styled, { createGlobalStyle } from "styled-components";
+import { Colors } from "@shared/constants";
 import Text from "@shared/components/Text";
-import OpenMapLink from '../OpenMapLink';
-import { ReviewButton } from '../FindStore/StoreInfoWindow';
+import OpenMapLink from "../OpenMapLink";
+import { ReviewButton } from "../FindStore/StoreInfoWindow";
 
 const InfoWindowContainer = styled.div`
   display: flex;
@@ -14,8 +14,9 @@ const InfoWindowContainer = styled.div`
   padding: 16px;
   z-index: 3;
   border: none;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25), 0px 8px 16px rgba(0, 0, 0, 0.14);
-  
+  box-shadow:
+    0px 4px 4px rgba(0, 0, 0, 0.25),
+    0px 8px 16px rgba(0, 0, 0, 0.14);
 `;
 
 const Section = styled.div`
@@ -31,14 +32,14 @@ const Divider = styled.hr`
   margin: 8px 0;
 `;
 
-const AddButton = styled.button.attrs(props => ({
-})) <AddButtonProps>`
+const AddButton = styled.button.attrs((props) => ({}))<AddButtonProps>`
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 8px;
-  background-color: ${props => props.added ? Colors.Emerald900 : Colors.Emerald500};
-  color: #FFFFFF;
+  background-color: ${(props) =>
+    props.added ? Colors.Emerald900 : Colors.Emerald500};
+  color: #ffffff;
   border: none;
   border-radius: 4px;
   font-size: 14px;
@@ -73,7 +74,17 @@ interface AddButtonProps {
   added: boolean;
 }
 
-const MarketInfoWindow = ({ id, name, address, latitude, longitude, overlayRef, onToggleAdded, added, onShowReviews }: MarketInfoWindowProps) => {
+const MarketInfoWindow = ({
+  id,
+  name,
+  address,
+  latitude,
+  longitude,
+  overlayRef,
+  onToggleAdded,
+  added,
+  onShowReviews,
+}: MarketInfoWindowProps) => {
   const [isSelected, setIsSelected] = useState(false);
 
   useEffect(() => {
@@ -81,10 +92,12 @@ const MarketInfoWindow = ({ id, name, address, latitude, longitude, overlayRef, 
   }, [added]);
 
   const handleButtonClick = () => {
-    const addedMarkers = JSON.parse(localStorage.getItem("addedMarkers") || "[]");
+    const addedMarkers = JSON.parse(
+      localStorage.getItem("addedMarkers") || "[]",
+    );
 
     if (!isSelected && addedMarkers.length >= 4) {
-      alert('최대 4개의 시장만 추가할 수 있습니다.');
+      alert("최대 4개의 시장만 추가할 수 있습니다.");
       return;
     } else {
       setIsSelected(!isSelected);
@@ -93,7 +106,7 @@ const MarketInfoWindow = ({ id, name, address, latitude, longitude, overlayRef, 
   };
 
   const handleShowReviewsClick = () => {
-    console.log('ID:', id, '이름:', name);
+    console.log("ID:", id, "이름:", name);
     onShowReviews(id, name);
   };
 
@@ -101,7 +114,7 @@ const MarketInfoWindow = ({ id, name, address, latitude, longitude, overlayRef, 
     if (overlayRef && overlayRef.current) {
       const content = overlayRef.current.getContent();
       if (content instanceof HTMLElement) {
-        content.style.display = isSelected ? 'block' : 'none';
+        content.style.display = isSelected ? "block" : "none";
       }
     }
   }, [isSelected, overlayRef]);
@@ -109,34 +122,28 @@ const MarketInfoWindow = ({ id, name, address, latitude, longitude, overlayRef, 
   return (
     <InfoWindowContainer>
       <Section>
-        <Text
-          variant="Body1"
-          color={Colors.Black900}
-          fontWeight="SemiBold"
-        >
+        <Text variant="Body1" color={Colors.Black900} fontWeight="SemiBold">
           {name}
         </Text>
-        <Text
-          variant="Body4"
-          color={Colors.Black800}
-          fontWeight="Regular"
-        >
+        <Text variant="Body4" color={Colors.Black800} fontWeight="Regular">
           장소 | {address}
         </Text>
         <AddButton onClick={handleButtonClick} added={isSelected}>
-          {isSelected ? '삭제하기' : '추가하기'}&emsp;{isSelected ? 'x' : '+'}
+          {isSelected ? "삭제하기" : "추가하기"}&emsp;{isSelected ? "x" : "+"}
         </AddButton>
         <Divider />
         <BottomContainer>
           <ReviewButton onClick={handleShowReviewsClick}>
-            <img src="/images/aiReviewIcon.svg" alt="리뷰 아이콘" style={{ width: 16, height: 16, marginRight: '8px' }} />
-            <Text variant='Body4' color={Colors.Black900} fontWeight='SemiBold'>AI 리뷰</Text>
+            <img
+              src="/images/aiReviewIcon.svg"
+              alt="리뷰 아이콘"
+              style={{ width: 16, height: 16, marginRight: "8px" }}
+            />
+            <Text variant="Body4" color={Colors.Black900} fontWeight="SemiBold">
+              AI 리뷰
+            </Text>
           </ReviewButton>
-          <OpenMapLink
-            name={name}
-            latitude={latitude}
-            longitude={longitude}
-          />
+          <OpenMapLink name={name} latitude={latitude} longitude={longitude} />
         </BottomContainer>
       </Section>
     </InfoWindowContainer>

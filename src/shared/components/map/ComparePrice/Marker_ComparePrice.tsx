@@ -14,10 +14,10 @@ const Marker_ComparePrice = ({ map }: { map: kakao.maps.Map }) => {
   const infoWindowRef = useRef<kakao.maps.InfoWindow | null>(null);
   const circleOverlaysRef = useRef(new Map());
   const [focusedMarkerId, setFocusedMarkerId] = useState<number | null>(null);
-  const { reviews, storeName, isModalOpen, openModal, closeModal } = useReviewModal('market/market-place');
+  const { reviews, storeName, isModalOpen, openModal, closeModal } =
+    useReviewModal("market/market-place");
 
   // const [isLoading, setIsLoading] = useState(true);
-
 
   const toggleAdded = (id: number) => {
     setMarkers((prevMarkers) => {
@@ -47,7 +47,7 @@ const Marker_ComparePrice = ({ map }: { map: kakao.maps.Map }) => {
           }
         }
         return { ...marker, focus: isFocused };
-      })
+      }),
     );
     setFocusedMarkerId(markerId);
   };
@@ -62,7 +62,7 @@ const Marker_ComparePrice = ({ map }: { map: kakao.maps.Map }) => {
             updateMarkerOnMap({ ...marker, focus: false }, marker.added);
           }
           return { ...marker, focus: false };
-        })
+        }),
       );
       setFocusedMarkerId(null);
     }
@@ -79,7 +79,7 @@ const Marker_ComparePrice = ({ map }: { map: kakao.maps.Map }) => {
       "addedMarkers",
       JSON.stringify(selectedMarkets.map((market) => market.id)),
     );
-    markers.forEach(marker => {
+    markers.forEach((marker) => {
       updateCircleOverlay(marker, marker.added);
     });
   }, [markers]);
@@ -94,26 +94,30 @@ const Marker_ComparePrice = ({ map }: { map: kakao.maps.Map }) => {
     //   localStorage.getItem("addedMarkers") || "[]",
     // );
 
-    const markerUpdates = markers.map(marker => {
-      return new Promise(resolve => {
-        geocoder.coord2Address(marker.longitude, marker.latitude, (result, status) => {
-          if (status === kakao.maps.services.Status.OK) {
-            const address = result[0].address.address_name;
-            const updatedMarker = {
-              ...marker,
-              address: address,
-              lat: marker.latitude,
-              lng: marker.longitude,
-              added: false,
-              focus: false,
-            };
-            updateMarkerOnMap(updatedMarker, updatedMarker.added);
-            resolve(updatedMarker);
-          } else {
-            console.error(`Failed: ${marker.name}`);
-            resolve(marker);
-          }
-        });
+    const markerUpdates = markers.map((marker) => {
+      return new Promise((resolve) => {
+        geocoder.coord2Address(
+          marker.longitude,
+          marker.latitude,
+          (result, status) => {
+            if (status === kakao.maps.services.Status.OK) {
+              const address = result[0].address.address_name;
+              const updatedMarker = {
+                ...marker,
+                address: address,
+                lat: marker.latitude,
+                lng: marker.longitude,
+                added: false,
+                focus: false,
+              };
+              updateMarkerOnMap(updatedMarker, updatedMarker.added);
+              resolve(updatedMarker);
+            } else {
+              console.error(`Failed: ${marker.name}`);
+              resolve(marker);
+            }
+          },
+        );
       });
     });
 
@@ -125,18 +129,14 @@ const Marker_ComparePrice = ({ map }: { map: kakao.maps.Map }) => {
     return () => kakao.maps.event.removeListener(map, "click", closeInfoWindow);
   }, [map]);
 
-
   function updateMarkerOnMap(marker: any, added: boolean) {
-    const markerPosition = new kakao.maps.LatLng(
-      marker.lat,
-      marker.lng,
-    );
+    const markerPosition = new kakao.maps.LatLng(marker.lat, marker.lng);
     const imageSrc = getMarkerImage(marker.focus);
     const markerImage = new kakao.maps.MarkerImage(
       imageSrc,
       new kakao.maps.Size(44, 51),
     );
-  
+
     const kakaoMarker = new kakao.maps.Marker({
       map: map,
       position: markerPosition,
@@ -144,11 +144,11 @@ const Marker_ComparePrice = ({ map }: { map: kakao.maps.Map }) => {
       image: markerImage,
       zIndex: -1,
     });
-  
+
     const onToggleAdded = () => {
       toggleAdded(marker.id);
     };
-  
+
     const infoWindowContent = document.createElement("div");
     const root = createRoot(infoWindowContent);
     root.render(
@@ -159,7 +159,7 @@ const Marker_ComparePrice = ({ map }: { map: kakao.maps.Map }) => {
         onShowReviews={handleShowReviews}
       />,
     );
-  
+
     kakao.maps.event.addListener(kakaoMarker, "click", () => {
       handleMarkerClick(marker.id);
       infoWindowRef.current = new kakao.maps.InfoWindow({
@@ -173,26 +173,25 @@ const Marker_ComparePrice = ({ map }: { map: kakao.maps.Map }) => {
         parentDiv.style.boxShadow = "none";
       }
     });
-  
+
     updateCircleOverlay(marker, added);
   }
-  
 
   function updateCircleOverlay(marker: MarkerInfo, display: boolean) {
     let circleOverlay = circleOverlaysRef.current.get(marker.id);
     if (!circleOverlay) {
-      const circleContent = createCircleContent(display); 
+      const circleContent = createCircleContent(display);
       circleOverlay = new kakao.maps.CustomOverlay({
         map: map,
         position: new kakao.maps.LatLng(marker.latitude, marker.longitude),
         content: circleContent,
-        zIndex: -1
+        zIndex: -1,
       });
       circleOverlaysRef.current.set(marker.id, circleOverlay);
     } else {
       circleOverlay.getContent().style.display = display ? "block" : "none";
     }
-  };
+  }
 
   const createCircleContent = (display: boolean) => {
     const circleContent = document.createElement("div");
@@ -208,15 +207,20 @@ const Marker_ComparePrice = ({ map }: { map: kakao.maps.Map }) => {
     return circleContent;
   };
 
-
   function getMarkerImage(focus: boolean) {
     return focus ? "/images/selectedMarker.png" : "/images/defaultMarker.png";
   }
 
   return (
     <>
-    {isModalOpen && <ReviewModal reviews={reviews} storeName={storeName} onClose={closeModal} />}
-  </>
+      {isModalOpen && (
+        <ReviewModal
+          reviews={reviews}
+          storeName={storeName}
+          onClose={closeModal}
+        />
+      )}
+    </>
   );
 };
 export default Marker_ComparePrice;

@@ -136,7 +136,7 @@ const Marker_ComparePrice = ({ map }: { map: kakao.maps.Map }) => {
       imageSrc,
       new kakao.maps.Size(44, 51),
     );
-
+  
     const kakaoMarker = new kakao.maps.Marker({
       map: map,
       position: markerPosition,
@@ -144,14 +144,12 @@ const Marker_ComparePrice = ({ map }: { map: kakao.maps.Map }) => {
       image: markerImage,
       zIndex: -1,
     });
-
+  
     const onToggleAdded = () => {
       toggleAdded(marker.id);
     };
-
+  
     const infoWindowContent = document.createElement("div");
-    infoWindowContent.style.backgroundColor = 'transparent';
-    infoWindowContent.style.border = 'none';
     const root = createRoot(infoWindowContent);
     root.render(
       <MarketInfoWindow
@@ -161,17 +159,24 @@ const Marker_ComparePrice = ({ map }: { map: kakao.maps.Map }) => {
         onShowReviews={handleShowReviews}
       />,
     );
-
+  
     kakao.maps.event.addListener(kakaoMarker, "click", () => {
       handleMarkerClick(marker.id);
       infoWindowRef.current = new kakao.maps.InfoWindow({
         content: infoWindowContent,
       });
       infoWindowRef.current.open(map, kakaoMarker);
+      const parentDiv = infoWindowContent.parentElement?.parentElement;
+      if (parentDiv) {
+        parentDiv.style.background = "none";
+        parentDiv.style.border = "none";
+        parentDiv.style.boxShadow = "none";
+      }
     });
-
+  
     updateCircleOverlay(marker, added);
   }
+  
 
   function updateCircleOverlay(marker: MarkerInfo, display: boolean) {
     let circleOverlay = circleOverlaysRef.current.get(marker.id);

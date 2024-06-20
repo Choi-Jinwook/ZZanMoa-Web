@@ -68,6 +68,7 @@ interface MarketInfoWindowProps {
   onToggleAdded: () => void;
   added: boolean;
   onShowReviews: (id: number, name: string) => void;
+  focus: boolean;
 }
 
 interface AddButtonProps {
@@ -84,6 +85,7 @@ const MarketInfoWindow = ({
   onToggleAdded,
   added,
   onShowReviews,
+  focus,
 }: MarketInfoWindowProps) => {
   const [isSelected, setIsSelected] = useState(false);
 
@@ -143,7 +145,12 @@ const MarketInfoWindow = ({
               AI 리뷰
             </Text>
           </ReviewButton>
-          <OpenMapLink name={name} latitude={latitude} longitude={longitude} />
+          <OpenMapLink
+            name={name}
+            latitude={latitude}
+            longitude={longitude}
+            isInfoActive={focus}
+          />
         </BottomContainer>
       </Section>
     </InfoWindowContainer>

@@ -120,7 +120,7 @@ const StoreOverlay = ({
                 onClose();
               }}
               onShowReviews={handleShowReviewsClick}
-              //isInfoActive={isInfoActive}
+              isInfoActive={isInfoActive}
             />
           </InfoContainer>
         )}

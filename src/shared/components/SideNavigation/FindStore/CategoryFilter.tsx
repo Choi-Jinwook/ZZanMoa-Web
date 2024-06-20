@@ -5,6 +5,7 @@ import { useRecoilState } from "recoil";
 import { MinMaxPrice, SelectedCategory } from "@shared/atoms";
 import { useEffect } from "react";
 import { Category, Text } from "@shared/components";
+import Accordion from "@shared/components/Accordion";
 
 const CategoryFilter = () => {
   const { data: categories, isLoading } = useGetCategory();
@@ -28,18 +29,16 @@ const CategoryFilter = () => {
 
   return (
     <Container>
-      <Text variant="H4" color={Colors.Black900} fontWeight="SemiBold">
-        카테고리
-      </Text>
-      <CategoryContainer>
-        <CategoryWrapper>
-          <TextContainer>
-            <Text color="#000000" variant="Body3" fontWeight="Medium">
-              음식
-            </Text>
-          </TextContainer>
-          <CategoryContent>
-            {categories
+      <Accordion title="카테고리">
+        <CategoryContainer>
+          <CategoryWrapper>
+            <TextContainer>
+              <Text color="#000000" variant="Body3" fontWeight="Medium">
+                음식
+              </Text>
+            </TextContainer>
+            <CategoryContent>
+              {categories
               ?.slice(0, 6)
               .map(({ category }) => (
                 <Category
@@ -49,16 +48,16 @@ const CategoryFilter = () => {
                   handleClick={handleClick}
                 />
               ))}
-          </CategoryContent>
-        </CategoryWrapper>
-        <CategoryWrapper>
-          <TextContainer>
-            <Text color="#000000" variant="Body3" fontWeight="Medium">
-              서비스
-            </Text>
-          </TextContainer>
-          <CategoryContent>
-            {categories
+            </CategoryContent>
+          </CategoryWrapper>
+          <CategoryWrapper>
+            <TextContainer>
+              <Text color="#000000" variant="Body3" fontWeight="Medium">
+                서비스
+              </Text>
+            </TextContainer>
+            <CategoryContent>
+              {categories
               ?.slice(6, 15)
               .map(({ category }) => (
                 <Category
@@ -68,9 +67,10 @@ const CategoryFilter = () => {
                   handleClick={handleClick}
                 />
               ))}
-          </CategoryContent>
-        </CategoryWrapper>
-      </CategoryContainer>
+            </CategoryContent>
+          </CategoryWrapper>
+        </CategoryContainer>
+      </Accordion>
     </Container>
   );
 };
@@ -101,5 +101,6 @@ const CategoryWrapper = styled.div`
   display: flex;
   gap: 16px;
 `;
+
 
 export default CategoryFilter;

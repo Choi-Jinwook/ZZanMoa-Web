@@ -36,6 +36,7 @@ interface OpenMapLinkProps {
   isInfoActive?: boolean;
 }
 
+
 const OpenMapLink = ({
   name,
   latitude,

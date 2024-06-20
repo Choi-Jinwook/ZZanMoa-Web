@@ -11,7 +11,7 @@ const WindowContainer = styled.div`
   background: #fff;
   border: 1px solid #ccc;
   padding: 15px;
-  border-radius: 5px;
+  border-radius: 16px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   width: 327px;
   position: absolute;
@@ -33,15 +33,9 @@ const CloseButton = styled.button`
 
 const ItemsContainer = styled.div`
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 10px 0px 10px 0px;
-`;
-
-const LeftItems = styled.div`
-  display: flex;
-  align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
+  margin-top: 5px;
 `;
 
 const ItemText = styled(Text)`
@@ -56,10 +50,31 @@ const MoreItemsText = styled(Text)`
   border-radius: 4px;
 `;
 
-const RightIcons = styled.div`
+const ActionsContainer = styled.div`
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px 0px 10px 0px;
 `;
 
+export const ReviewButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  color: ${Colors.Black900};
+  border: 1px solid ${Colors.Black600};
+  border-radius: 16px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-weight: bold;
+  &:hover {
+    background-color: #f0f0f0;
+  }
+  img {
+    margin-right: 8px;
+  }
+`;
 const PriceList = styled.ul`
   list-style: none;
   padding: 0;
@@ -81,12 +96,14 @@ const PriceItem = styled.li`
 interface StoreInfoWindowProps {
   store: StoreData;
   onClose: () => void;
+  onShowReviews: (storeId: number, storeName: string) => void;
   isInfoActive: boolean;
 }
 
 const StoreInfoWindow = ({
   store,
   onClose,
+  onShowReviews,
   isInfoActive,
 }: StoreInfoWindowProps) => {
   const displayedItems = store.items.slice(0, 2);
@@ -94,6 +111,16 @@ const StoreInfoWindow = ({
 
   const handleWindowClick = (e: { stopPropagation: () => void }) => {
     e.stopPropagation();
+  };
+
+  const handleShowReviewsClick = () => {
+    const storeId = parseInt(store.storeId, 10);
+    if (!isNaN(storeId)) {
+      console.log("!!", storeId, store.storeName);
+      onShowReviews(storeId, store.storeName);
+    } else {
+      console.error("Invalid store ID");
+    }
   };
 
   return (
@@ -109,37 +136,44 @@ const StoreInfoWindow = ({
         번호 | {store.phoneNumber}
       </Text>
       <ItemsContainer>
-        <LeftItems>
-          {displayedItems.map((item) => (
-            <ItemText
-              variant="Body4"
-              color={Colors.Emerald600}
-              fontWeight="SemiBold"
-              key={item.itemId}
-            >
-              {item.item}
-            </ItemText>
-          ))}
-          {moreItemsCount > 0 && (
-            <MoreItemsText
-              variant="Body4"
-              color={Colors.Black800}
-              fontWeight="SemiBold"
-            >
-              +{moreItemsCount}
-            </MoreItemsText>
-          )}
-        </LeftItems>
-        <RightIcons>
-          <OpenMapLink
-            name={store.storeName}
-            latitude={store.latitude}
-            longitude={store.longitude}
-            isInfoActive={isInfoActive}
-          />
-        </RightIcons>
+        {displayedItems.map((item) => (
+          <ItemText
+            variant="Body4"
+            color={Colors.Emerald600}
+            fontWeight="SemiBold"
+            key={item.itemId}
+          >
+            {item.item}
+          </ItemText>
+        ))}
+        {moreItemsCount > 0 && (
+          <MoreItemsText
+            variant="Body4"
+            color={Colors.Black800}
+            fontWeight="SemiBold"
+          >
+            +{moreItemsCount}
+          </MoreItemsText>
+        )}
       </ItemsContainer>
-
+      <ActionsContainer>
+        <ReviewButton onClick={handleShowReviewsClick}>
+          <img
+            src="/images/aiReviewIcon.svg"
+            alt="리뷰 아이콘"
+            style={{ width: 16, height: 16 }}
+          />
+          <Text variant="Body4" color={Colors.Black900} fontWeight="SemiBold">
+            AI 리뷰
+          </Text>
+        </ReviewButton>
+        <OpenMapLink
+          name={store.storeName}
+          latitude={store.latitude}
+          longitude={store.longitude}
+          isInfoActive={isInfoActive}
+        />
+      </ActionsContainer>
       <PriceList>
         {store.items.map((item) => (
           <PriceItem key={item.itemId}>

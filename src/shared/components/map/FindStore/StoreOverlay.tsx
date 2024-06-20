@@ -64,6 +64,8 @@ const InfoContainer = styled.div`
 
 export interface StoreOverlayProps extends MarkerFindStoreProps {
   onClose: () => void;
+  closeModal: () => void;
+  handleShowReviews: (storeId: number, storeName: string) => void;
 }
 
 const StoreOverlay = ({
@@ -72,15 +74,21 @@ const StoreOverlay = ({
   content,
   onClose,
   store,
+  closeModal,
+  handleShowReviews,
 }: StoreOverlayProps) => {
   const [isActive, setIsActive] = useState(false);
   const [isInfoActive, setIsInfoActive] = useState(false);
-  // const overlayRef = useRef(null);
   const overlayRef = useRef<HTMLDivElement | null>(null);
 
   const handleOverlayClick = () => {
     setIsActive(!isActive);
     setIsInfoActive(!isInfoActive);
+  };
+
+  const handleShowReviewsClick = (storeId: number, storeName: string) => {
+    closeModal();
+    handleShowReviews(storeId, storeName);
   };
 
   useEffect(() => {
@@ -111,7 +119,8 @@ const StoreOverlay = ({
                 setIsInfoActive(false);
                 onClose();
               }}
-              isInfoActive={isInfoActive}
+              onShowReviews={handleShowReviewsClick}
+              //isInfoActive={isInfoActive}
             />
           </InfoContainer>
         )}

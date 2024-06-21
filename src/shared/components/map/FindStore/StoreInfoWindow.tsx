@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 import { Colors } from "@shared/constants";
 import Text from "../../Text";
@@ -122,6 +122,19 @@ const StoreInfoWindow = ({
       console.error("Invalid store ID");
     }
   };
+
+  useEffect(() => {
+    const eventHandler = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const { storeId, storeName } = customEvent.detail;
+      onShowReviews(storeId, storeName);
+    };
+    window.addEventListener("showReviews", eventHandler);
+
+    return () => {
+      window.removeEventListener("showReviews", eventHandler);
+    };
+  }, [onShowReviews]);
 
   return (
     <WindowContainer id="store-info-window" onClick={handleWindowClick}>

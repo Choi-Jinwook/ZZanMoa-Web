@@ -4,6 +4,7 @@ import Text from "../../Text";
 import { useRecoilState } from "recoil";
 import { storeMarkerState } from "@shared/atoms/storeMarkerState";
 import { CurrentStore, mapCenterState } from "@shared/atoms/MapState";
+import { ReviewButton } from "@shared/components/map/FindStore/StoreInfoWindow";
 
 const FilteredStore = () => {
   const [storeMarkers] = useRecoilState(storeMarkerState);
@@ -18,6 +19,14 @@ const FilteredStore = () => {
     console.log(storeId, latitude, longitude);
     if (latitude && longitude) setMapCenter({ lat: latitude, lng: longitude });
     setCurrentStore(storeId);
+  };
+
+  const handleShowReviewsClick = (storeId: string, storeName: string) => {
+    const storeIdNum = parseInt(storeId, 10);
+    const event = new CustomEvent("showReviews", {
+      detail: { storeId: storeIdNum, storeName },
+    });
+    window.dispatchEvent(event);
   };
 
   return (
@@ -54,30 +63,49 @@ const FilteredStore = () => {
                   color={Colors.Black800}
                 >{`번호 | ${phoneNumber}`}</Text>
               </StoreDetail>
-              <StoreMenu>
-                {items.slice(0, 2).map(({ item, itemId, price }) => (
-                  <Menu key={itemId + price}>
-                    <Text
-                      variant="Body4"
-                      color={Colors.Emerald600}
-                      fontWeight="SemiBold"
-                    >
-                      {item}
-                    </Text>
-                  </Menu>
-                ))}
-                {items.length - 2 > 0 && (
-                  <Remains key={address + storeId}>
-                    <Text
-                      variant="Body4"
-                      color={Colors.Black800}
-                      fontWeight="SemiBold"
-                    >
-                      {`+${items.length - 2}`}
-                    </Text>
-                  </Remains>
-                )}
-              </StoreMenu>
+              <Footer>
+                <StoreMenu>
+                  {items.slice(0, 2).map(({ item, itemId, price }) => (
+                    <Menu key={itemId + price}>
+                      <Text
+                        variant="Body4"
+                        color={Colors.Emerald600}
+                        fontWeight="SemiBold"
+                      >
+                        {item}
+                      </Text>
+                    </Menu>
+                  ))}
+                  {items.length - 2 > 0 && (
+                    <Remains key={address + storeId}>
+                      <Text
+                        variant="Body4"
+                        color={Colors.Black800}
+                        fontWeight="SemiBold"
+                      >
+                        {`+${items.length - 2}`}
+                      </Text>
+                    </Remains>
+                  )}
+                </StoreMenu>
+
+                <ReviewButton
+                  onClick={() => handleShowReviewsClick(storeId, storeName)}
+                >
+                  <img
+                    src="/images/aiReviewIcon.svg"
+                    alt="리뷰 아이콘"
+                    style={{ width: 16, height: 16 }}
+                  />
+                  <Text
+                    variant="Body4"
+                    color={Colors.Black900}
+                    fontWeight="SemiBold"
+                  >
+                    AI 리뷰
+                  </Text>
+                </ReviewButton>
+              </Footer>
             </StoreCard>
           );
         },
@@ -128,6 +156,12 @@ const Menu = styled.div`
 const Remains = styled.div`
   background-color: ${Colors.Black100};
   padding: 4px;
+`;
+
+const Footer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 `;
 
 export default FilteredStore;

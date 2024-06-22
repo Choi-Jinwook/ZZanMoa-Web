@@ -16,7 +16,6 @@ const FilteredStore = () => {
     latitude?: number,
     longitude?: number,
   ) => {
-    console.log(storeId, latitude, longitude);
     if (latitude && longitude) setMapCenter({ lat: latitude, lng: longitude });
     setCurrentStore(storeId);
   };

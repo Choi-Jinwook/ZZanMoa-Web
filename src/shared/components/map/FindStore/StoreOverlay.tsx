@@ -5,6 +5,8 @@ import { Colors } from "@shared/constants";
 import Text from "@shared/components/Text";
 import StoreInfoWindow from "./StoreInfoWindow";
 import { MarkerFindStoreProps } from "./Marker_FindStore";
+import { useRecoilState } from "recoil";
+import { CurrentStore } from "@shared/atoms/MapState";
 
 const OverlayContainer = styled.div<{ $isActive?: boolean }>`
   position: absolute;
@@ -79,6 +81,7 @@ const StoreOverlay = ({
 }: StoreOverlayProps) => {
   const [isActive, setIsActive] = useState(false);
   const [isInfoActive, setIsInfoActive] = useState(false);
+  const [currentStore] = useRecoilState(CurrentStore);
   const overlayRef = useRef<HTMLDivElement | null>(null);
 
   const handleOverlayClick = () => {
@@ -90,6 +93,16 @@ const StoreOverlay = ({
     closeModal();
     handleShowReviews(storeId, storeName);
   };
+
+  useEffect(() => {
+    if (currentStore === store.storeId) {
+      setIsActive(true);
+      setIsInfoActive(true);
+    } else {
+      setIsActive(false);
+      setIsInfoActive(false);
+    }
+  }, [currentStore]);
 
   useEffect(() => {
     if (!map) return;

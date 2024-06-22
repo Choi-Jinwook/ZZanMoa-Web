@@ -38,7 +38,7 @@ const MenuList = ({ currentMenu, handleCurrentMenu }: MenuListProps) => {
 };
 
 const ListContainer = styled.ul`
-  min-width: 138px;
+  min-width: 148px;
   height: 100%;
   border-right: 1px solid ${Colors.Black600};
   padding: 16px 0px;
@@ -63,6 +63,7 @@ const TextContainer = styled.div<{ $focus: boolean }>`
   border-radius: 4px;
   background-color: ${({ $focus }) =>
     $focus ? Colors.Emerald50 : "transparent"};
+  text-align: center;
 `;
 
 export default MenuList;

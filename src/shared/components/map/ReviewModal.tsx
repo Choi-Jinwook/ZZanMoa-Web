@@ -52,9 +52,12 @@ const LoadingContainer = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.2);
+  padding: 16px 24px;
+  gap: 8px;
+  border-radius: 16px;
+  box-shadow:
+    0px 8px 16px rgba(0, 0, 0, 0.14),
+    0px 0px 2px rgba(0, 0, 0, 0.12);
   text-align: center;
   width: 80%;
   margin: 0 auto;
@@ -72,11 +75,13 @@ const CompleteText = styled(Text)`
   color: ${Colors.Black900};
   text-align: center;
   margin-top: 20px;
-  background: ${Colors.Emerald50};
+  background: #ffffff;
   padding: 10px;
-  border-radius: 5px;
+  border-radius: 16px;
   gap: 10px;
-  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.2);
+  box-shadow:
+    0px 8px 16px rgba(0, 0, 0, 0.14),
+    0px 0px 2px rgba(0, 0, 0, 0.12);
 `;
 
 const StoreName = styled(Text)`
@@ -96,8 +101,14 @@ const StoreName = styled(Text)`
   }
 `;
 
+const FooterText = styled(Text)`
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  text-align: center;
+`;
+
 const convertMarkdownToHtml = (markdown: string) => {
-  // **텍스트**를 <b>텍스트</b>로 변환
   return markdown.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
 };
 
@@ -151,6 +162,13 @@ const ReviewModal = ({ reviews, storeName, onClose }: ReviewModalProps) => (
             />
             AI가 리뷰 요약을 완료했어요
           </CompleteText>
+          <FooterText
+            variant="Body4"
+            color={Colors.Black700}
+            fontWeight="Medium"
+          >
+            AI는 실수를 할 수 있습니다. 중요한 정보를 확인하세요.
+          </FooterText>
         </ReviewContent>
       ) : (
         <>

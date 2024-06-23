@@ -95,8 +95,8 @@ const KakaoMap = () => {
     }
   };
 
-  const loadMarketData = async (apiUrl: string | undefined) => {
-    return await axios
+  const loadMarketData = (apiUrl: string | undefined) => {
+    return axios
       .get(`${apiUrl}/market/market-place/get`)
       .then((response) => {
         const newMarkers = response.data.map(

@@ -95,16 +95,18 @@ const KakaoMap = () => {
     }
   };
 
-  const loadMarketData = (apiUrl: string | undefined) => {
-    return axios
+  const loadMarketData = async (apiUrl: string | undefined) => {
+    return await axios
       .get(`${apiUrl}/market/market-place/get`)
       .then((response) => {
         const newMarkers = response.data.map(
-          (
-            market: { marketName: string; latitude: number; longitude: number },
-            index: number,
-          ) => ({
-            id: index,
+          (market: {
+            marketName: string;
+            latitude: number;
+            longitude: number;
+            marketId: string;
+          }) => ({
+            id: market.marketId,
             name: market.marketName,
             latitude: market.latitude,
             longitude: market.longitude,
@@ -165,7 +167,6 @@ const KakaoMap = () => {
   }, [map]);
 
   useEffect(() => {
-
     if (currentMenu === "시장 가격 비교") {
       setIsLoading(true);
       loadMarketData(apiUrl)
